@@ -593,6 +593,7 @@
     background-color: rgba(0, 0, 0, 0.514);
     padding: 10px;
     margin: 10px;
+    min-width: 290px;
   }
   
   .project-item.active {
@@ -680,9 +681,16 @@
     font-weight: var(--fw-300);
   }
   
+  #interval{
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
   
-  
-  
+  #separate{
+    margin-top: 10px; 
+    border-top: 1px solid #ffffff; 
+    padding-top: 5px;
+  }
   
   
   
@@ -802,6 +810,11 @@
    */
   
   @media (min-width: 450px) {
+
+    .header-text {
+        top: 45px;
+        left: 50%;
+      }
   
     /**
      * client
@@ -1123,6 +1136,11 @@
    */
   
   @media (min-width: 768px) {
+
+    .header-text {
+        top: 40px;
+        left: 50%;
+      }
   
     /**
      * REUSED STYLE
