@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>nginx에서 React SPA 라우팅이 깨지는 문제와 해결 | 기록 블로그</title>
+<meta name="keywords" content="react, nginx, docker, spa">
+<meta name="description" content="React(Vite) 앱을 nginx 컨테이너로 실행할 때 발생한 SPA 라우팅 문제를 분석하고 해결한 과정">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/first-post/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4ef7a8b464b8b49133f6755337764a20c26a3fbec992f7d21276dee2d10ea77a.css" integrity="sha256-TveotGS4tJEz9nVTN3ZKIMJqP77JkvfSEnbe4tEOp3o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/first-post/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/first-post/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="nginx에서 React SPA 라우팅이 깨지는 문제와 해결">
+  <meta property="og:description" content="React(Vite) 앱을 nginx 컨테이너로 실행할 때 발생한 SPA 라우팅 문제를 분석하고 해결한 과정">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:tag" content="React">
+    <meta property="article:tag" content="Nginx">
+    <meta property="article:tag" content="Docker">
+    <meta property="article:tag" content="Spa">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="nginx에서 React SPA 라우팅이 깨지는 문제와 해결">
+  <meta name="twitter:description" content="React(Vite) 앱을 nginx 컨테이너로 실행할 때 발생한 SPA 라우팅 문제를 분석하고 해결한 과정">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "nginx에서 React SPA 라우팅이 깨지는 문제와 해결",
+      "item": "http://localhost:1313/posts/first-post/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "nginx에서 React SPA 라우팅이 깨지는 문제와 해결",
+  "name": "nginx에서 React SPA 라우팅이 깨지는 문제와 해결",
+  "description": "React(Vite) 앱을 nginx 컨테이너로 실행할 때 발생한 SPA 라우팅 문제를 분석하고 해결한 과정",
+  "keywords": [
+    "react", "nginx", "docker", "spa"
+  ],
+  "articleBody": "진행 사항 React SPA를 nginx 기반 Docker 컨테이너로 실행했습니다.\n발생한 문제 Vite dev 서버(npm run dev)로 실행 시에는 로그인 페이지가 정상 렌더링되었으나,\n도커 컨테이너로 띄울 때는 다음과 같은 이상 현상이 발생했습니다.\n로그인하지 않은 상태임에도 보호된 메인 페이지의 일부 UI가 먼저 렌더링되는 현상이 발생했습니다. 문제 재현 및 추가 실험 문제를 더 정확히 이해하기 위해 아래 4가지 케이스로 나누어 테스트했습니다.\n1. PrivateRoute ❌ + nginx.conf ❌ → 흰 화면 2. PrivateRoute ❌ + nginx.conf ⭕ → 흰 화면 3. PrivateRoute ⭕ + nginx.conf ❌ → 로그인 페이지는 뜨지만 새로고침 시 404 4. PrivateRoute ⭕ + nginx.conf ⭕ → 로그인 페이지 로딩 후 새로고침 시에도 페이지 정상 로딩 → 실험을 통해 nginx 설정과 인증 로직은 서로 다른 문제를 해결하며, 둘 다 필요하다는 것을 확인했습니다.\n원인 분석 4-1. nginx와 SPA 라우팅의 차이 Vite dev server는 Node.js 기반이라 모든 요청을 받아서 index.html로 전달해주기 때문에 SPA 라우팅이 자동으로 동작했습니다.\nReact Router는 클라이언트 사이드 라우팅을 사용합니다.\n즉, 실제 URL 경로(/login, /dashboard)는 브라우저에서 해석됩니다.\n반면 nginx는 정적 파일 서버이기 때문에:\nGET /login → /login 파일 찾음 → 없으면 404 이 동작을 합니다.\n→ 따라서 별도 설정이 없으면 SPA 라우팅이 깨집니다.\n4-2. PrivateRoute의 역할 const PrivateRoute = ({ children }) =\u003e { const token = localStorage.getItem(\"accessToken\"); return token ? children : ; }; 역할:\n인증되지 않은 사용자를 /login으로 리다이렉트 하지만:\n❗ PrivateRoute는 클라이언트 렌더링 이후에만 동작하므로, 서버 레벨에서 발생하는 404 문제를 해결할 수 없습니다.\n4-3. 왜 새로고침 시 404가 발생했는가 초기 진입 시:\n/ → index.html → React 실행 → /login으로 리다이렉트 하지만 새로고침 시:\n/login → nginx 요청 → 파일 없음 → 404 → 클라이언트 라우팅이 개입하기 전에 서버에서 요청이 끝나버립니다.\n4-4. 핵심 정리 요소 레이어 역할 nginx.conf 서버 SPA 라우팅을 위한 fallback 처리 PrivateRoute 클라이언트 인증 기반 접근 제어 → 두 요소는 서로 다른 레이어에서 동작하며, 둘 다 필요합니다.\n해결 방법 5-1. nginx 설정 추가 location / { try_files $uri $uri/ /index.html; } → 존재하지 않는 경로를 index.html로 전달하여 SPA 라우팅을 가능하게 합니다.\n5-2. Dockerfile에서 설정 적용 COPY nginx.conf /etc/nginx/conf.d/default.conf → nginx가 실제로 설정 파일을 읽도록 경로에 복사합니다.\n5-3. 적용 결과 /login 페이지에 정상 접근 가능 새로고침 시에도 404 발생 ❌ SPA 라우팅이 정상 동작 새로 배운 점 SPA는 클라이언트 라우팅을 사용하므로 서버에서 별도의 fallback 설정이 필요합니다. Vite dev 서버는 이를 자동으로 처리하지만, 운영 환경에서는 직접 설정해야 합니다. 클라이언트 라우팅과 서버 라우팅은 완전히 다른 개념입니다. 이 문제가 nginx에 국한된 게 아니라 CDN(Cloudflare, CloudFront) 등 정적 서버로 배포할 때도 고려해야 합니다. ",
+  "wordCount" : "396",
+  "inLanguage": "en",
+  "datePublished": "0001-01-01T00:00:00Z",
+  "dateModified": "0001-01-01T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/first-post/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        nginx에서 React SPA 라우팅이 깨지는 문제와 해결
+      </h1>
+      <p class="post-description">React(Vite) 앱을 nginx 컨테이너로 실행할 때 발생한 SPA 라우팅 문제를 분석하고 해결한 과정</p>
+      <div class="post-meta"><span>2 분</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%ec%a7%84%ed%96%89-%ec%82%ac%ed%95%ad" aria-label="진행 사항">진행 사항</a></li>
+            <li>
+                <a href="#%eb%b0%9c%ec%83%9d%ed%95%9c-%eb%ac%b8%ec%a0%9c" aria-label="발생한 문제">발생한 문제</a></li>
+            <li>
+                <a href="#%eb%ac%b8%ec%a0%9c-%ec%9e%ac%ed%98%84-%eb%b0%8f-%ec%b6%94%ea%b0%80-%ec%8b%a4%ed%97%98" aria-label="문제 재현 및 추가 실험">문제 재현 및 추가 실험</a></li>
+            <li>
+                <a href="#%ec%9b%90%ec%9d%b8-%eb%b6%84%ec%84%9d" aria-label="원인 분석">원인 분석</a><ul>
+            <li>
+                <a href="#4-1-nginx%ec%99%80-spa-%eb%9d%bc%ec%9a%b0%ed%8c%85%ec%9d%98-%ec%b0%a8%ec%9d%b4" aria-label="4-1. nginx와 SPA 라우팅의 차이">4-1. nginx와 SPA 라우팅의 차이</a></li>
+            <li>
+                <a href="#4-2-privateroute%ec%9d%98-%ec%97%ad%ed%95%a0" aria-label="4-2. PrivateRoute의 역할">4-2. PrivateRoute의 역할</a></li>
+            <li>
+                <a href="#4-3-%ec%99%9c-%ec%83%88%eb%a1%9c%ea%b3%a0%ec%b9%a8-%ec%8b%9c-404%ea%b0%80-%eb%b0%9c%ec%83%9d%ed%96%88%eb%8a%94%ea%b0%80" aria-label="4-3. 왜 새로고침 시 404가 발생했는가">4-3. 왜 새로고침 시 404가 발생했는가</a></li>
+            <li>
+                <a href="#4-4-%ed%95%b5%ec%8b%ac-%ec%a0%95%eb%a6%ac" aria-label="4-4. 핵심 정리">4-4. 핵심 정리</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ed%95%b4%ea%b2%b0-%eb%b0%a9%eb%b2%95" aria-label="해결 방법">해결 방법</a><ul>
+            <li>
+                <a href="#5-1-nginx-%ec%84%a4%ec%a0%95-%ec%b6%94%ea%b0%80" aria-label="5-1. nginx 설정 추가">5-1. nginx 설정 추가</a></li>
+            <li>
+                <a href="#5-2-dockerfile%ec%97%90%ec%84%9c-%ec%84%a4%ec%a0%95-%ec%a0%81%ec%9a%a9" aria-label="5-2. Dockerfile에서 설정 적용">5-2. Dockerfile에서 설정 적용</a></li>
+            <li>
+                <a href="#5-3-%ec%a0%81%ec%9a%a9-%ea%b2%b0%ea%b3%bc" aria-label="5-3. 적용 결과">5-3. 적용 결과</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ec%83%88%eb%a1%9c-%eb%b0%b0%ec%9a%b4-%ec%a0%90" aria-label="새로 배운 점">새로 배운 점</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <h2 id="진행-사항">진행 사항</h2>
+<p>React SPA를 nginx 기반 Docker 컨테이너로 실행했습니다.</p>
+<h2 id="발생한-문제">발생한 문제</h2>
+<p>Vite dev 서버(<code>npm run dev</code>)로 실행 시에는 로그인 페이지가 정상 렌더링되었으나,</p>
+<p>도커 컨테이너로 띄울 때는 다음과 같은 이상 현상이 발생했습니다.</p>
+<ul>
+<li>로그인하지 않은 상태임에도 보호된 메인 페이지의 일부 UI가 먼저 렌더링되는 현상이 발생했습니다.</li>
+</ul>
+<h2 id="문제-재현-및-추가-실험">문제 재현 및 추가 실험</h2>
+<p>문제를 더 정확히 이해하기 위해 아래 4가지 케이스로 나누어 테스트했습니다.</p>
+<pre tabindex="0"><code>1. PrivateRoute ❌ + nginx.conf ❌ → 흰 화면
+2. PrivateRoute ❌ + nginx.conf ⭕ → 흰 화면
+3. PrivateRoute ⭕ + nginx.conf ❌ → 로그인 페이지는 뜨지만 새로고침 시 404
+4. PrivateRoute ⭕ + nginx.conf ⭕ → 로그인 페이지 로딩 후 새로고침 시에도 페이지 정상 로딩
+</code></pre><p>→ 실험을 통해 nginx 설정과 인증 로직은 서로 다른 문제를 해결하며, 둘 다 필요하다는 것을 확인했습니다.</p>
+<h2 id="원인-분석">원인 분석</h2>
+<h3 id="4-1-nginx와-spa-라우팅의-차이">4-1. nginx와 SPA 라우팅의 차이</h3>
+<p>Vite dev server는 Node.js 기반이라 모든 요청을 받아서 index.html로 전달해주기 때문에 SPA 라우팅이 자동으로 동작했습니다.</p>
+<p>React Router는 클라이언트 사이드 라우팅을 사용합니다.</p>
+<p>즉, 실제 URL 경로(<code>/login</code>, <code>/dashboard</code>)는 브라우저에서 해석됩니다.</p>
+<p>반면 nginx는 정적 파일 서버이기 때문에:</p>
+<pre tabindex="0"><code>GET /login
+→ /login 파일 찾음
+→ 없으면 404
+</code></pre><p>이 동작을 합니다.</p>
+<p>→ 따라서 별도 설정이 없으면 SPA 라우팅이 깨집니다.</p>
+<hr>
+<h3 id="4-2-privateroute의-역할">4-2. PrivateRoute의 역할</h3>
+<pre tabindex="0"><code>const PrivateRoute = ({ children }) =&gt; {
+  const token = localStorage.getItem(&#34;accessToken&#34;);
+  return token ? children : &lt;Navigate to=&#34;/login&#34; replace /&gt;;
+};
+</code></pre><p>역할:</p>
+<ul>
+<li>인증되지 않은 사용자를 <code>/login</code>으로 리다이렉트</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p>하지만:</p>
+<blockquote>
+<p>❗ PrivateRoute는 클라이언트 렌더링 이후에만 동작하므로,
+서버 레벨에서 발생하는 404 문제를 해결할 수 없습니다.</p>
+</blockquote>
+<hr>
+<h3 id="4-3-왜-새로고침-시-404가-발생했는가">4-3. 왜 새로고침 시 404가 발생했는가</h3>
+<p>초기 진입 시:</p>
+<pre tabindex="0"><code>/ → index.html → React 실행 → /login으로 리다이렉트
+</code></pre><p>하지만 새로고침 시:</p>
+<pre tabindex="0"><code>/login → nginx 요청 → 파일 없음 → 404
+</code></pre><p>→ 클라이언트 라우팅이 개입하기 전에 서버에서 요청이 끝나버립니다.</p>
+<hr>
+<h3 id="4-4-핵심-정리">4-4. 핵심 정리</h3>
+<table>
+  <thead>
+      <tr>
+          <th>요소</th>
+          <th>레이어</th>
+          <th>역할</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>nginx.conf</td>
+          <td>서버</td>
+          <td>SPA 라우팅을 위한 fallback 처리</td>
+      </tr>
+      <tr>
+          <td>PrivateRoute</td>
+          <td>클라이언트</td>
+          <td>인증 기반 접근 제어</td>
+      </tr>
+  </tbody>
+</table>
+<p>→ 두 요소는 서로 다른 레이어에서 동작하며, 둘 다 필요합니다.</p>
+<h2 id="해결-방법">해결 방법</h2>
+<h3 id="5-1-nginx-설정-추가">5-1. nginx 설정 추가</h3>
+<pre tabindex="0"><code>location / {
+  try_files $uri $uri/ /index.html;
+}
+</code></pre><p>→ 존재하지 않는 경로를 <code>index.html</code>로 전달하여 SPA 라우팅을 가능하게 합니다.</p>
+<hr>
+<h3 id="5-2-dockerfile에서-설정-적용">5-2. Dockerfile에서 설정 적용</h3>
+<pre tabindex="0"><code>COPY nginx.conf /etc/nginx/conf.d/default.conf
+</code></pre><p>→ nginx가 실제로 설정 파일을 읽도록 경로에 복사합니다.</p>
+<hr>
+<h3 id="5-3-적용-결과">5-3. 적용 결과</h3>
+<ul>
+<li><code>/login</code> 페이지에 정상 접근 가능</li>
+<li>새로고침 시에도 404 발생 ❌</li>
+<li>SPA 라우팅이 정상 동작</li>
+</ul>
+<h2 id="새로-배운-점">새로 배운 점</h2>
+<ul>
+<li>SPA는 클라이언트 라우팅을 사용하므로 서버에서 별도의 fallback 설정이 필요합니다.</li>
+<li>Vite dev 서버는 이를 자동으로 처리하지만, 운영 환경에서는 직접 설정해야 합니다.</li>
+<li>클라이언트 라우팅과 서버 라우팅은 완전히 다른 개념입니다.</li>
+<li>이 문제가 nginx에 국한된 게 아니라 CDN(Cloudflare, CloudFront) 등 정적 서버로 배포할 때도 고려해야 합니다.</li>
+</ul>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/react/">react</a>
+      <a href="http://localhost:1313/tags/nginx/">nginx</a>
+      <a href="http://localhost:1313/tags/docker/">docker</a>
+      <a href="http://localhost:1313/tags/spa/">spa</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+{{- define "main" }}
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        {{ .Title }}
+      </h1>
+      {{- if .Description }}
+      <p class="post-description">{{ .Description }}</p>
+      {{- end }}
+      <div class="post-meta">
+        {{- partial "post_meta.html" . -}}
+      </div>
+
+      <div class="fn-post-divider"></div>
+    </header>
+
+    {{- if (.Param "ShowToc") }}
+    {{- partial "toc.html" . }}
+    {{- end }}
+
+    {{- if .Content }}
+    <div class="post-content">
+      {{ .Content }}
+    </div>
+    {{- end }}
+
+    {{- if .Params.tags }}
+    <div class="fn-tags-bottom">
+      {{- range .Params.tags }}
+      <a href="{{ absURL (printf "tags/%s/" (urlize .)) }}">{{ . }}</a>
+      {{- end }}
+    </div>
+    {{- end }}
+
+    <footer class="post-footer">
+    </footer>
+
+    {{- if (.Param "ShowPostNavLinks") }}
+    {{- partial "post_nav_links.html" . }}
+    {{- end }}
+
+    {{- if (.Param "comments") }}
+    {{- partial "comments.html" . }}
+    {{- end }}
+
+  </div>
+</article>
+
+{{- end }}
