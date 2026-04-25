@@ -3,6 +3,7 @@ languageCode = "ko"
 title = "기록 블로그"
 theme = "PaperMod"
 paginate = 10
+timezone = "Asia/Seoul"
 
 [outputs]
   home = ["HTML", "RSS", "JSON"]

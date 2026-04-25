@@ -1,7 +1,7 @@
 ---
 title: "nginx에서 React SPA 라우팅이 깨지는 문제와 해결"
 description: "React(Vite) 앱을 nginx 컨테이너로 실행할 때 발생한 SPA 라우팅 문제를 분석하고 해결한 과정"
-date: 2025-04-26
+date: 2026-04-26
 tags: ["react", "nginx", "docker", "spa"]
 ---
 
@@ -134,4 +134,4 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 - SPA는 클라이언트 라우팅을 사용하므로 서버에서 별도의 fallback 설정이 필요합니다.
 - Vite dev 서버는 이를 자동으로 처리하지만, 운영 환경에서는 직접 설정해야 합니다.
 - 클라이언트 라우팅과 서버 라우팅은 완전히 다른 개념입니다.
-- 이 문제가 nginx에 국한된 게 아니라 CDN(Cloudflare, CloudFront) 등 정적 서버로 배포할 때도 고려해야 합니다.
+- 이 문제는 nginx에 국한된 것이 아니라, Cloudflare나 CloudFront 같은 CDN을 포함한 정적 서버 환경에서도 고려해야 합니다.

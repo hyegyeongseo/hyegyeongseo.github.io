@@ -6,12 +6,12 @@
     <description>Recent content on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Sat, 26 Apr 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 26 Apr 2026 00:00:00 +0900</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>nginx에서 React SPA 라우팅이 깨지는 문제와 해결</title>
       <link>http://localhost:1313/posts/first-post/</link>
-      <pubDate>Sat, 26 Apr 2025 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 26 Apr 2026 00:00:00 +0900</pubDate>
       <guid>http://localhost:1313/posts/first-post/</guid>
       <description>React(Vite) 앱을 nginx 컨테이너로 실행할 때 발생한 SPA 라우팅 문제를 분석하고 해결한 과정</description>
     </item>
