@@ -1,6 +1,7 @@
 ---
 title: "nginx에서 React SPA 라우팅이 깨지는 문제와 해결"
 description: "React(Vite) 앱을 nginx 컨테이너로 실행할 때 발생한 SPA 라우팅 문제를 분석하고 해결한 과정"
+date: 2025-04-26
 tags: ["react", "nginx", "docker", "spa"]
 ---
 
