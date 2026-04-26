@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>Docker | 기록 블로그</title>
+<title>Gradle | 기록 블로그</title>
 <meta name="keywords" content="">
 <meta name="description" content="트러블슈팅 기록">
 <meta name="author" content="hyegyeongseo">
-<link rel="canonical" href="http://localhost:1313/tags/docker/">
+<link rel="canonical" href="http://localhost:1313/tags/gradle/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.4ef7a8b464b8b49133f6755337764a20c26a3fbec992f7d21276dee2d10ea77a.css" integrity="sha256-TveotGS4tJEz9nVTN3ZKIMJqP77JkvfSEnbe4tEOp3o=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
@@ -18,8 +18,8 @@
 <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/tags/docker/index.xml" title="rss">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/tags/docker/">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/tags/gradle/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/tags/gradle/">
 <noscript>
     <style>
         #theme-toggle,
@@ -69,15 +69,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
-<meta property="og:url" content="http://localhost:1313/tags/docker/">
+<meta property="og:url" content="http://localhost:1313/tags/gradle/">
   <meta property="og:site_name" content="기록 블로그">
-  <meta property="og:title" content="Docker">
+  <meta property="og:title" content="Gradle">
   <meta property="og:description" content="트러블슈팅 기록">
   <meta property="og:locale" content="ko">
   <meta property="og:type" content="website">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Docker">
+  <meta name="twitter:title" content="Gradle">
   <meta name="twitter:description" content="트러블슈팅 기록">
 
 </head>
@@ -121,25 +121,24 @@
 <main class="main"> 
 <header class="page-header">
   <h1>
-    Docker
+    Gradle
   </h1>
 </header>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">nginx에서 React SPA 라우팅이 깨지는 문제와 해결
+    <h2 class="entry-hint-parent">Spring Boot를 도커 컨테이너로 실행 시 민감 정보 외부화
     </h2>
   </header>
   <div class="entry-content">
-    <p>진행 사항 React SPA를 nginx 기반 Docker 컨테이너로 실행했습니다.
-발생한 문제 Vite dev 서버(npm run dev)로 실행 시에는 로그인 페이지가 정상 렌더링되었으나,
-도커 컨테이너로 띄울 때는 다음과 같은 이상 현상이 발생했습니다.
-로그인하지 않은 상태임에도 보호된 메인 페이지의 일부 UI가 먼저 렌더링되는 현상이 발생했습니다. 문제 재현 및 추가 실험 문제를 더 정확히 이해하기 위해 아래 4가지 케이스로 나누어 테스트했습니다.
-1. PrivateRoute ❌ &#43; nginx.conf ❌ → 흰 화면2. PrivateRoute ❌ &#43; nginx.conf ⭕ → 흰 화면3. PrivateRoute ⭕ &#43; nginx.conf ❌ → 로그인 페이지는 뜨지만 새로고침 시 4044. PrivateRoute ⭕ &#43; nginx.conf ⭕ → 로그인 페이지 로딩 후 새로고침 시에도 페이지 정상 로딩 → 실험을 통해 nginx 설정과 인증 로직은 서로 다른 문제를 해결하며, 둘 다 필요하다는 것을 확인했습니다.
+    <p>진행 사항 Spring Boot를 Docker Compose 환경에서 Docker 컨테이너로 실행했습니다.
+발생한 문제 로컬 개발 환경에서는 application.propertise에 민감정보를 하드코딩으로도 정상 동작했습니다. 그 상태에서는 docker-compose.yml에도 민감정보를 하드코딩해야 정상적으로 사용 가능해서, 보안적인 측면에서 취약해졌습니다.
+시도 사항 .env 파일을 새로 생성하여 민감 정보를 담고, docker-compose.yml에 아래와 같이 작성했으나 정보를 불러오는 데에 실패하여 컨테이너 접속 시도 시 바로 컨테이너가 죽었습니다.
+environment:SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD} 해결 방법 4-1. 방법1 .env에 민감정보를 담고, 이 정보를 application.propertise와 docker-compose.yml에서 호출해서 사용하도록 설정합니다.
 ...</p>
   </div>
   <footer class="entry-footer"><span title='2026-04-26 00:00:00 +0900 KST'>April 26, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to nginx에서 React SPA 라우팅이 깨지는 문제와 해결" href="http://localhost:1313/posts/first-post/"></a>
+  <a class="entry-link" aria-label="post link to Spring Boot를 도커 컨테이너로 실행 시 민감 정보 외부화" href="http://localhost:1313/posts/spring-boot-docker-env-config/"></a>
 </article>
     </main>
     

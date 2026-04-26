@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Spring Boot on 기록 블로그</title>
+    <link>http://localhost:1313/tags/spring-boot/</link>
+    <description>Recent content in Spring Boot on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Sun, 26 Apr 2026 00:00:00 +0900</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/spring-boot/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Spring Boot를 도커 컨테이너로 실행 시 민감 정보 외부화</title>
+      <link>http://localhost:1313/posts/spring-boot-docker-env-config/</link>
+      <pubDate>Sun, 26 Apr 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/spring-boot-docker-env-config/</guid>
+      <description>민감정보를 application.propertise에 하드코딩 시 발생하는 문제 기록 및 해결</description>
+    </item>
+  </channel>
+</rss>
