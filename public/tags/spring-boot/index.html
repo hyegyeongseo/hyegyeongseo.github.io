@@ -132,9 +132,9 @@
   </header>
   <div class="entry-content">
     <p>진행 사항 Spring Boot를 Docker Compose 환경에서 Docker 컨테이너로 실행했습니다.
-발생한 문제 로컬 개발 환경에서는 application.propertise에 민감정보를 하드코딩으로도 정상 동작했습니다. 그 상태에서는 docker-compose.yml에도 민감정보를 하드코딩해야 정상적으로 사용 가능해서, 보안적인 측면에서 취약해졌습니다.
-시도 사항 .env 파일을 새로 생성하여 민감 정보를 담고, docker-compose.yml에 아래와 같이 작성했으나 정보를 불러오는 데에 실패하여 컨테이너 접속 시도 시 바로 컨테이너가 죽었습니다.
-environment:SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD} 해결 방법 4-1. 방법1 .env에 민감정보를 담고, 이 정보를 application.propertise와 docker-compose.yml에서 호출해서 사용하도록 설정합니다.
+발생한 문제 GitHub에서 프로젝트를 Clone한 뒤 Docker Compose로 실행했을 때 컨테이너가 즉시 종료되는 문제가 발생했습니다.
+application.properties가 포함되지 않은 상태에서 컨테이너화하다 생긴 문제였습니다. application.properties에 민감정보를 다시 하드코딩하면 동작은 하지만, Git에 민감정보가 노출되는 문제가 있었습니다.
+테스트 사항 1. application.properties ❌ → 빌드 성공 / 컨테이너 실행 실패 2. application.properties ❌ &#43; .env ⭕ → 빌드 성공 / 컨테이너 실행 실패 → .env의 환경변수는 자동 매핑되었지만, application.properties에 정의되어 있던 다른 필수 설정값들이 함께 빠지면서 애플리케이션이 정상 기동되지 못함 3. application.properties ⭕ &#43; .env ⭕ → 빌드 성공 / 컨테이너 실행 성공 → 로그인 기능 정상 동작 application.properties에서 .env의 환경변수를 참조하도록 구성하면, 민감 정보를 하드코딩하지 않고도 정상 동작합니다. 해결 방법 4-1. .env 파일 설정 .env에 민감정보를 작성하고, docker-compose가 이를 컨테이너 환경변수로 전달하도록 설정합니다.
 ...</p>
   </div>
   <footer class="entry-footer"><span title='2026-04-26 00:00:00 +0900 KST'>April 26, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>

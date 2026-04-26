@@ -115,8 +115,8 @@
   "keywords": [
     "spring boot", "docker"
   ],
-  "articleBody": "진행 사항 Spring Boot를 Docker Compose 환경에서 Docker 컨테이너로 실행했습니다.\n발생한 문제 GitHub에서 프로젝트를 Clone한 뒤 Docker Compose로 실행했을 때 컨테이너가 즉시 종료되는 문제가 발생했습니다.\nGitHub에는 application.properties가 포함되지 않아, 실행 시 필요한 설정값이 Spring Boot 환경에 주입되지 않는 문제가 발생했습니다.\n테스트 사항 1. application.properties ❌ → 빌드(./gradlew build) 성공. 컨테이너 실행 실패\r2. application.properties ❌ + .env ⭕ → 빌드(./gradlew build) 성공. 컨테이너 실행 실패(.env는 docker-compose를 통해 컨테이너에 정상 주입되었지만, Spring Boot에서 해당 환경변수를 application 설정으로 바인딩하거나 참조하도록 구성되지 않아 값이 사용되지 않음)\r3. application.properties ⭕ + .env ⭕ → 빌드(./gradlew build) 성공. 컨테이너 실행 성공, 로그인 기능 정상 수행 application.properties 파일이 .env 파일에서 민감정보를 참조하는 식으로 변경하면 application.properties에는 민감정보를 하드코딩할 필요가 없었습니다. 해결 방법 4-1. .env 파일 설정 .env에 민감정보를 작성하고, docker-compose가 이를 컨테이너 환경변수로 전달하도록 설정합니다.\n.env 예시\nSPRING_DATASOURCE_PASSWORD=XXXX 4-2. docker-compose.yml에서 환경변수 참조 docker-compose.yml 예시\nenv_file:\r- .env 4-3. Spring Boot에서 환경변수 참조 application.properties 예시\nspring.datasource.password=${SPRING_DATASOURCE_PASSWORD} 4-4. .gitignore 수정 application.properties는 Git에 포함하고, 민감정보는 환경변수(.env)로 분리합니다. 4-5. 핵심 정리 민감정보는 외부 환경(.env)에 저장하고 application.properties나 docker-compose.yml에서는 참조하도록 구성합니다. 새로 배운 점 docker-compose와 application.properties는 환경변수를 통해 동일한 설정 구조로 통합 관리할 수 있습니다. 환경변수 기반 구조로 변경하면 로컬 / CI / 운영 환경을 동일한 방식으로 구성할 수 있습니다. 민감정보 관리 방식은 다음과 같이 계층적으로 분리됩니다: 환경 비밀 관리 방식 로컬 개발 .env CI/CD (GitHub Actions) GitHub Secrets 운영(Production) Secret Manager (AWS/GCP/Vault) ",
-  "wordCount" : "220",
+  "articleBody": "진행 사항 Spring Boot를 Docker Compose 환경에서 Docker 컨테이너로 실행했습니다.\n발생한 문제 GitHub에서 프로젝트를 Clone한 뒤 Docker Compose로 실행했을 때 컨테이너가 즉시 종료되는 문제가 발생했습니다.\napplication.properties가 포함되지 않은 상태로 컨테이너를 실행하면서 발생한 문제였습니다. application.properties에 민감정보를 다시 하드코딩하면 동작은 하지만, Git에 민감정보가 노출되는 문제가 있었습니다.\n테스트 사항 1. application.properties ❌ → 빌드 성공 / 컨테이너 실행 실패\n2. application.properties ❌ + .env ⭕ → 빌드 성공 / 컨테이너 실행 실패 → .env의 일부 환경변수는 자동 매핑되었지만, 애플리케이션 기동에 필요한 필수 설정값이 모두 제공되지 않아 정상적으로 실행되지 않음\n3. application.properties ⭕ + .env ⭕ → 빌드 성공 / 컨테이너 실행 성공 → 로그인 기능 정상 동작\n해결 방법 4-1. .env 파일 설정 .env에 민감정보를 작성하고, docker-compose가 이를 컨테이너 환경변수로 전달하도록 설정합니다.\n.env 예시\nSPRING_DATASOURCE_PASSWORD=XXXX 4-2. docker-compose.yml에서 환경변수 참조 docker-compose.yml 예시\nenv_file: - .env 4-3. Spring Boot에서 환경변수 참조 application.properties 예시\nspring.datasource.password=${SPRING_DATASOURCE_PASSWORD} 4-4. .gitignore 수정 application.properties는 Git에 포함하고, 민감정보는 환경변수(.env)로 분리합니다. .env 파일은 민감 정보를 포함하므로 .gitignore에 추가하여 Git에 포함되지 않도록 합니다. 4-5. 핵심 정리 민감정보는 .env 한 곳에서만 관리하고, application.properties와 docker-compose.yml은 이를 참조만 합니다. 같은 값을 여러 파일에 하드코딩하지 않으므로, 비밀번호 변경 시 .env만 수정하면 됩니다. 새로 배운 점 docker-compose와 application.properties는 환경변수를 통해 동일한 설정 구조로 통합 관리할 수 있습니다. 환경변수 기반 구조로 변경하면 로컬 / CI / 운영 환경을 동일한 방식으로 구성할 수 있습니다. 환경별로 민감정보 관리 방식은 다음과 같이 구분할 수 있습니다. 환경 비밀 관리 방식 로컬 개발 .env CI/CD (GitHub Actions) GitHub Secrets 운영(Production) Secret Manager (AWS/GCP/Vault) ",
+  "wordCount" : "238",
   "inLanguage": "en",
   "datePublished": "2026-04-26T00:00:00+09:00",
   "dateModified": "2026-04-26T00:00:00+09:00",
@@ -227,39 +227,46 @@
 <p>Spring Boot를 Docker Compose 환경에서 Docker 컨테이너로 실행했습니다.</p>
 <h2 id="발생한-문제">발생한 문제</h2>
 <p>GitHub에서 프로젝트를 Clone한 뒤 Docker Compose로 실행했을 때 컨테이너가 즉시 종료되는 문제가 발생했습니다.</p>
-<p>GitHub에는 application.properties가 포함되지 않아, 실행 시 필요한 설정값이 Spring Boot 환경에 주입되지 않는 문제가 발생했습니다.</p>
+<p>application.properties가 포함되지 않은 상태로 컨테이너를 실행하면서 발생한 문제였습니다. application.properties에 민감정보를 다시 하드코딩하면 동작은 하지만, Git에 민감정보가 노출되는 문제가 있었습니다.</p>
 <h2 id="테스트-사항">테스트 사항</h2>
-<pre tabindex="0"><code>1. application.properties ❌ → 빌드(./gradlew build) 성공. 컨테이너 실행 실패
-2. application.properties ❌ + .env ⭕ → 빌드(./gradlew build) 성공. 컨테이너 실행 실패(.env는 docker-compose를 통해 컨테이너에 정상 주입되었지만, Spring Boot에서 해당 환경변수를 application 설정으로 바인딩하거나 참조하도록 구성되지 않아 값이 사용되지 않음)
-3. application.properties ⭕ + .env ⭕ → 빌드(./gradlew build) 성공. 컨테이너 실행 성공, 로그인 기능 정상 수행
-</code></pre><ul>
-<li>application.properties 파일이 .env 파일에서 민감정보를 참조하는 식으로 변경하면 application.properties에는 민감정보를 하드코딩할 필요가 없었습니다.</li>
-</ul>
+<blockquote>
+<p><strong>1. application.properties ❌</strong>
+→ 빌드 성공 / 컨테이너 실행 실패</p>
+<p><strong>2. application.properties ❌ + .env ⭕</strong>
+→ 빌드 성공 / 컨테이너 실행 실패
+→ .env의 일부 환경변수는 자동 매핑되었지만, 애플리케이션 기동에 필요한 필수 설정값이 모두 제공되지 않아 정상적으로 실행되지 않음</p>
+<p><strong>3. application.properties ⭕ + .env ⭕</strong>
+→ 빌드 성공 / 컨테이너 실행 성공
+→ 로그인 기능 정상 동작</p>
+</blockquote>
 <h2 id="해결-방법">해결 방법</h2>
 <h3 id="4-1-env-파일-설정">4-1. .env 파일 설정</h3>
 <p>.env에 민감정보를 작성하고, docker-compose가 이를 컨테이너 환경변수로 전달하도록 설정합니다.</p>
 <p>.env 예시</p>
-<pre tabindex="0"><code>SPRING_DATASOURCE_PASSWORD=XXXX
+<pre tabindex="0"><code class="language-dotenv" data-lang="dotenv">SPRING_DATASOURCE_PASSWORD=XXXX
 </code></pre><h3 id="4-2-docker-composeyml에서-환경변수-참조">4-2. docker-compose.yml에서 환경변수 참조</h3>
 <p>docker-compose.yml 예시</p>
-<pre tabindex="0"><code>env_file:
-  - .env
-</code></pre><h3 id="4-3-spring-boot에서-환경변수-참조">4-3. Spring Boot에서 환경변수 참조</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#ff79c6">env_file</span>:
+</span></span><span style="display:flex;"><span>  - .env
+</span></span></code></pre></div><h3 id="4-3-spring-boot에서-환경변수-참조">4-3. Spring Boot에서 환경변수 참조</h3>
 <p>application.properties 예시</p>
-<pre tabindex="0"><code>spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
-</code></pre><h3 id="4-4-gitignore-수정">4-4. .gitignore 수정</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#50fa7b">spring.datasource.password</span><span style="color:#ff79c6">=</span><span style="color:#f1fa8c">${SPRING_DATASOURCE_PASSWORD}</span>
+</span></span></code></pre></div><h3 id="4-4-gitignore-수정">4-4. .gitignore 수정</h3>
 <ul>
 <li>application.properties는 Git에 포함하고, 민감정보는 환경변수(.env)로 분리합니다.</li>
+<li>.env 파일은 민감 정보를 포함하므로 .gitignore에 추가하여 Git에 포함되지 않도록 합니다.</li>
 </ul>
 <h3 id="4-5-핵심-정리">4-5. 핵심 정리</h3>
 <ul>
-<li>민감정보는 외부 환경(.env)에 저장하고 application.properties나 docker-compose.yml에서는 참조하도록 구성합니다.</li>
+<li>민감정보는 .env 한 곳에서만 관리하고, application.properties와 docker-compose.yml은 이를 참조만 합니다.</li>
+<li>같은 값을 여러 파일에 하드코딩하지 않으므로, 비밀번호 변경 시 .env만 수정하면 됩니다.</li>
 </ul>
 <h2 id="새로-배운-점">새로 배운 점</h2>
 <ul>
 <li>docker-compose와 application.properties는 환경변수를 통해 동일한 설정 구조로 통합 관리할 수 있습니다.</li>
 <li>환경변수 기반 구조로 변경하면 로컬 / CI / 운영 환경을 동일한 방식으로 구성할 수 있습니다.</li>
-<li>민감정보 관리 방식은 다음과 같이 계층적으로 분리됩니다:
+<li>환경별로 민감정보 관리 방식은 다음과 같이 구분할 수 있습니다.</li>
+</ul>
 <table>
   <thead>
       <tr>
@@ -282,8 +289,6 @@
       </tr>
   </tbody>
 </table>
-</li>
-</ul>
 
     </div>
     <div class="fn-tags-bottom">
