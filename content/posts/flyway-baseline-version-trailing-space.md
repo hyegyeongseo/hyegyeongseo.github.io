@@ -39,7 +39,7 @@ Caused by: org.flywaydb.core.api.FlywayException:
 
 ## 원인 분석
 
-### 1. `.properties`의 인라인 주석 규칙 (Cycle 1)
+### `.properties`의 인라인 주석 규칙 (Cycle 1)
 
 Java `.properties` 파일에서 `#`과 `!`는 **줄 첫 글자일 때만 주석**으로 처리됩니다. 줄 중간에 등장하면 그 시점부터 끝까지가 *value의 일부*로 읽힙니다. YAML, Python, INI 등 다른 형식은 인라인 주석을 허용하지만 `.properties`는 그렇지 않습니다.
 
@@ -67,7 +67,7 @@ Flyway는 *"version에는 `0..9`와 `.`만 허용된다"*는 규칙을 가지고
 + spring.flyway.baseline-version=1
 ```
 
-### 2. `cat -A` 한 명령으로 본 실제 byte (Cycle 2)
+### `cat -A` 한 명령으로 본 실제 byte (Cycle 2)
 
 2차 에러는 메시지에 단서가 거의 없었습니다 (`Invalid version: 1`로 깔끔하게 끝나니까). 추측만으로 *"혹시 보이지 않는 공백?"* 같은 가설을 쌓는 단계에 들어가기 직전, `cat -A`로 파일의 실제 byte를 가시화해봤습니다.
 
@@ -81,7 +81,7 @@ $ grep -n "baseline" src/main/resources/application.properties | cat -A
 
 `1` 다음에 스페이스 한 칸이 trailing으로 붙어 있었고, 그 뒤에 LF(`$`)가 이어졌습니다. 1차 수정 때 `# 기존 DB는 ...` 부분을 지우면서 *주석 앞의 공백 한 칸은 그대로 남긴* 것이었습니다.
 
-### 3. 공통 원인 — Java `Properties.load()`의 trim 규칙
+### 공통 원인 — Java `Properties.load()`의 trim 규칙
 
 두 cycle 모두 같은 뿌리에 있었습니다. `Properties.load()`가 각 부분에 적용하는 trim 규칙이 비대칭이라는 점입니다.
 
@@ -96,7 +96,7 @@ $ grep -n "baseline" src/main/resources/application.properties | cat -A
 
 ## 해결 방법
 
-### 1. 공백 한 칸 제거 + 전체 파일 trailing whitespace 일괄 정리
+### 공백 한 칸 제거 + 전체 파일 trailing whitespace 일괄 정리
 
 ```diff
 - spring.flyway.baseline-version=1·    # ← 보이지 않는 공백 한 칸
@@ -111,7 +111,7 @@ $ sed -i 's/[[:space:]]*$//' src/main/resources/application.properties
 # tab, space 다 잡아내고 멱등 (여러 번 돌려도 같은 결과)
 ```
 
-### 2. 적용 결과
+### 적용 결과
 
 - `Invalid version` 에러 해소
 - Flyway가 정상적으로 baseline-version=1을 인식
