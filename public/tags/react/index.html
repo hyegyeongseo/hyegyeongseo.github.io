@@ -10,7 +10,7 @@
 <meta name="description" content="트러블슈팅 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/react/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.4ef7a8b464b8b49133f6755337764a20c26a3fbec992f7d21276dee2d10ea77a.css" integrity="sha256-TveotGS4tJEz9nVTN3ZKIMJqP77JkvfSEnbe4tEOp3o=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -135,7 +135,7 @@
 발생한 문제 Vite dev 서버(npm run dev)로 실행 시에는 로그인 페이지가 정상 렌더링되었으나,
 도커 컨테이너로 띄울 때는 다음과 같은 이상 현상이 발생했습니다.
 로그인하지 않은 상태임에도 보호된 메인 페이지의 일부 UI가 먼저 렌더링되는 현상이 발생했습니다. 문제 재현 및 추가 실험 문제를 더 정확히 이해하기 위해 아래 4가지 케이스로 나누어 테스트했습니다.
-1. PrivateRoute ❌ &#43; nginx.conf ❌ → 흰 화면2. PrivateRoute ❌ &#43; nginx.conf ⭕ → 흰 화면3. PrivateRoute ⭕ &#43; nginx.conf ❌ → 로그인 페이지는 뜨지만 새로고침 시 4044. PrivateRoute ⭕ &#43; nginx.conf ⭕ → 로그인 페이지 로딩 후 새로고침 시에도 페이지 정상 로딩 → 실험을 통해 nginx 설정과 인증 로직은 서로 다른 문제를 해결하며, 둘 다 필요하다는 것을 확인했습니다.
+PrivateRoute nginx.conf 결과 ❌ ❌ 흰 화면 ❌ ⭕ 흰 화면 ⭕ ❌ 로그인 페이지는 뜨지만 새로고침 시 404 ⭕ ⭕ 로그인 페이지 로딩 후 새로고침 시에도 정상 → 실험을 통해 nginx 설정과 인증 로직은 서로 다른 문제를 해결하며, 둘 다 필요하다는 것을 확인했습니다.
 ...</p>
   </div>
   <footer class="entry-footer"><span title='2026-04-26 00:00:00 +0900 KST'>April 26, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>

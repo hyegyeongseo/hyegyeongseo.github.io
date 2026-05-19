@@ -11,7 +11,7 @@
 <meta name="description" content="트러블슈팅 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.4ef7a8b464b8b49133f6755337764a20c26a3fbec992f7d21276dee2d10ea77a.css" integrity="sha256-TveotGS4tJEz9nVTN3ZKIMJqP77JkvfSEnbe4tEOp3o=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -162,9 +162,159 @@
 
   <div class="fn-section-label">
     All posts
-    <span class="fn-section-count" id="fn-post-count">2</span>
+    <span class="fn-section-count" id="fn-post-count">12</span>
   </div>
   <div class="fn-list" id="fn-post-list">
+    <a class="fn-list-item" href="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/"
+       data-title="aws dev 환경 vpc 비용 최적화 — interface endpoint를 nat instance로 우회한 의사결정"
+       data-desc="aws dev 환경 vpc 비용 최적화 — interface vpc endpoint를 nat instance로 전환한 의사결정과 운영 이슈 분석"
+       data-tags="aws,vpc-endpoint,cost-optimization">
+      <div class="fn-list-top">
+        <div class="fn-list-title">AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정</div>
+        <time class="fn-list-date" datetime="2026-05-17">
+          May 17
+        </time>
+      </div>
+      <div class="fn-list-desc">AWS dev 환경 VPC 비용 최적화 — Interface VPC Endpoint를 NAT Instance로 전환한 의사결정과 운영 이슈 분석</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">aws, vpc-endpoint, cost-optimization</span>
+      </div>
+    </a>
+    <a class="fn-list-item" href="http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/"
+       data-title="nat은 무죄 — ssm이 연결되지 않던 진짜 이유 (al2023 minimal ami 함정)"
+       data-desc="nat 문제처럼 보였던 ssm 연결 실패를 추적하다, al2023 minimal ami에 amazon-ssm-agent가 없다는 함정을 발견한 과정"
+       data-tags="aws,ssm,nat,al2023,ami">
+      <div class="fn-list-top">
+        <div class="fn-list-title">NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)</div>
+        <time class="fn-list-date" datetime="2026-05-17">
+          May 17
+        </time>
+      </div>
+      <div class="fn-list-desc">NAT 문제처럼 보였던 SSM 연결 실패를 추적하다, AL2023 minimal AMI에 amazon-ssm-agent가 없다는 함정을 발견한 과정</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">aws, ssm, nat, al2023, ami</span>
+      </div>
+    </a>
+    <a class="fn-list-item" href="http://localhost:1313/posts/git-commit-graph-principles/"
+       data-title="git 동작 원리 정리 — commit graph, merge-base, cherry-pick"
+       data-desc="unrelated histories, merge-base, cherry-pick을 중심으로 git의 commit graph 동작 원리를 정리"
+       data-tags="git">
+      <div class="fn-list-top">
+        <div class="fn-list-title">Git 동작 원리 정리 — commit graph, merge-base, cherry-pick</div>
+        <time class="fn-list-date" datetime="2026-05-10">
+          May 10
+        </time>
+      </div>
+      <div class="fn-list-desc">unrelated histories, merge-base, cherry-pick을 중심으로 Git의 commit graph 동작 원리를 정리</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">git</span>
+      </div>
+    </a>
+    <a class="fn-list-item" href="http://localhost:1313/posts/flyway-baseline-version-trailing-space/"
+       data-title="flyway invalid version: 1 디버깅 기록 — 인라인 주석과 보이지 않는 공백 2단 함정"
+       data-desc="spring boot에 flyway baseline을 설정하다 같은 에러를 두 번 만난 디버깅 기록. 첫 cycle은 .properties의 인라인 주석 함정, 두 번째 cycle은 보이지 않는 trailing space 한 칸. cat -a 한 명령으로 가설을 사실로 바꿨던 과정"
+       data-tags="flyway,spring boot,properties">
+      <div class="fn-list-top">
+        <div class="fn-list-title">Flyway Invalid version: 1 디버깅 기록 — 인라인 주석과 보이지 않는 공백 2단 함정</div>
+        <time class="fn-list-date" datetime="2026-05-09">
+          May 9
+        </time>
+      </div>
+      <div class="fn-list-desc">Spring Boot에 Flyway baseline을 설정하다 같은 에러를 두 번 만난 디버깅 기록. 첫 cycle은 .properties의 인라인 주석 함정, 두 번째 cycle은 보이지 않는 trailing space 한 칸. cat -A 한 명령으로 가설을 사실로 바꿨던 과정</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">flyway, spring boot, properties</span>
+      </div>
+    </a>
+    <a class="fn-list-item" href="http://localhost:1313/posts/flyway-migration-principles/"
+       data-title="flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴"
+       data-desc="flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다."
+       data-tags="flyway,database,migration,spring boot">
+      <div class="fn-list-top">
+        <div class="fn-list-title">Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴</div>
+        <time class="fn-list-date" datetime="2026-05-09">
+          May 9
+        </time>
+      </div>
+      <div class="fn-list-desc">Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다.</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">flyway, database, migration, spring boot</span>
+      </div>
+    </a>
+    <a class="fn-list-item" href="http://localhost:1313/posts/alb-spring-boot-actuator-health-check/"
+       data-title="spring boot actuator와 alb health check를 함께 맞춰야 했던 이유"
+       data-desc="alb health check가 spring security에 의해 401로 실패했던 문제를 actuator permitall 설정으로 해결한 과정"
+       data-tags="aws,alb,spring boot,spring security,actuator,health check">
+      <div class="fn-list-top">
+        <div class="fn-list-title">Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유</div>
+        <time class="fn-list-date" datetime="2026-05-09">
+          May 9
+        </time>
+      </div>
+      <div class="fn-list-desc">ALB health check가 Spring Security에 의해 401로 실패했던 문제를 actuator permitAll 설정으로 해결한 과정</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">aws, alb, spring boot, spring security, actuator, health check</span>
+      </div>
+    </a>
+    <a class="fn-list-item" href="http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/"
+       data-title="spring boot readiness probe down으로 alb가 503을 받던 이유 — valkey 비밀번호 위치 어긋남과 user_data 함정"
+       data-desc="spring boot의 readiness probe가 fail로 잡혀 alb가 503을 반환한 문제를 추적해, valkey 비밀번호가 iac와 ec2 instance 사이에 어긋나 있던 원인을 확인하고 user_data 시점 특성에 따라 instance를 수동 replace한 과정"
+       data-tags="aws,alb,spring boot,valkey,redis,terraform,ec2,user_data,readiness">
+      <div class="fn-list-top">
+        <div class="fn-list-title">Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정</div>
+        <time class="fn-list-date" datetime="2026-05-09">
+          May 9
+        </time>
+      </div>
+      <div class="fn-list-desc">Spring Boot의 readiness probe가 fail로 잡혀 ALB가 503을 반환한 문제를 추적해, Valkey 비밀번호가 IaC와 EC2 instance 사이에 어긋나 있던 원인을 확인하고 user_data 시점 특성에 따라 instance를 수동 replace한 과정</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">aws, alb, spring boot, valkey, redis, terraform, ec2, user_data, readiness</span>
+      </div>
+    </a>
+    <a class="fn-list-item" href="http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/"
+       data-title="spring boot에서 rds ssl 연결 시 certpathvalidatorexception이 발생한 이유 — jvm truststore와 rds ca"
+       data-desc="rds ssl 검증을 verify_identity로 설정했지만 hikaripool 초기화가 trust anchor 에러로 실패한 문제를 추적해, jvm cacerts에 rds ca가 없었다는 원인을 확인하고 dockerfile에 import 단계를 추가한 과정"
+       data-tags="aws,rds,spring boot,ssl,tls,jvm,hikaricp,docker">
+      <div class="fn-list-top">
+        <div class="fn-list-title">Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA</div>
+        <time class="fn-list-date" datetime="2026-05-09">
+          May 9
+        </time>
+      </div>
+      <div class="fn-list-desc">RDS SSL 검증을 VERIFY_IDENTITY로 설정했지만 HikariPool 초기화가 trust anchor 에러로 실패한 문제를 추적해, JVM cacerts에 RDS CA가 없었다는 원인을 확인하고 Dockerfile에 import 단계를 추가한 과정</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">aws, rds, spring boot, ssl, tls, jvm, hikaricp, docker</span>
+      </div>
+    </a>
+    <a class="fn-list-item" href="http://localhost:1313/posts/ecs-arm64-exec-format-error/"
+       data-title="ecs에서 exec format error가 발생한 이유 — graviton(arm64) 이미지 아키텍처 문제"
+       data-desc="graviton(arm64) 기반 ecs에서 발생한 exec format error를 추적해 amd64 이미지 아키텍처 mismatch 문제를 해결한 과정"
+       data-tags="aws,ecs,docker,arm64,graviton,ci-cd,github actions">
+      <div class="fn-list-top">
+        <div class="fn-list-title">ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제</div>
+        <time class="fn-list-date" datetime="2026-05-08">
+          May 8
+        </time>
+      </div>
+      <div class="fn-list-desc">Graviton(ARM64) 기반 ECS에서 발생한 exec format error를 추적해 amd64 이미지 아키텍처 mismatch 문제를 해결한 과정</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">aws, ecs, docker, arm64, graviton, ci-cd, github actions</span>
+      </div>
+    </a>
+    <a class="fn-list-item" href="http://localhost:1313/posts/ecs-task-definition-entrypoint-command/"
+       data-title="ecs에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 entrypoint 동작 방식"
+       data-desc="ecs task definition의 command와 docker entrypoint/cmd 동작 차이 때문에 발생한 `unknown command &#34;sh&#34;` 에러를 추적하고 해결한 과정"
+       data-tags="aws,ecs,docker,task definition,entrypoint,cmd">
+      <div class="fn-list-top">
+        <div class="fn-list-title">ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식</div>
+        <time class="fn-list-date" datetime="2026-05-08">
+          May 8
+        </time>
+      </div>
+      <div class="fn-list-desc">ECS task definition의 command와 Docker ENTRYPOINT/CMD 동작 차이 때문에 발생한 `unknown command &#34;sh&#34;` 에러를 추적하고 해결한 과정</div>
+      <div class="fn-list-meta">
+        <span class="fn-list-tags-inline">aws, ecs, docker, task definition, entrypoint, cmd</span>
+      </div>
+    </a>
     <a class="fn-list-item" href="http://localhost:1313/posts/first-post/"
        data-title="nginx에서 react spa 라우팅이 깨지는 문제와 해결"
        data-desc="react(vite) 앱을 nginx 컨테이너로 실행할 때 발생한 spa 라우팅 문제를 분석하고 해결한 과정"

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴 | 기록 블로그</title>
+<meta name="keywords" content="flyway, database, migration, spring boot">
+<meta name="description" content="Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다.">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/flyway-migration-principles/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/flyway-migration-principles/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/flyway-migration-principles/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴">
+  <meta property="og:description" content="Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다.">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-09T00:00:00+09:00">
+    <meta property="article:modified_time" content="2026-05-09T00:00:00+09:00">
+    <meta property="article:tag" content="Flyway">
+    <meta property="article:tag" content="Database">
+    <meta property="article:tag" content="Migration">
+    <meta property="article:tag" content="Spring Boot">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴">
+  <meta name="twitter:description" content="Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴",
+      "item": "http://localhost:1313/posts/flyway-migration-principles/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴",
+  "name": "Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴",
+  "description": "Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다.",
+  "keywords": [
+    "flyway", "database", "migration", "spring boot"
+  ],
+  "articleBody": "이 글을 쓰게 된 계기 backend 레포에 Flyway를 도입하면서 baseline 패턴을 설계하는 과정에서, Spring Boot 부팅 시 Invalid version: 1이라는 에러를 만났습니다. 표면적으로는 단순한 문법 오류처럼 보였지만, 실제로는 Flyway의 데이터 모델과 baseline 패턴을 정확히 이해하지 못한 채 따라 쓰던 결과였습니다. 사건 자체는 별도 글에서 다루고, 이 글에서는 사건의 전제가 되는 Flyway의 핵심 동작 원리를 정리합니다.\nFlyway란 Flyway는 데이터베이스 스키마의 git 같은 도구입니다. 코드를 git으로 버전 관리하듯, DB 스키마 변경도 SQL 파일로 기록하고 순서대로 적용합니다.\n한 줄로 정의하면: SQL 파일들 + 적용 기록 테이블 = 재현 가능한 DB 상태.\n다시 말해 Flyway는 SQL 실행 도구가 아니라 DB 상태를 고정하는 시스템입니다. baseline, checksum, validate 같은 모든 동작이 이 관점에서 출발합니다.\nflyway_schema_history — 진실의 원천 Flyway의 모든 동작은 flyway_schema_history 테이블 하나가 결정합니다. 어떤 마이그레이션이 적용됐는지, 다음에 무엇을 적용할지, 기존 DB와 새 DB를 어떻게 다르게 처리할지 — 답이 모두 이 테이블에 있습니다.\n컬럼 의미 installed_rank 적용 순서 version 마이그레이션 버전 (예: 1, 2.1) description 사람이 읽는 설명 type SQL 또는 BASELINE script 파일명 (예: V1__init.sql) checksum 파일 내용의 해시 installed_on 적용 시각 success 성공/실패 Spring Boot 부팅 시 Flyway는 항상 두 가지를 수행합니다.\nflyway_schema_history를 읽어 지금까지 적용된 마이그레이션 목록을 확인 classpath의 마이그레이션 파일 목록과 비교해 아직 적용되지 않은 것만 순서대로 실행 Migration 파일 구조 — V1__name.sql 마이그레이션 파일은 일정한 명명 규칙을 따릅니다. 예를 들어 이번 backend의 src/main/resources/db/migration/ 경로에는 다음 파일들이 있습니다.\nV1__baseline.sql V2__add_image_blobs.sql V3__search_logs_fk_set_null.sql 각 파일명은 다음 구조입니다.\nV1__create_user_table.sql │ │ └─ description (사람이 읽기 위해) │ └─ 구분자 (밑줄 2개, 필수) └─ prefix + version Prefix: V (Versioned) — 한 번 적용되면 변경 불가 R (Repeatable) — checksum이 변경될 때마다 재실행 U (Undo) — 롤백 (유료 기능) Version: 정렬 가능한 숫자. 1, 2.0, 2.1.5 등 Description: 사람이 읽는 부분. 공백은 _로 표기 Checksum — applied = immutable Flyway는 각 마이그레이션 파일의 내용을 해시로 계산해 checksum 컬럼에 저장합니다. 부팅 시 파일과 DB의 checksum을 비교하고, 일치하지 않으면 부팅이 중단됩니다 (validate-on-migrate=true일 때).\n이 규칙의 의미는 이미 한 번 적용된 마이그레이션 파일은 절대 수정할 수 없다는 것입니다. 변경이 필요하면 새 버전(V2__fix.sql)을 추가해야 합니다. 이 immutability가 Flyway의 핵심 가치입니다 — 모든 환경에서 같은 순서, 같은 내용으로 적용되어야 재현 가능한 DB 상태가 보장됩니다.\nBaseline — 이미 존재하는 DB와의 만남 Flyway는 두 가지 상황을 모두 다뤄야 합니다.\n시나리오 문제 빈 DB V1__init.sql부터 차례로 적용. 문제 없음 이미 데이터가 있는 DB V1이 정의하는 schema가 이미 존재. 그대로 적용하면 충돌 두 번째 경우를 위해 baseline이라는 개념이 있습니다. “여기서부터 시작했다고 치자” 는 의미로, 특정 버전까지를 이미 적용된 것으로 표시하고 그 다음부터 실제 실행을 시작하는 패턴입니다.\nbaseline-on-migrate 옵션 spring.flyway.baseline-on-migrate=true 이 옵션이 true일 때, flyway_schema_history 테이블이 없고 DB에 다른 테이블이 이미 존재하는 상황에서 Flyway는 자동으로 baseline을 생성합니다. flyway_schema_history를 만들고 baseline 항목을 기록한 뒤, 그 다음 버전부터 적용을 시작합니다.\nbaseline-version 옵션 spring.flyway.baseline-version=1 “V1까지는 baseline으로 잡고, V2부터 적용한다\"는 의미입니다. baseline 항목의 version 값이 됩니다.\nV1__baseline.sql 패턴 — 빈 schema와 데이터 있는 schema에서 동작하는 방식 본 backend의 application.properties에 실제 적용한 Flyway 설정은 다음과 같습니다.\nspring.flyway.enabled=${FLYWAY_ENABLED:true} spring.flyway.locations=classpath:db/migration spring.flyway.baseline-on-migrate=${FLYWAY_BASELINE_ON_MIGRATE:true} spring.flyway.baseline-version=1 spring.flyway.baseline-description=baseline_schema spring.flyway.validate-on-migrate=true spring.flyway.out-of-order=false 그리고 V1__baseline.sql에는 prod의 현재 schema 전체를 담아둡니다 (mysqldump --no-data로 schema-only dump를 받은 뒤 CREATE TABLE 문을 정리해 넣는 패턴). 이 패턴이 우아한 이유는 schema가 빈 상태든 데이터가 이미 있는 상태든 동일한 코드·설정으로 동작한다는 것입니다.\nDB 상태 Flyway의 동작 빈 schema (history 없음) flyway_schema_history 생성 → V1__baseline.sql을 실제 실행 → schema 생성 데이터 있는 schema (history 없음) flyway_schema_history 생성 → V1__baseline.sql은 baseline 항목으로 기록만 (실행 안 함) 두 경우 모두 V2__add_image_blobs.sql부터는 동일하게 실행됩니다. 결과적으로 환경별 분기 처리 없이, 같은 코드가 두 상황을 자연스럽게 처리합니다.\nFlyway와 Hibernate ddl-auto의 환경별 분리 Flyway를 도입한 환경에서 Hibernate의 ddl-auto 설정은 함께 조정되어야 합니다. 본 backend에서는 다음과 같이 분리했습니다.\n환경 JPA_DDL_AUTO 의미 dev update (default) Entity 변경 시 Hibernate가 자동으로 ALTER 수행. 빠른 개발 prod validate (ECS task env에서 override) DDL은 Flyway만 담당. Hibernate는 entity ↔ 적용된 schema 일치 여부만 검증 prod에서 validate로 두면 DDL 권한은 Flyway에게만 있고, Hibernate는 현재 entity 정의와 실제 schema가 어긋나지 않았는지만 점검하는 안전장치 역할이 됩니다. Flyway 미적용 변경이 있으면 부팅 자체가 실패하므로, schema drift가 운영에 도달하지 못합니다.\n운영 명령 — info, validate, repair 부팅이 안 되는 상황에서도 명령어로 직접 진단할 수 있습니다.\n명령 용도 info 현재 상태 보기 (적용된 마이그레이션, 대기 중인 것, 실패한 것) validate 파일과 DB의 checksum 비교 repair history 테이블 정리 (실패 항목 제거, checksum 재계산) baseline 수동 baseline (baseline-on-migrate 안 쓸 때) migrate 명시적 적용 (Spring Boot 부팅 외에 수동 실행) info는 가장 자주 쓰는 진단 명령입니다. 지금 DB가 어디까지 와 있는지를 한 번에 보여줍니다.\n운영 환경에서는 Flyway 자체를 Spring Boot Actuator endpoint로 노출해두면 HTTP로도 상태를 확인할 수 있습니다.\nmanagement.endpoints.web.exposure.include=health,info,prometheus,flyway 이렇게 두면 /actuator/flyway로 적용된 마이그레이션 목록과 상태를 조회할 수 있습니다.\n참고로 Flyway migration이 부팅 중 실패하면 Spring Boot application context 초기화가 실패해 ECS task가 RUNNING 상태에 도달하지 못합니다. ALB target health check도 자연스럽게 unhealthy로 잡혀, 실패 자체가 운영 환경의 트래픽에 도달하지 못합니다.\n정리 Flyway는 결국 한 테이블(flyway_schema_history), 한 invariant(applied = immutable), 한 패턴(baseline)이 전부입니다.\nflyway_schema_history가 진실의 원천 한 번 적용된 migration은 checksum이 변경되면 안 됨 기존 DB와 만나면 baseline으로 “여기서부터” 표시 V1__baseline.sql 패턴은 빈 schema와 데이터 있는 schema 양쪽에서 동일 코드로 동작 Hibernate ddl-auto=validate와 결합하면 schema drift를 부팅 단계에서 차단 이 기본 모델만 이해하면, baseline 패턴이나 migration 충돌 같은 상황도 표면 에러 너머의 원리로 풀어볼 수 있습니다.\n",
+  "wordCount" : "832",
+  "inLanguage": "en",
+  "datePublished": "2026-05-09T00:00:00+09:00",
+  "dateModified": "2026-05-09T00:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/flyway-migration-principles/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴
+      </h1>
+      <p class="post-description">Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다.</p>
+      <div class="post-meta"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%ec%9d%b4-%ea%b8%80%ec%9d%84-%ec%93%b0%ea%b2%8c-%eb%90%9c-%ea%b3%84%ea%b8%b0" aria-label="이 글을 쓰게 된 계기">이 글을 쓰게 된 계기</a></li>
+            <li>
+                <a href="#flyway%eb%9e%80" aria-label="Flyway란">Flyway란</a></li>
+            <li>
+                <a href="#flyway_schema_history--%ec%a7%84%ec%8b%a4%ec%9d%98-%ec%9b%90%ec%b2%9c" aria-label="flyway_schema_history — 진실의 원천">flyway_schema_history — 진실의 원천</a></li>
+            <li>
+                <a href="#migration-%ed%8c%8c%ec%9d%bc-%ea%b5%ac%ec%a1%b0--v1__namesql" aria-label="Migration 파일 구조 — V1__name.sql">Migration 파일 구조 — V1__name.sql</a></li>
+            <li>
+                <a href="#checksum--applied--immutable" aria-label="Checksum — applied = immutable">Checksum — applied = immutable</a></li>
+            <li>
+                <a href="#baseline--%ec%9d%b4%eb%af%b8-%ec%a1%b4%ec%9e%ac%ed%95%98%eb%8a%94-db%ec%99%80%ec%9d%98-%eb%a7%8c%eb%82%a8" aria-label="Baseline — 이미 존재하는 DB와의 만남">Baseline — 이미 존재하는 DB와의 만남</a><ul>
+            <li>
+                <a href="#baseline-on-migrate-%ec%98%b5%ec%85%98" aria-label="baseline-on-migrate 옵션">baseline-on-migrate 옵션</a></li>
+            <li>
+                <a href="#baseline-version-%ec%98%b5%ec%85%98" aria-label="baseline-version 옵션">baseline-version 옵션</a></li></ul>
+            </li>
+            <li>
+                <a href="#v1__baselinesql-%ed%8c%a8%ed%84%b4--%eb%b9%88-schema%ec%99%80-%eb%8d%b0%ec%9d%b4%ed%84%b0-%ec%9e%88%eb%8a%94-schema%ec%97%90%ec%84%9c-%eb%8f%99%ec%9e%91%ed%95%98%eb%8a%94-%eb%b0%a9%ec%8b%9d" aria-label="V1__baseline.sql 패턴 — 빈 schema와 데이터 있는 schema에서 동작하는 방식">V1__baseline.sql 패턴 — 빈 schema와 데이터 있는 schema에서 동작하는 방식</a></li>
+            <li>
+                <a href="#flyway%ec%99%80-hibernate-ddl-auto%ec%9d%98-%ed%99%98%ea%b2%bd%eb%b3%84-%eb%b6%84%eb%a6%ac" aria-label="Flyway와 Hibernate ddl-auto의 환경별 분리">Flyway와 Hibernate ddl-auto의 환경별 분리</a></li>
+            <li>
+                <a href="#%ec%9a%b4%ec%98%81-%eb%aa%85%eb%a0%b9--info-validate-repair" aria-label="운영 명령 — info, validate, repair">운영 명령 — info, validate, repair</a></li>
+            <li>
+                <a href="#%ec%a0%95%eb%a6%ac" aria-label="정리">정리</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <h2 id="이-글을-쓰게-된-계기">이 글을 쓰게 된 계기</h2>
+<p>backend 레포에 Flyway를 도입하면서 baseline 패턴을 설계하는 과정에서, Spring Boot 부팅 시 <code>Invalid version: 1</code>이라는 에러를 만났습니다. 표면적으로는 단순한 문법 오류처럼 보였지만, 실제로는 <em>Flyway의 데이터 모델과 baseline 패턴을 정확히 이해하지 못한 채 따라 쓰던</em> 결과였습니다. 사건 자체는 <a href="/posts/flyway-baseline-version-trailing-space/">별도 글</a>에서 다루고, 이 글에서는 사건의 전제가 되는 Flyway의 핵심 동작 원리를 정리합니다.</p>
+<h2 id="flyway란">Flyway란</h2>
+<p>Flyway는 <strong>데이터베이스 스키마의 git 같은 도구</strong>입니다. 코드를 git으로 버전 관리하듯, DB 스키마 변경도 SQL 파일로 기록하고 순서대로 적용합니다.</p>
+<p>한 줄로 정의하면: <strong>SQL 파일들 + 적용 기록 테이블 = 재현 가능한 DB 상태</strong>.</p>
+<p>다시 말해 Flyway는 <em>SQL 실행 도구</em>가 아니라 <em>DB 상태를 고정하는 시스템</em>입니다. baseline, checksum, validate 같은 모든 동작이 이 관점에서 출발합니다.</p>
+<h2 id="flyway_schema_history--진실의-원천">flyway_schema_history — 진실의 원천</h2>
+<p>Flyway의 모든 동작은 <code>flyway_schema_history</code> 테이블 하나가 결정합니다. <em>어떤 마이그레이션이 적용됐는지</em>, <em>다음에 무엇을 적용할지</em>, <em>기존 DB와 새 DB를 어떻게 다르게 처리할지</em> — 답이 모두 이 테이블에 있습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>컬럼</th>
+          <th>의미</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>installed_rank</code></td>
+          <td>적용 순서</td>
+      </tr>
+      <tr>
+          <td><code>version</code></td>
+          <td>마이그레이션 버전 (예: <code>1</code>, <code>2.1</code>)</td>
+      </tr>
+      <tr>
+          <td><code>description</code></td>
+          <td>사람이 읽는 설명</td>
+      </tr>
+      <tr>
+          <td><code>type</code></td>
+          <td><code>SQL</code> 또는 <code>BASELINE</code></td>
+      </tr>
+      <tr>
+          <td><code>script</code></td>
+          <td>파일명 (예: <code>V1__init.sql</code>)</td>
+      </tr>
+      <tr>
+          <td><code>checksum</code></td>
+          <td>파일 내용의 해시</td>
+      </tr>
+      <tr>
+          <td><code>installed_on</code></td>
+          <td>적용 시각</td>
+      </tr>
+      <tr>
+          <td><code>success</code></td>
+          <td>성공/실패</td>
+      </tr>
+  </tbody>
+</table>
+<p>Spring Boot 부팅 시 Flyway는 <strong>항상</strong> 두 가지를 수행합니다.</p>
+<ol>
+<li><code>flyway_schema_history</code>를 읽어 <em>지금까지 적용된 마이그레이션 목록</em>을 확인</li>
+<li>classpath의 마이그레이션 파일 목록과 비교해 <em>아직 적용되지 않은 것</em>만 순서대로 실행</li>
+</ol>
+<h2 id="migration-파일-구조--v1__namesql">Migration 파일 구조 — V1__name.sql</h2>
+<p>마이그레이션 파일은 일정한 명명 규칙을 따릅니다. 예를 들어 이번 backend의 <code>src/main/resources/db/migration/</code> 경로에는 다음 파일들이 있습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">V1__baseline.sql
+</span></span><span class="line"><span class="cl">V2__add_image_blobs.sql
+</span></span><span class="line"><span class="cl">V3__search_logs_fk_set_null.sql
+</span></span></code></pre></div><p>각 파일명은 다음 구조입니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">V1__create_user_table.sql
+</span></span><span class="line"><span class="cl">│  │  └─ description (사람이 읽기 위해)
+</span></span><span class="line"><span class="cl">│  └─ 구분자 (밑줄 2개, 필수)
+</span></span><span class="line"><span class="cl">└─ prefix + version
+</span></span></code></pre></div><ul>
+<li><strong>Prefix</strong>:
+<ul>
+<li><code>V</code> (Versioned) — 한 번 적용되면 변경 불가</li>
+<li><code>R</code> (Repeatable) — checksum이 변경될 때마다 재실행</li>
+<li><code>U</code> (Undo) — 롤백 (유료 기능)</li>
+</ul>
+</li>
+<li><strong>Version</strong>: 정렬 가능한 숫자. <code>1</code>, <code>2.0</code>, <code>2.1.5</code> 등</li>
+<li><strong>Description</strong>: 사람이 읽는 부분. 공백은 <code>_</code>로 표기</li>
+</ul>
+<h2 id="checksum--applied--immutable">Checksum — applied = immutable</h2>
+<p>Flyway는 각 마이그레이션 파일의 내용을 해시로 계산해 <code>checksum</code> 컬럼에 저장합니다. 부팅 시 파일과 DB의 checksum을 비교하고, <strong>일치하지 않으면 부팅이 중단</strong>됩니다 (<code>validate-on-migrate=true</code>일 때).</p>
+<p>이 규칙의 의미는 <em>이미 한 번 적용된 마이그레이션 파일은 절대 수정할 수 없다</em>는 것입니다. 변경이 필요하면 새 버전(<code>V2__fix.sql</code>)을 추가해야 합니다. 이 immutability가 Flyway의 핵심 가치입니다 — 모든 환경에서 같은 순서, 같은 내용으로 적용되어야 재현 가능한 DB 상태가 보장됩니다.</p>
+<h2 id="baseline--이미-존재하는-db와의-만남">Baseline — 이미 존재하는 DB와의 만남</h2>
+<p>Flyway는 두 가지 상황을 모두 다뤄야 합니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>시나리오</th>
+          <th>문제</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>빈 DB</td>
+          <td><code>V1__init.sql</code>부터 차례로 적용. 문제 없음</td>
+      </tr>
+      <tr>
+          <td>이미 데이터가 있는 DB</td>
+          <td><code>V1</code>이 정의하는 schema가 이미 존재. 그대로 적용하면 충돌</td>
+      </tr>
+  </tbody>
+</table>
+<p>두 번째 경우를 위해 <strong>baseline</strong>이라는 개념이 있습니다. <em>&ldquo;여기서부터 시작했다고 치자&rdquo;</em> 는 의미로, 특정 버전까지를 <em>이미 적용된 것으로 표시</em>하고 그 다음부터 실제 실행을 시작하는 패턴입니다.</p>
+<h3 id="baseline-on-migrate-옵션">baseline-on-migrate 옵션</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-properties" data-lang="properties"><span class="line"><span class="cl"><span class="na">spring.flyway.baseline-on-migrate</span><span class="o">=</span><span class="s">true</span>
+</span></span></code></pre></div><p>이 옵션이 <code>true</code>일 때, <strong><code>flyway_schema_history</code> 테이블이 없고 DB에 다른 테이블이 이미 존재하는 상황</strong>에서 Flyway는 자동으로 baseline을 생성합니다. <code>flyway_schema_history</code>를 만들고 baseline 항목을 기록한 뒤, 그 다음 버전부터 적용을 시작합니다.</p>
+<h3 id="baseline-version-옵션">baseline-version 옵션</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-properties" data-lang="properties"><span class="line"><span class="cl"><span class="na">spring.flyway.baseline-version</span><span class="o">=</span><span class="s">1</span>
+</span></span></code></pre></div><p>&ldquo;V1까지는 baseline으로 잡고, V2부터 적용한다&quot;는 의미입니다. baseline 항목의 version 값이 됩니다.</p>
+<h2 id="v1__baselinesql-패턴--빈-schema와-데이터-있는-schema에서-동작하는-방식">V1__baseline.sql 패턴 — 빈 schema와 데이터 있는 schema에서 동작하는 방식</h2>
+<p>본 backend의 <code>application.properties</code>에 실제 적용한 Flyway 설정은 다음과 같습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-properties" data-lang="properties"><span class="line"><span class="cl"><span class="na">spring.flyway.enabled</span><span class="o">=</span><span class="s">${FLYWAY_ENABLED:true}</span>
+</span></span><span class="line"><span class="cl"><span class="na">spring.flyway.locations</span><span class="o">=</span><span class="s">classpath:db/migration</span>
+</span></span><span class="line"><span class="cl"><span class="na">spring.flyway.baseline-on-migrate</span><span class="o">=</span><span class="s">${FLYWAY_BASELINE_ON_MIGRATE:true}</span>
+</span></span><span class="line"><span class="cl"><span class="na">spring.flyway.baseline-version</span><span class="o">=</span><span class="s">1</span>
+</span></span><span class="line"><span class="cl"><span class="na">spring.flyway.baseline-description</span><span class="o">=</span><span class="s">baseline_schema</span>
+</span></span><span class="line"><span class="cl"><span class="na">spring.flyway.validate-on-migrate</span><span class="o">=</span><span class="s">true</span>
+</span></span><span class="line"><span class="cl"><span class="na">spring.flyway.out-of-order</span><span class="o">=</span><span class="s">false</span>
+</span></span></code></pre></div><p>그리고 <code>V1__baseline.sql</code>에는 <em>prod의 현재 schema 전체</em>를 담아둡니다 (<code>mysqldump --no-data</code>로 schema-only dump를 받은 뒤 <code>CREATE TABLE</code> 문을 정리해 넣는 패턴). 이 패턴이 우아한 이유는 <strong>schema가 빈 상태든 데이터가 이미 있는 상태든 동일한 코드·설정으로 동작</strong>한다는 것입니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>DB 상태</th>
+          <th>Flyway의 동작</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>빈 schema (history 없음)</td>
+          <td><code>flyway_schema_history</code> 생성 → <code>V1__baseline.sql</code>을 <em>실제 실행</em> → schema 생성</td>
+      </tr>
+      <tr>
+          <td>데이터 있는 schema (history 없음)</td>
+          <td><code>flyway_schema_history</code> 생성 → <code>V1__baseline.sql</code>은 <em>baseline 항목으로 기록만</em> (실행 안 함)</td>
+      </tr>
+  </tbody>
+</table>
+<p>두 경우 모두 <code>V2__add_image_blobs.sql</code>부터는 동일하게 실행됩니다. 결과적으로 환경별 분기 처리 없이, 같은 코드가 두 상황을 자연스럽게 처리합니다.</p>
+<h2 id="flyway와-hibernate-ddl-auto의-환경별-분리">Flyway와 Hibernate <code>ddl-auto</code>의 환경별 분리</h2>
+<p>Flyway를 도입한 환경에서 Hibernate의 <code>ddl-auto</code> 설정은 함께 조정되어야 합니다. 본 backend에서는 다음과 같이 분리했습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>환경</th>
+          <th><code>JPA_DDL_AUTO</code></th>
+          <th>의미</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>dev</td>
+          <td><code>update</code> (default)</td>
+          <td>Entity 변경 시 Hibernate가 자동으로 ALTER 수행. 빠른 개발</td>
+      </tr>
+      <tr>
+          <td>prod</td>
+          <td><code>validate</code> (ECS task env에서 override)</td>
+          <td>DDL은 Flyway만 담당. Hibernate는 entity ↔ 적용된 schema 일치 여부만 검증</td>
+      </tr>
+  </tbody>
+</table>
+<p>prod에서 <code>validate</code>로 두면 <em>DDL 권한은 Flyway에게만 있고</em>, Hibernate는 <em>현재 entity 정의와 실제 schema가 어긋나지 않았는지</em>만 점검하는 안전장치 역할이 됩니다. Flyway 미적용 변경이 있으면 부팅 자체가 실패하므로, schema drift가 운영에 도달하지 못합니다.</p>
+<h2 id="운영-명령--info-validate-repair">운영 명령 — info, validate, repair</h2>
+<p>부팅이 안 되는 상황에서도 명령어로 직접 진단할 수 있습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>명령</th>
+          <th>용도</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>info</code></td>
+          <td>현재 상태 보기 (적용된 마이그레이션, 대기 중인 것, 실패한 것)</td>
+      </tr>
+      <tr>
+          <td><code>validate</code></td>
+          <td>파일과 DB의 checksum 비교</td>
+      </tr>
+      <tr>
+          <td><code>repair</code></td>
+          <td>history 테이블 정리 (실패 항목 제거, checksum 재계산)</td>
+      </tr>
+      <tr>
+          <td><code>baseline</code></td>
+          <td>수동 baseline (<code>baseline-on-migrate</code> 안 쓸 때)</td>
+      </tr>
+      <tr>
+          <td><code>migrate</code></td>
+          <td>명시적 적용 (Spring Boot 부팅 외에 수동 실행)</td>
+      </tr>
+  </tbody>
+</table>
+<p><code>info</code>는 가장 자주 쓰는 진단 명령입니다. <em>지금 DB가 어디까지 와 있는지</em>를 한 번에 보여줍니다.</p>
+<p>운영 환경에서는 Flyway 자체를 Spring Boot Actuator endpoint로 노출해두면 HTTP로도 상태를 확인할 수 있습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-properties" data-lang="properties"><span class="line"><span class="cl"><span class="na">management.endpoints.web.exposure.include</span><span class="o">=</span><span class="s">health,info,prometheus,flyway</span>
+</span></span></code></pre></div><p>이렇게 두면 <code>/actuator/flyway</code>로 적용된 마이그레이션 목록과 상태를 조회할 수 있습니다.</p>
+<p>참고로 Flyway migration이 부팅 중 실패하면 Spring Boot application context 초기화가 실패해 ECS task가 RUNNING 상태에 도달하지 못합니다. ALB target health check도 자연스럽게 unhealthy로 잡혀, 실패 자체가 운영 환경의 트래픽에 도달하지 못합니다.</p>
+<h2 id="정리">정리</h2>
+<p>Flyway는 결국 <em>한 테이블</em>(<code>flyway_schema_history</code>), <em>한 invariant</em>(applied = immutable), <em>한 패턴</em>(baseline)이 전부입니다.</p>
+<ul>
+<li><code>flyway_schema_history</code>가 진실의 원천</li>
+<li>한 번 적용된 migration은 checksum이 변경되면 안 됨</li>
+<li>기존 DB와 만나면 baseline으로 &ldquo;여기서부터&rdquo; 표시</li>
+<li><code>V1__baseline.sql</code> 패턴은 빈 schema와 데이터 있는 schema 양쪽에서 동일 코드로 동작</li>
+<li>Hibernate <code>ddl-auto=validate</code>와 결합하면 schema drift를 부팅 단계에서 차단</li>
+</ul>
+<p>이 기본 모델만 이해하면, baseline 패턴이나 migration 충돌 같은 상황도 표면 에러 너머의 원리로 풀어볼 수 있습니다.</p>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/flyway/">flyway</a>
+      <a href="http://localhost:1313/tags/database/">database</a>
+      <a href="http://localhost:1313/tags/migration/">migration</a>
+      <a href="http://localhost:1313/tags/spring-boot/">spring boot</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/flyway-baseline-version-trailing-space/">
+    <span class="title">« 이전 페이지</span>
+    <span>Flyway Invalid version: 1 디버깅 기록 — 인라인 주석과 보이지 않는 공백 2단 함정</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/alb-spring-boot-actuator-health-check/">
+    <span class="title">다음 페이지 »</span>
+    <span>Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

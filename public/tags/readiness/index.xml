@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Readiness on 기록 블로그</title>
+    <link>http://localhost:1313/tags/readiness/</link>
+    <description>Recent content in Readiness on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Sat, 09 May 2026 00:00:00 +0900</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/readiness/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정</title>
+      <link>http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/</guid>
+      <description>Spring Boot의 readiness probe가 fail로 잡혀 ALB가 503을 반환한 문제를 추적해, Valkey 비밀번호가 IaC와 EC2 instance 사이에 어긋나 있던 원인을 확인하고 user_data 시점 특성에 따라 instance를 수동 replace한 과정</description>
+    </item>
+  </channel>
+</rss>

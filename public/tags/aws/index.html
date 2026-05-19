@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Aws | 기록 블로그</title>
+<meta name="keywords" content="">
+<meta name="description" content="트러블슈팅 기록">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/tags/aws/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/tags/aws/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/tags/aws/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/tags/aws/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="Aws">
+  <meta property="og:description" content="트러블슈팅 기록">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="website">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Aws">
+  <meta name="twitter:description" content="트러블슈팅 기록">
+
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header">
+  <h1>
+    Aws
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>시작 — VPC 카테고리에 $23.74 AWS 청구서 화면에서 한 줄이 눈에 띄었습니다.
+Amazon Virtual Private Cloud: $23.74
+VPC 리소스 자체(subnet, route table, IGW)는 무료라고 알고 있어서 의문이 생겼습니다. “VPC 자체로 돈이 나가나?”
+답은 VPC 카테고리 아래 묶이는 유료 컴포넌트들 — Interface VPC Endpoint, Public IPv4 였습니다.
+비용 분해 — Bills 화면 그대로 펼치기 Billing → Bills → 해당 월을 선택하면 서비스 단위로 수량과 단가까지 다 나옵니다. VPC 카테고리만 펼쳐 보니 다음과 같았습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0900 KST'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정" href="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 dev 환경의 VPC Interface Endpoint 3개를 제거하고 기존 NAT Instance로 outbound를 우회시키는 작업이 별도 글에서 마무리됐습니다. 변경은 정지 윈도우에서 깔끔하게 4개 destroy만 일어났고, 다음 단계는 단순히 dev를 다시 켜는 것이었습니다.
+NAT, Valkey, RDS 차례로 start. NAT을 거친 outbound가 정상인지를 SSH 대신 SSM Session Manager로 검증해 보기로 했습니다 — SSM Agent의 등록 자체가 NAT 경로를 통한 공개 SSM endpoint 도달에 성공해야만 일어나는 일이라, 간접 검증이 되거든요. 콘솔에서 EC2 → Valkey → SSM Session Manager 탭을 열어봤습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0900 KST'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)" href="http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 ECS 위에 띄운 Spring Boot backend를 ALB target group에 등록하고, /actuator/health를 health check path로 설정해 운영하는 구조였습니다.
+발생한 문제 컨테이너는 정상적으로 RUNNING이었고, CloudWatch 로그에도 Spring Boot의 부팅 완료 로그(Tomcat started on port(s), Started ... in N.NNN seconds)가 정상적으로 찍혀 있었습니다. JVM은 정상적으로 실행 중이었지만, ALB target group health check는 계속 실패하며 unhealthy 상태로 유지되고 있었습니다.
+인프라가 application에 보내는 health check 요청이 어딘가에서 막혀 있었습니다.
+원인 분석 ALB가 받은 응답 확인 application이 살아있는데 ALB만 unhealthy라면, ALB가 application에 보낸 요청이 실제로 어떤 응답을 받고 있는지를 먼저 확인해야 했습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유" href="http://localhost:1313/posts/alb-spring-boot-actuator-health-check/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 dev 환경의 Spring Boot backend가 Valkey(Redis fork)를 종속 리소스로 사용하는 구조였습니다. dev 환경에서는 비용 절약을 위해 ElastiCache 대신 EC2 인스턴스에 Valkey를 직접 설치해 운영했고, Terraform으로 관리하면서 user_data에서 valkey.conf의 requirepass를 주입하는 패턴이었습니다.
+Spring Boot Actuator의 readiness probe는 Valkey 연결 상태를 함께 점검하도록 설정되어 있어, Valkey 연결이 실패하면 readiness가 DOWN으로 잡힙니다.
+발생한 문제 ALB target이 unhealthy로 잡혔습니다. 응답 코드는 503이었습니다.
+$ aws elbv2 describe-target-health --target-group-arn &#34;$TG_ARN&#34; &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; | 10.0.10.209| unhealthy| Target.ResponseCodeMismatch | Health checks failed: [503] | &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; application까지는 요청이 도달하고 있었지만, Spring Boot가 자기 자신을 “준비 안 됨&#34;이라고 응답하고 있는 상태였습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정" href="http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 ECS에 띄운 Spring Boot backend가 RDS(MySQL)에 SSL로 연결하는 구조였습니다. 로컬과 운영 환경에서 SSL 모드를 다르게 가져가도록, application.properties에서 환경변수로 받게 해두었습니다.
+# application.properties # 로컬은 PREFERRED, ECS는 VERIFY_IDENTITY spring.datasource.url=jdbc:mysql://...?sslMode=${DB_SSL_MODE:PREFERRED} ECS task definition에서는 DB_SSL_MODE=VERIFY_IDENTITY로 운영 등급 SSL 검증이 활성화되도록 환경변수를 주입했습니다.
+발생한 문제 ECS에 배포한 후 Spring Boot가 부팅을 시작하다 HikariPool 초기화 단계에서 막혔습니다.
+HikariPool : DraweHikariCP - Exception during pool initialization com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure Caused by: javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Path does not chain with any of the trust anchors application 단까지는 부팅이 진행됐지만, DB 연결 풀을 만드는 단계에서 SSL handshake가 실패했습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA" href="http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 dev 환경용 ECS 클러스터를 구성하고, Spring Boot backend 이미지를 배포하고 있었습니다.
+발생한 문제 로컬에서는 정상 실행되던 컨테이너가 ECS 환경에서는 시작 직후 종료되었습니다.
+CloudWatch 로그에는 다음 한 줄만 찍히고 컨테이너가 즉시 죽었습니다.
+exec /opt/java/openjdk/bin/java: exec format error 원인 분석 exec format error는 무엇인가 exec format error는 실행 파일 형식이나 아키텍처가 현재 환경과 맞지 않을 때 발생하는 에러였습니다. AWS에서도 해당 에러에 대한 해결 방법을 간략히 안내하고 있습니다.
+ECS 호스트로 Graviton을 선택했으므로 호스트 아키텍처가 ARM64라는 것은 처음부터 알고 있었습니다. 모르고 있었던 건 — 그 사실이 컨테이너 이미지 빌드와 컨테이너 실행 결과에까지 영향을 줄 수 있다는 점이었습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0900 KST'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제" href="http://localhost:1313/posts/ecs-arm64-exec-format-error/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 ECS 클러스터에 Grafana Alloy 컨테이너를 띄우려 했습니다. Alloy의 config 파일은 환경변수로 주입받는 패턴이었기 때문에, sh -c로 디코딩과 실행을 함께 수행하는 형태로 task definition을 작성했습니다.
+# task definition (요약) command = [ &#34;sh&#34;, &#34;-c&#34;, &#34;echo $ALLOY_CONFIG_B64 | base64 -d &gt; /tmp/config.alloy &amp;&amp; exec /bin/alloy run /tmp/config.alloy&#34; ] 발생한 문제 컨테이너가 시작 직후 종료되었습니다. CloudWatch 로그에는 다음 한 줄만 찍혀 있었습니다.
+Error: unknown command &#34;sh&#34; for &#34;/bin/alloy&#34; 원인 분석 에러 메시지를 다시 읽기 unknown command &#34;sh&#34; for &#34;/bin/alloy&#34; — 이 메시지는 alloy 바이너리가 “sh&#34;라는 subcommand를 받았다는 의미였습니다. 즉 컨테이너 안에서 실제로 실행된 명령은 다음과 같은 형태일 가능성이 높았습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0900 KST'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식" href="http://localhost:1313/posts/ecs-task-definition-entrypoint-command/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

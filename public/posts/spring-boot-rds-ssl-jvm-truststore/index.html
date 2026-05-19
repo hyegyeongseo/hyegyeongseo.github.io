@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA | 기록 블로그</title>
+<meta name="keywords" content="aws, rds, spring boot, ssl, tls, jvm, hikaricp, docker">
+<meta name="description" content="RDS SSL 검증을 VERIFY_IDENTITY로 설정했지만 HikariPool 초기화가 trust anchor 에러로 실패한 문제를 추적해, JVM cacerts에 RDS CA가 없었다는 원인을 확인하고 Dockerfile에 import 단계를 추가한 과정">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA">
+  <meta property="og:description" content="RDS SSL 검증을 VERIFY_IDENTITY로 설정했지만 HikariPool 초기화가 trust anchor 에러로 실패한 문제를 추적해, JVM cacerts에 RDS CA가 없었다는 원인을 확인하고 Dockerfile에 import 단계를 추가한 과정">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-09T00:00:00+09:00">
+    <meta property="article:modified_time" content="2026-05-09T00:00:00+09:00">
+    <meta property="article:tag" content="Aws">
+    <meta property="article:tag" content="Rds">
+    <meta property="article:tag" content="Spring Boot">
+    <meta property="article:tag" content="Ssl">
+    <meta property="article:tag" content="Tls">
+    <meta property="article:tag" content="Jvm">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA">
+  <meta name="twitter:description" content="RDS SSL 검증을 VERIFY_IDENTITY로 설정했지만 HikariPool 초기화가 trust anchor 에러로 실패한 문제를 추적해, JVM cacerts에 RDS CA가 없었다는 원인을 확인하고 Dockerfile에 import 단계를 추가한 과정">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA",
+      "item": "http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA",
+  "name": "Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA",
+  "description": "RDS SSL 검증을 VERIFY_IDENTITY로 설정했지만 HikariPool 초기화가 trust anchor 에러로 실패한 문제를 추적해, JVM cacerts에 RDS CA가 없었다는 원인을 확인하고 Dockerfile에 import 단계를 추가한 과정",
+  "keywords": [
+    "aws", "rds", "spring boot", "ssl", "tls", "jvm", "hikaricp", "docker"
+  ],
+  "articleBody": "진행 사항 ECS에 띄운 Spring Boot backend가 RDS(MySQL)에 SSL로 연결하는 구조였습니다. 로컬과 운영 환경에서 SSL 모드를 다르게 가져가도록, application.properties에서 환경변수로 받게 해두었습니다.\n# application.properties # 로컬은 PREFERRED, ECS는 VERIFY_IDENTITY spring.datasource.url=jdbc:mysql://...?sslMode=${DB_SSL_MODE:PREFERRED} ECS task definition에서는 DB_SSL_MODE=VERIFY_IDENTITY로 운영 등급 SSL 검증이 활성화되도록 환경변수를 주입했습니다.\n발생한 문제 ECS에 배포한 후 Spring Boot가 부팅을 시작하다 HikariPool 초기화 단계에서 막혔습니다.\nHikariPool : DraweHikariCP - Exception during pool initialization com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure Caused by: javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Path does not chain with any of the trust anchors application 단까지는 부팅이 진행됐지만, DB 연결 풀을 만드는 단계에서 SSL handshake가 실패했습니다.\n원인 분석 에러 스택의 의미 따라가기 에러 스택을 가장 안쪽부터 따라가면 원인은 다음과 같이 정리됩니다.\nCertPathValidatorException: Path does not chain with any of the trust anchors → 서버가 제시한 인증서의 발급 CA를 내가 신뢰하는 CA 목록(trust anchors) 에서 찾을 수 없음 SSLHandshakeException → 그래서 SSL handshake 자체가 실패 CommunicationsException → 결과적으로 DB와 통신을 시작도 못 함 즉 application은 SSL 검증을 요청했고, 서버는 정상적으로 인증서를 제시했는데, JVM이 그 인증서를 신뢰할 수 없다고 판단한 상태였습니다.\n설계 자체는 정공법이었는지 확인 먼저 SSL 검증을 요청한 쪽 — application과 인프라 설정 — 을 점검했습니다.\napplication.properties: sslMode=${DB_SSL_MODE:PREFERRED} 으로 환경변수 매핑 ✓ ECS task definition 환경변수: DB_SSL_MODE=VERIFY_IDENTITY ✓ 두 곳 모두 운영 등급 SSL 검증(VERIFY_IDENTITY)을 의도하고 있었습니다. 설계 자체에는 빠진 게 없었습니다.\n빠진 한 조각 — JVM cacerts에 RDS CA가 없음 문제는 SSL 검증을 수행하는 쪽 — JVM truststore — 에 있었습니다. JVM은 기본 truststore($JAVA_HOME/lib/security/cacerts)에 등록된 CA만 신뢰합니다. 그 안에는 공개 CA들(DigiCert, Let’s Encrypt, VeriSign 등)이 들어있지만, RDS CA는 들어있지 않습니다.\ncacerts (JVM truststore) ├─ DigiCert ✓ ├─ Let's Encrypt ✓ ├─ VeriSign ✓ └─ RDS CA ✗ ← 없음 RDS는 AWS가 자체적으로 발급한 CA(rds-ca-rsa2048-g1 등)로 서버 인증서를 서명하기 때문에, 이 CA를 JVM truststore에 따로 등록하지 않으면 VERIFY_IDENTITY 모드에서는 trust chain을 만들지 못합니다.\napplication의 의도(VERIFY_IDENTITY)와 인프라의 설정(DB_SSL_MODE=VERIFY_IDENTITY 환경변수)은 일치했지만, 그 둘을 실행 시점에 잇는 한 단계 — JVM의 trust 단계 — 가 누락된 패턴이었습니다.\n결국 문제는 “SSL 설정 여부\"가 아니라 “신뢰할 CA가 JVM에 존재하느냐\"의 문제였습니다.\n해결 방법 Dockerfile에서 RDS CA bundle을 cacerts에 import AWS는 region별로 RDS CA bundle을 PEM 형식으로 공개하고 있습니다(https://truststore.pki.rds.amazonaws.com//-bundle.pem). 이를 다운로드해 JVM cacerts에 import하는 단계를 Dockerfile에 추가했습니다.\n# USER drawe 전 (root 권한 필요) ADD https://truststore.pki.rds.amazonaws.com/ap-northeast-2/ap-northeast-2-bundle.pem \\ /tmp/rds-bundle.pem RUN cd /tmp \u0026\u0026 \\ csplit -z -s -f rds-cert- rds-bundle.pem '/-----BEGIN CERTIFICATE-----/' '{*}' \u0026\u0026 \\ n=0; \\ for cert in rds-cert-*; do \\ n=$((n+1)); \\ keytool -importcert -trustcacerts -noprompt \\ -alias \"rds-ca-${n}\" \\ -file \"$cert\" \\ -keystore \"$JAVA_HOME/lib/security/cacerts\" \\ -storepass changeit; \\ done \u0026\u0026 \\ rm -f rds-bundle.pem rds-cert-* 각 단계의 역할:\nADD — RDS CA bundle 파일을 컨테이너로 다운로드 csplit — bundle은 여러 인증서가 합쳐진 파일이라, -----BEGIN CERTIFICATE----- 단위로 분리해 개별 파일로 만듦 keytool -importcert — 각 인증서를 JVM cacerts에 import. alias는 중복되지 않게 번호로 매김 -storepass changeit — JVM cacerts의 기본 비밀번호 마지막 rm — 임시 파일 정리 USER drawe 같은 비루트 사용자 전환 단계가 있다면, 이 단계는 반드시 그 전에 두어야 합니다. cacerts 수정에는 root 권한이 필요하기 때문입니다.\n적용 결과 SSL handshake 정상 완료 HikariPool 초기화 성공, DB 연결 풀 생성 Spring Boot 부팅 완료 새로 배운 점 운영 요구사항(VERIFY_IDENTITY)이 JVM 기본 cacerts의 커버 범위를 넘어서면서 trust chain이 끊긴 케이스였습니다. 프레임워크의 기본 동작을 깬 것이 아니라, 자동 영역이 커버하지 않는 운영 요구사항으로 확장하면서 만난 경계 문제였습니다. RDS는 AWS 자체 발급한 CA로 서버 인증서를 서명하므로, JVM의 공개 CA 목록만으로는 trust chain을 만들 수 없습니다. region별로 제공되는 RDS CA bundle을 cacerts에 별도로 import하는 단계가 필요합니다. ",
+  "wordCount" : "553",
+  "inLanguage": "en",
+  "datePublished": "2026-05-09T00:00:00+09:00",
+  "dateModified": "2026-05-09T00:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA
+      </h1>
+      <p class="post-description">RDS SSL 검증을 VERIFY_IDENTITY로 설정했지만 HikariPool 초기화가 trust anchor 에러로 실패한 문제를 추적해, JVM cacerts에 RDS CA가 없었다는 원인을 확인하고 Dockerfile에 import 단계를 추가한 과정</p>
+      <div class="post-meta"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%ec%a7%84%ed%96%89-%ec%82%ac%ed%95%ad" aria-label="진행 사항">진행 사항</a></li>
+            <li>
+                <a href="#%eb%b0%9c%ec%83%9d%ed%95%9c-%eb%ac%b8%ec%a0%9c" aria-label="발생한 문제">발생한 문제</a></li>
+            <li>
+                <a href="#%ec%9b%90%ec%9d%b8-%eb%b6%84%ec%84%9d" aria-label="원인 분석">원인 분석</a><ul>
+            <li>
+                <a href="#%ec%97%90%eb%9f%ac-%ec%8a%a4%ed%83%9d%ec%9d%98-%ec%9d%98%eb%af%b8-%eb%94%b0%eb%9d%bc%ea%b0%80%ea%b8%b0" aria-label="에러 스택의 의미 따라가기">에러 스택의 의미 따라가기</a></li>
+            <li>
+                <a href="#%ec%84%a4%ea%b3%84-%ec%9e%90%ec%b2%b4%eb%8a%94-%ec%a0%95%ea%b3%b5%eb%b2%95%ec%9d%b4%ec%97%88%eb%8a%94%ec%a7%80-%ed%99%95%ec%9d%b8" aria-label="설계 자체는 정공법이었는지 확인">설계 자체는 정공법이었는지 확인</a></li>
+            <li>
+                <a href="#%eb%b9%a0%ec%a7%84-%ed%95%9c-%ec%a1%b0%ea%b0%81--jvm-cacerts%ec%97%90-rds-ca%ea%b0%80-%ec%97%86%ec%9d%8c" aria-label="빠진 한 조각 — JVM cacerts에 RDS CA가 없음">빠진 한 조각 — JVM cacerts에 RDS CA가 없음</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ed%95%b4%ea%b2%b0-%eb%b0%a9%eb%b2%95" aria-label="해결 방법">해결 방법</a><ul>
+            <li>
+                <a href="#dockerfile%ec%97%90%ec%84%9c-rds-ca-bundle%ec%9d%84-cacerts%ec%97%90-import" aria-label="Dockerfile에서 RDS CA bundle을 cacerts에 import">Dockerfile에서 RDS CA bundle을 cacerts에 import</a></li>
+            <li>
+                <a href="#%ec%a0%81%ec%9a%a9-%ea%b2%b0%ea%b3%bc" aria-label="적용 결과">적용 결과</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ec%83%88%eb%a1%9c-%eb%b0%b0%ec%9a%b4-%ec%a0%90" aria-label="새로 배운 점">새로 배운 점</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <h2 id="진행-사항">진행 사항</h2>
+<p>ECS에 띄운 Spring Boot backend가 RDS(MySQL)에 SSL로 연결하는 구조였습니다. 로컬과 운영 환경에서 SSL 모드를 다르게 가져가도록, application.properties에서 환경변수로 받게 해두었습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-properties" data-lang="properties"><span class="line"><span class="cl"><span class="c1"># application.properties</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 로컬은 PREFERRED, ECS는 VERIFY_IDENTITY</span>
+</span></span><span class="line"><span class="cl"><span class="na">spring.datasource.url</span><span class="o">=</span><span class="s">jdbc:mysql://...?sslMode=${DB_SSL_MODE:PREFERRED}</span>
+</span></span></code></pre></div><p>ECS task definition에서는 <code>DB_SSL_MODE=VERIFY_IDENTITY</code>로 운영 등급 SSL 검증이 활성화되도록 환경변수를 주입했습니다.</p>
+<h2 id="발생한-문제">발생한 문제</h2>
+<p>ECS에 배포한 후 Spring Boot가 부팅을 시작하다 HikariPool 초기화 단계에서 막혔습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">HikariPool : DraweHikariCP - Exception during pool initialization
+</span></span><span class="line"><span class="cl">com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+</span></span><span class="line"><span class="cl">Caused by: javax.net.ssl.SSLHandshakeException:
+</span></span><span class="line"><span class="cl">  java.security.cert.CertPathValidatorException:
+</span></span><span class="line"><span class="cl">    Path does not chain with any of the trust anchors
+</span></span></code></pre></div><p>application 단까지는 부팅이 진행됐지만, DB 연결 풀을 만드는 단계에서 SSL handshake가 실패했습니다.</p>
+<h2 id="원인-분석">원인 분석</h2>
+<h3 id="에러-스택의-의미-따라가기">에러 스택의 의미 따라가기</h3>
+<p>에러 스택을 가장 안쪽부터 따라가면 원인은 다음과 같이 정리됩니다.</p>
+<ul>
+<li><code>CertPathValidatorException: Path does not chain with any of the trust anchors</code>
+→ 서버가 제시한 인증서의 발급 CA를 <em>내가 신뢰하는 CA 목록(trust anchors)</em> 에서 찾을 수 없음</li>
+<li><code>SSLHandshakeException</code>
+→ 그래서 SSL handshake 자체가 실패</li>
+<li><code>CommunicationsException</code>
+→ 결과적으로 DB와 통신을 시작도 못 함</li>
+</ul>
+<p>즉 application은 SSL 검증을 요청했고, 서버는 정상적으로 인증서를 제시했는데, <strong>JVM이 그 인증서를 신뢰할 수 없다</strong>고 판단한 상태였습니다.</p>
+<h3 id="설계-자체는-정공법이었는지-확인">설계 자체는 정공법이었는지 확인</h3>
+<p>먼저 SSL 검증을 요청한 쪽 — application과 인프라 설정 — 을 점검했습니다.</p>
+<ul>
+<li><code>application.properties</code>: <code>sslMode=${DB_SSL_MODE:PREFERRED}</code> 으로 환경변수 매핑 ✓</li>
+<li>ECS task definition 환경변수: <code>DB_SSL_MODE=VERIFY_IDENTITY</code> ✓</li>
+</ul>
+<p>두 곳 모두 운영 등급 SSL 검증(<code>VERIFY_IDENTITY</code>)을 의도하고 있었습니다. 설계 자체에는 빠진 게 없었습니다.</p>
+<h3 id="빠진-한-조각--jvm-cacerts에-rds-ca가-없음">빠진 한 조각 — JVM cacerts에 RDS CA가 없음</h3>
+<p>문제는 SSL 검증을 <em>수행하는 쪽</em> — JVM truststore — 에 있었습니다. JVM은 기본 truststore(<code>$JAVA_HOME/lib/security/cacerts</code>)에 등록된 CA만 신뢰합니다. 그 안에는 공개 CA들(DigiCert, Let&rsquo;s Encrypt, VeriSign 등)이 들어있지만, <strong>RDS CA는 들어있지 않습니다</strong>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">cacerts (JVM truststore)
+</span></span><span class="line"><span class="cl">├─ DigiCert       ✓
+</span></span><span class="line"><span class="cl">├─ Let&#39;s Encrypt  ✓
+</span></span><span class="line"><span class="cl">├─ VeriSign       ✓
+</span></span><span class="line"><span class="cl">└─ RDS CA         ✗  ← 없음
+</span></span></code></pre></div><p>RDS는 AWS가 자체적으로 발급한 CA(<code>rds-ca-rsa2048-g1</code> 등)로 서버 인증서를 서명하기 때문에, 이 CA를 JVM truststore에 따로 등록하지 않으면 <code>VERIFY_IDENTITY</code> 모드에서는 trust chain을 만들지 못합니다.</p>
+<p>application의 의도(<code>VERIFY_IDENTITY</code>)와 인프라의 설정(<code>DB_SSL_MODE=VERIFY_IDENTITY</code> 환경변수)은 일치했지만, 그 둘을 <em>실행 시점에 잇는 한 단계</em> — JVM의 trust 단계 — 가 누락된 패턴이었습니다.</p>
+<p>결국 문제는 &ldquo;SSL 설정 여부&quot;가 아니라 &ldquo;신뢰할 CA가 JVM에 존재하느냐&quot;의 문제였습니다.</p>
+<h2 id="해결-방법">해결 방법</h2>
+<h3 id="dockerfile에서-rds-ca-bundle을-cacerts에-import">Dockerfile에서 RDS CA bundle을 cacerts에 import</h3>
+<p>AWS는 region별로 RDS CA bundle을 PEM 형식으로 공개하고 있습니다(<code>https://truststore.pki.rds.amazonaws.com/&lt;region&gt;/&lt;region&gt;-bundle.pem</code>). 이를 다운로드해 JVM cacerts에 import하는 단계를 Dockerfile에 추가했습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="cl"><span class="c"># USER drawe 전 (root 권한 필요)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">ADD</span> https://truststore.pki.rds.amazonaws.com/ap-northeast-2/ap-northeast-2-bundle.pem <span class="se">\
+</span></span></span><span class="line"><span class="cl">    /tmp/rds-bundle.pem<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">RUN</span> <span class="nb">cd</span> /tmp <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">    csplit -z -s -f rds-cert- rds-bundle.pem <span class="s1">&#39;/-----BEGIN CERTIFICATE-----/&#39;</span> <span class="s1">&#39;{*}&#39;</span> <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">    <span class="nv">n</span><span class="o">=</span>0<span class="p">;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">    <span class="k">for</span> cert in rds-cert-*<span class="p">;</span> <span class="k">do</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">      <span class="nv">n</span><span class="o">=</span><span class="k">$((</span>n+1<span class="k">))</span><span class="p">;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">      keytool -importcert -trustcacerts -noprompt <span class="se">\
+</span></span></span><span class="line"><span class="cl">        -alias <span class="s2">&#34;rds-ca-</span><span class="si">${</span><span class="nv">n</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">        -file <span class="s2">&#34;</span><span class="nv">$cert</span><span class="s2">&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">        -keystore <span class="s2">&#34;</span><span class="nv">$JAVA_HOME</span><span class="s2">/lib/security/cacerts&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">        -storepass changeit<span class="p">;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">    <span class="k">done</span> <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">    rm -f rds-bundle.pem rds-cert-*<span class="err">
+</span></span></span></code></pre></div><p>각 단계의 역할:</p>
+<ul>
+<li><code>ADD</code> — RDS CA bundle 파일을 컨테이너로 다운로드</li>
+<li><code>csplit</code> — bundle은 여러 인증서가 합쳐진 파일이라, <code>-----BEGIN CERTIFICATE-----</code> 단위로 분리해 개별 파일로 만듦</li>
+<li><code>keytool -importcert</code> — 각 인증서를 JVM cacerts에 import. alias는 중복되지 않게 번호로 매김</li>
+<li><code>-storepass changeit</code> — JVM cacerts의 기본 비밀번호</li>
+<li>마지막 <code>rm</code> — 임시 파일 정리</li>
+</ul>
+<p><code>USER drawe</code> 같은 비루트 사용자 전환 단계가 있다면, 이 단계는 반드시 그 <em>전</em>에 두어야 합니다. cacerts 수정에는 root 권한이 필요하기 때문입니다.</p>
+<h3 id="적용-결과">적용 결과</h3>
+<ul>
+<li>SSL handshake 정상 완료</li>
+<li>HikariPool 초기화 성공, DB 연결 풀 생성</li>
+<li>Spring Boot 부팅 완료</li>
+</ul>
+<h2 id="새로-배운-점">새로 배운 점</h2>
+<ul>
+<li>운영 요구사항(<code>VERIFY_IDENTITY</code>)이 JVM 기본 cacerts의 커버 범위를 넘어서면서 trust chain이 끊긴 케이스였습니다. 프레임워크의 기본 동작을 깬 것이 아니라, 자동 영역이 커버하지 않는 운영 요구사항으로 확장하면서 만난 경계 문제였습니다.</li>
+<li>RDS는 AWS 자체 발급한 CA로 서버 인증서를 서명하므로, JVM의 공개 CA 목록만으로는 trust chain을 만들 수 없습니다. region별로 제공되는 RDS CA bundle을 cacerts에 별도로 import하는 단계가 필요합니다.</li>
+</ul>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/aws/">aws</a>
+      <a href="http://localhost:1313/tags/rds/">rds</a>
+      <a href="http://localhost:1313/tags/spring-boot/">spring boot</a>
+      <a href="http://localhost:1313/tags/ssl/">ssl</a>
+      <a href="http://localhost:1313/tags/tls/">tls</a>
+      <a href="http://localhost:1313/tags/jvm/">jvm</a>
+      <a href="http://localhost:1313/tags/hikaricp/">hikaricp</a>
+      <a href="http://localhost:1313/tags/docker/">docker</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/">
+    <span class="title">« 이전 페이지</span>
+    <span>Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/ecs-arm64-exec-format-error/">
+    <span class="title">다음 페이지 »</span>
+    <span>ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

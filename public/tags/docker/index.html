@@ -10,7 +10,7 @@
 <meta name="description" content="트러블슈팅 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/docker/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.4ef7a8b464b8b49133f6755337764a20c26a3fbec992f7d21276dee2d10ea77a.css" integrity="sha256-TveotGS4tJEz9nVTN3ZKIMJqP77JkvfSEnbe4tEOp3o=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -127,6 +127,54 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 ECS에 띄운 Spring Boot backend가 RDS(MySQL)에 SSL로 연결하는 구조였습니다. 로컬과 운영 환경에서 SSL 모드를 다르게 가져가도록, application.properties에서 환경변수로 받게 해두었습니다.
+# application.properties # 로컬은 PREFERRED, ECS는 VERIFY_IDENTITY spring.datasource.url=jdbc:mysql://...?sslMode=${DB_SSL_MODE:PREFERRED} ECS task definition에서는 DB_SSL_MODE=VERIFY_IDENTITY로 운영 등급 SSL 검증이 활성화되도록 환경변수를 주입했습니다.
+발생한 문제 ECS에 배포한 후 Spring Boot가 부팅을 시작하다 HikariPool 초기화 단계에서 막혔습니다.
+HikariPool : DraweHikariCP - Exception during pool initialization com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure Caused by: javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Path does not chain with any of the trust anchors application 단까지는 부팅이 진행됐지만, DB 연결 풀을 만드는 단계에서 SSL handshake가 실패했습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA" href="http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 dev 환경용 ECS 클러스터를 구성하고, Spring Boot backend 이미지를 배포하고 있었습니다.
+발생한 문제 로컬에서는 정상 실행되던 컨테이너가 ECS 환경에서는 시작 직후 종료되었습니다.
+CloudWatch 로그에는 다음 한 줄만 찍히고 컨테이너가 즉시 죽었습니다.
+exec /opt/java/openjdk/bin/java: exec format error 원인 분석 exec format error는 무엇인가 exec format error는 실행 파일 형식이나 아키텍처가 현재 환경과 맞지 않을 때 발생하는 에러였습니다. AWS에서도 해당 에러에 대한 해결 방법을 간략히 안내하고 있습니다.
+ECS 호스트로 Graviton을 선택했으므로 호스트 아키텍처가 ARM64라는 것은 처음부터 알고 있었습니다. 모르고 있었던 건 — 그 사실이 컨테이너 이미지 빌드와 컨테이너 실행 결과에까지 영향을 줄 수 있다는 점이었습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0900 KST'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제" href="http://localhost:1313/posts/ecs-arm64-exec-format-error/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 ECS 클러스터에 Grafana Alloy 컨테이너를 띄우려 했습니다. Alloy의 config 파일은 환경변수로 주입받는 패턴이었기 때문에, sh -c로 디코딩과 실행을 함께 수행하는 형태로 task definition을 작성했습니다.
+# task definition (요약) command = [ &#34;sh&#34;, &#34;-c&#34;, &#34;echo $ALLOY_CONFIG_B64 | base64 -d &gt; /tmp/config.alloy &amp;&amp; exec /bin/alloy run /tmp/config.alloy&#34; ] 발생한 문제 컨테이너가 시작 직후 종료되었습니다. CloudWatch 로그에는 다음 한 줄만 찍혀 있었습니다.
+Error: unknown command &#34;sh&#34; for &#34;/bin/alloy&#34; 원인 분석 에러 메시지를 다시 읽기 unknown command &#34;sh&#34; for &#34;/bin/alloy&#34; — 이 메시지는 alloy 바이너리가 “sh&#34;라는 subcommand를 받았다는 의미였습니다. 즉 컨테이너 안에서 실제로 실행된 명령은 다음과 같은 형태일 가능성이 높았습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0900 KST'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식" href="http://localhost:1313/posts/ecs-task-definition-entrypoint-command/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">nginx에서 React SPA 라우팅이 깨지는 문제와 해결
     </h2>
   </header>
@@ -135,7 +183,7 @@
 발생한 문제 Vite dev 서버(npm run dev)로 실행 시에는 로그인 페이지가 정상 렌더링되었으나,
 도커 컨테이너로 띄울 때는 다음과 같은 이상 현상이 발생했습니다.
 로그인하지 않은 상태임에도 보호된 메인 페이지의 일부 UI가 먼저 렌더링되는 현상이 발생했습니다. 문제 재현 및 추가 실험 문제를 더 정확히 이해하기 위해 아래 4가지 케이스로 나누어 테스트했습니다.
-1. PrivateRoute ❌ &#43; nginx.conf ❌ → 흰 화면2. PrivateRoute ❌ &#43; nginx.conf ⭕ → 흰 화면3. PrivateRoute ⭕ &#43; nginx.conf ❌ → 로그인 페이지는 뜨지만 새로고침 시 4044. PrivateRoute ⭕ &#43; nginx.conf ⭕ → 로그인 페이지 로딩 후 새로고침 시에도 페이지 정상 로딩 → 실험을 통해 nginx 설정과 인증 로직은 서로 다른 문제를 해결하며, 둘 다 필요하다는 것을 확인했습니다.
+PrivateRoute nginx.conf 결과 ❌ ❌ 흰 화면 ❌ ⭕ 흰 화면 ⭕ ❌ 로그인 페이지는 뜨지만 새로고침 시 404 ⭕ ⭕ 로그인 페이지 로딩 후 새로고침 시에도 정상 → 실험을 통해 nginx 설정과 인증 로직은 서로 다른 문제를 해결하며, 둘 다 필요하다는 것을 확인했습니다.
 ...</p>
   </div>
   <footer class="entry-footer"><span title='2026-04-26 00:00:00 +0900 KST'>April 26, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
@@ -150,8 +198,9 @@
   <div class="entry-content">
     <p>진행 사항 Spring Boot를 Docker Compose 환경에서 Docker 컨테이너로 실행했습니다.
 발생한 문제 GitHub에서 프로젝트를 Clone한 뒤 Docker Compose로 실행했을 때 컨테이너가 즉시 종료되는 문제가 발생했습니다.
-application.properties가 포함되지 않은 상태에서 컨테이너화하다 생긴 문제였습니다. application.properties에 민감정보를 다시 하드코딩하면 동작은 하지만, Git에 민감정보가 노출되는 문제가 있었습니다.
-테스트 사항 1. application.properties ❌ → 빌드 성공 / 컨테이너 실행 실패 2. application.properties ❌ &#43; .env ⭕ → 빌드 성공 / 컨테이너 실행 실패 → .env의 환경변수는 자동 매핑되었지만, application.properties에 정의되어 있던 다른 필수 설정값들이 함께 빠지면서 애플리케이션이 정상 기동되지 못함 3. application.properties ⭕ &#43; .env ⭕ → 빌드 성공 / 컨테이너 실행 성공 → 로그인 기능 정상 동작 application.properties에서 .env의 환경변수를 참조하도록 구성하면, 민감 정보를 하드코딩하지 않고도 정상 동작합니다. 해결 방법 4-1. .env 파일 설정 .env에 민감정보를 작성하고, docker-compose가 이를 컨테이너 환경변수로 전달하도록 설정합니다.
+application.properties가 포함되지 않은 상태로 컨테이너를 실행하면서 발생한 문제였습니다. application.properties에 민감정보를 다시 하드코딩하면 동작은 하지만, Git에 민감정보가 노출되는 문제가 있었습니다.
+테스트 사항 1. application.properties ❌ → 빌드 성공 / 컨테이너 실행 실패
+2. application.properties ❌ &#43; .env ⭕ → 빌드 성공 / 컨테이너 실행 실패 → .env의 일부 환경변수는 자동 매핑되었지만, 애플리케이션 기동에 필요한 필수 설정값이 모두 제공되지 않아 정상적으로 실행되지 않음
 ...</p>
   </div>
   <footer class="entry-footer"><span title='2026-04-26 00:00:00 +0900 KST'>April 26, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>

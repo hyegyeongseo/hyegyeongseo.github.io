@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Migration on 기록 블로그</title>
+    <link>http://localhost:1313/tags/migration/</link>
+    <description>Recent content in Migration on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Sat, 09 May 2026 00:00:00 +0900</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/migration/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴</title>
+      <link>http://localhost:1313/posts/flyway-migration-principles/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/flyway-migration-principles/</guid>
+      <description>Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다.</description>
+    </item>
+  </channel>
+</rss>

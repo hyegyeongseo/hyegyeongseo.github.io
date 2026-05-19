@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정 | 기록 블로그</title>
+<meta name="keywords" content="aws, vpc-endpoint, cost-optimization">
+<meta name="description" content="AWS dev 환경 VPC 비용 최적화 — Interface VPC Endpoint를 NAT Instance로 전환한 의사결정과 운영 이슈 분석">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정">
+  <meta property="og:description" content="AWS dev 환경 VPC 비용 최적화 — Interface VPC Endpoint를 NAT Instance로 전환한 의사결정과 운영 이슈 분석">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-17T00:00:00+09:00">
+    <meta property="article:modified_time" content="2026-05-17T00:00:00+09:00">
+    <meta property="article:tag" content="Aws">
+    <meta property="article:tag" content="Vpc-Endpoint">
+    <meta property="article:tag" content="Cost-Optimization">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정">
+  <meta name="twitter:description" content="AWS dev 환경 VPC 비용 최적화 — Interface VPC Endpoint를 NAT Instance로 전환한 의사결정과 운영 이슈 분석">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정",
+      "item": "http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정",
+  "name": "AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정",
+  "description": "AWS dev 환경 VPC 비용 최적화 — Interface VPC Endpoint를 NAT Instance로 전환한 의사결정과 운영 이슈 분석",
+  "keywords": [
+    "aws", "vpc-endpoint", "cost-optimization"
+  ],
+  "articleBody": "시작 — VPC 카테고리에 $23.74 AWS 청구서 화면에서 한 줄이 눈에 띄었습니다.\nAmazon Virtual Private Cloud: $23.74\nVPC 리소스 자체(subnet, route table, IGW)는 무료라고 알고 있어서 의문이 생겼습니다. “VPC 자체로 돈이 나가나?”\n답은 VPC 카테고리 아래 묶이는 유료 컴포넌트들 — Interface VPC Endpoint, Public IPv4 였습니다.\n비용 분해 — Bills 화면 그대로 펼치기 Billing → Bills → 해당 월을 선택하면 서비스 단위로 수량과 단가까지 다 나옵니다. VPC 카테고리만 펼쳐 보니 다음과 같았습니다.\nVirtual Private Cloud USD 23.74 └─ Asia Pacific (Seoul) ├─ Amazon Virtual Private Cloud Public IPv4 Addresses USD 3.15 │ ├─ $0.005 per Idle public IPv4 address per hour 48.596 Hrs $0.24 │ └─ $0.005 per In-use public IPv4 address per hour 582.549 Hrs $2.91 └─ Amazon Virtual Private Cloud VpcEndpoint USD 20.59 ├─ $0.01 per GB data processed by VPC Endpoints 0.37 GB $0.00 └─ $0.013 per VPC Endpoint Hour 1,584 Hrs $20.59 압도적 1위는 VPC Endpoint Hour — $20.59. terraform-dev/vpc-endpoints.tf를 확인해보니 원인이 명확했습니다.\n$ grep -E '^resource|vpc_endpoint_type' terraform-dev/vpc-endpoints.tf resource \"aws_vpc_endpoint\" \"s3\" { # Gateway — 무료 vpc_endpoint_type = \"Gateway\" resource \"aws_vpc_endpoint\" \"ecr_api\" { # Interface — 유료 vpc_endpoint_type = \"Interface\" resource \"aws_vpc_endpoint\" \"ecr_dkr\" { # Interface — 유료 vpc_endpoint_type = \"Interface\" resource \"aws_vpc_endpoint\" \"logs\" { # Interface — 유료 vpc_endpoint_type = \"Interface\" 3개의 Interface Endpoint(ECR API, ECR Docker, CloudWatch Logs)가 AZ 2개씩 떠 있는 구조 — 즉 ENI 6개. 서울 리전 단가는 ENI(=AZ)당 시간당 $0.013.\n1,584 시간 — endpoint는 “끌 수 없다” 빌에 찍힌 1,584 시간을 ENI 수로 나누면:\n1,584 hr ÷ 6 ENI = ENI당 264 시간 ≈ 11일치 연속 운영 여기서 중요한 사실 하나: Interface VPC Endpoint는 정지 상태가 없습니다. 한 번 만들어두면 Available 상태로 계속 과금되고, 지우는 것 외에는 멈출 방법이 없습니다. 즉 dev 환경에서 stop 스크립트로 ECS / NAT / RDS / Valkey 등을 다 내려도 endpoint는 그대로 시간을 쌓아요. 264 시간은 endpoint가 살아있던 전 기간에 해당합니다.\n이게 dev 환경에서 endpoint가 상대적으로 비싸 보이는 본질적인 이유입니다 — dev에서 다른 자원들은 stop 스크립트로 운영비를 깎아내는데, endpoint만 24/7로 누적되거든요. 24시간 가동 가정의 이론 최대치는:\n6 ENI × 730 hr × $0.013 ≈ $56.94 / 월 VPC 카테고리 안의 진짜 분해 항목 실측 비고 Interface Endpoint × 3 (ENI 6개) $20.59 (1,584 hr) ★ 제거 대상. 24/7 이론 최대치 $56.94 VPC Endpoint Data Processing $0.00 (0.37 GB) dev 트래픽이 작아 무시 가능 Public IPv4 In-use (ALB × 2 AZ + NAT EIP 등) $2.91 (582 hr) 손 댈 수 없음. 자원 가동 시간만큼만 Public IPv4 Idle $0.24 (48 hr) 운영 사이클 중 일시적 unassociate 흔적 NAT Instance × 1 (t4g.micro) (EC2 카테고리에 별도) 유지. endpoint 제거 시 모든 outbound 수용 ALB-managed EIP는 internet-facing ALB가 각 AZ의 ENI에 자동 할당한 것이라 사용자가 release 불가. 외부 트래픽을 받으려면 필수 자원이라 손대지 않습니다. 손볼 곳은 Interface Endpoint 3개 한 묶음이었습니다.\n의사결정 — Interface Endpoint vs NAT의 트레이드오프 두 방식 모두 private subnet에서 AWS 서비스에 도달하는 수단이지만, 강점이 다릅니다.\n측면 Interface Endpoint NAT (Instance/Gateway) 가용성 AZ별 별도 ENI, AZ 장애 무관 단일 NAT은 SPOF, AZ별 NAT은 비용 증가 보안 감사 AWS 트래픽이 인터넷을 경유하지 않음 NAT 거쳐 인터넷으로 트래픽 비용 endpoint 시간당 + 데이터 처리비 NAT 시간당 + 데이터 처리비 고정 비용 AZ당 $0.013/시간 × 사용한 서비스 수 (24/7 누적) NAT Instance: ~$6/월, NAT Gateway: ~$43/월 stop 가능 여부 불가 — 지우는 것만이 정지 NAT Instance: stop 가능 / NAT Gateway: 불가 prod와 dev의 가용성 비대칭 prod 환경에서는 Interface Endpoint가 정당화됩니다.\nAZ 분산된 endpoint가 단일 NAT보다 가용성이 좋음 대용량 트래픽에서는 NAT 데이터 처리비가 endpoint 고정 비용을 추월 보안 감사상 AWS 서비스 트래픽이 NAT을 안 거치는 게 선호됨 24/7 가동되는 워크로드라 “endpoint는 끌 수 없다\"는 단점이 단점이 아님 dev 환경은 가치가 다릅니다.\n트래픽 자체가 작음 (실측 데이터 처리비 $0.00) SLA가 느슨 — AZ 장애 시 잠시 끊겨도 OK 나머지 자원이 stop 스크립트로 절약되는 상황에서 endpoint만 24/7 과금되어 상대 비중이 자연스럽게 커짐 같은 자원이라도 dev와 prod에서 얻는 가치가 다릅니다. prod의 best practice가 dev에서는 비용 낭비가 되는 영역입니다.\n결정: dev에서는 Interface Endpoint 3개를 제거하고 기존 NAT Instance로 우회. prod는 손대지 않음 (Interface Endpoint 유지).\n실행 — 정지 윈도우 활용 dev는 마침 stop 스크립트로 다 내려가 있는 상태였습니다 — ECS 0, ASG 0, NAT/Valkey/RDS 정지. VPC Endpoint를 사용할 클라이언트가 하나도 없는 시점이라 전환 비용이 가장 낮은 순간이었습니다.\nvpc-endpoints.tf — S3 Gateway만 남기고 주석 처리 S3 Gateway Endpoint는 무료이고 ECR 이미지 레이어가 S3에 저장되므로 유지. 나머지 3개 Interface + 그들이 공유하던 SG 1개 = 정확히 4개만 주석 처리.\n# ── S3 Gateway Endpoint (무료) — 유지 resource \"aws_vpc_endpoint\" \"s3\" { vpc_id = aws_vpc.main.id vpc_endpoint_type = \"Gateway\" route_table_ids = [aws_route_table.private.id] } - resource \"aws_security_group\" \"vpce\" { ... } - resource \"aws_vpc_endpoint\" \"ecr_api\" { ... Interface } - resource \"aws_vpc_endpoint\" \"ecr_dkr\" { ... Interface } - resource \"aws_vpc_endpoint\" \"logs\" { ... Interface } $ terraform plan # aws_security_group.vpce will be destroyed # aws_vpc_endpoint.ecr_api will be destroyed # aws_vpc_endpoint.ecr_dkr will be destroyed # aws_vpc_endpoint.logs will be destroyed Plan: 0 to add, 0 to change, 4 to destroy. $ terraform apply Apply complete! Resources: 0 added, 0 changed, 4 destroyed. 왜 정지 윈도우가 가장 안전한 타이밍인가 서비스가 돌아가는 중에 VPC Endpoint를 삭제하면, 기존에 연결되어 있던 시스템들이 이전 주소(사설 IP)를 계속 사용하다가 실패할 수 있습니다.\n하지만 서비스가 이미 멈춰 있는 상태에서는 요청을 보내는 주체가 없어서, 이런 연결 문제나 캐시 문제 없이 안전하게 변경을 적용할 수 있습니다.\n정리 결정 이유 dev의 Interface Endpoint 3개 제거 실측 $20.59 / 이론 최대 $56.94. 24/7 누적되는 유일한 자원이라 dev에서 상대 비중이 큼 prod는 손대지 않음 가용성·보안 감사·트래픽 규모상 Interface Endpoint가 정당화됨 정지 윈도우에 변경 DNS 캐시 / 연결 풀 같은 stateful 자원의 전이 비용 zero S3 Gateway Endpoint는 유지 무료이고 ECR 이미지 레이어가 S3에 저장 핵심 통찰 두 가지를 남깁니다.\nInterface Endpoint는 정지 상태가 없다. stop 스크립트로 다른 자원을 깎는 dev 환경에서 endpoint만 24/7 누적되며 상대 비중이 자연스럽게 커집니다. 이 비대칭이 “dev에서 endpoint를 빼라\"는 결정을 이끌어내는 핵심 논리입니다. 환경별 자원 가치는 비대칭이다. 같은 자원이라도 dev와 prod에서 가치가 다릅니다. prod의 best practice를 dev에 그대로 가져가면 비용 낭비가 되는 영역이 존재합니다. VPC endpoint 제거 및 dev 재시작 직후 통신 확인을 위해 SSH 대신 SSM Session Manager를 사용하려 했으나 SSM이 응답하지 않는 문제가 발생했습니다. 이는 NAT과는 무관한 AL2023 minimal AMI 구성 이슈였습니다. 해당 내용은 별도 글에서 다룹니다.\n",
+  "wordCount" : "1001",
+  "inLanguage": "en",
+  "datePublished": "2026-05-17T00:00:00+09:00",
+  "dateModified": "2026-05-17T00:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정
+      </h1>
+      <p class="post-description">AWS dev 환경 VPC 비용 최적화 — Interface VPC Endpoint를 NAT Instance로 전환한 의사결정과 운영 이슈 분석</p>
+      <div class="post-meta"><span title='2026-05-17 00:00:00 +0900 KST'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%ec%8b%9c%ec%9e%91--vpc-%ec%b9%b4%ed%85%8c%ea%b3%a0%eb%a6%ac%ec%97%90-2374" aria-label="시작 — VPC 카테고리에 $23.74">시작 — VPC 카테고리에 $23.74</a></li>
+            <li>
+                <a href="#%eb%b9%84%ec%9a%a9-%eb%b6%84%ed%95%b4--bills-%ed%99%94%eb%a9%b4-%ea%b7%b8%eb%8c%80%eb%a1%9c-%ed%8e%bc%ec%b9%98%ea%b8%b0" aria-label="비용 분해 — Bills 화면 그대로 펼치기">비용 분해 — Bills 화면 그대로 펼치기</a><ul>
+            <li>
+                <a href="#1584-%ec%8b%9c%ea%b0%84--endpoint%eb%8a%94-%eb%81%8c-%ec%88%98-%ec%97%86%eb%8b%a4" aria-label="1,584 시간 — endpoint는 &ldquo;끌 수 없다&rdquo;">1,584 시간 — endpoint는 &ldquo;끌 수 없다&rdquo;</a></li>
+            <li>
+                <a href="#vpc-%ec%b9%b4%ed%85%8c%ea%b3%a0%eb%a6%ac-%ec%95%88%ec%9d%98-%ec%a7%84%ec%a7%9c-%eb%b6%84%ed%95%b4" aria-label="VPC 카테고리 안의 진짜 분해">VPC 카테고리 안의 진짜 분해</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ec%9d%98%ec%82%ac%ea%b2%b0%ec%a0%95--interface-endpoint-vs-nat%ec%9d%98-%ed%8a%b8%eb%a0%88%ec%9d%b4%eb%93%9c%ec%98%a4%ed%94%84" aria-label="의사결정 — Interface Endpoint vs NAT의 트레이드오프">의사결정 — Interface Endpoint vs NAT의 트레이드오프</a><ul>
+            <li>
+                <a href="#prod%ec%99%80-dev%ec%9d%98-%ea%b0%80%ec%9a%a9%ec%84%b1-%eb%b9%84%eb%8c%80%ec%b9%ad" aria-label="prod와 dev의 가용성 비대칭">prod와 dev의 가용성 비대칭</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ec%8b%a4%ed%96%89--%ec%a0%95%ec%a7%80-%ec%9c%88%eb%8f%84%ec%9a%b0-%ed%99%9c%ec%9a%a9" aria-label="실행 — 정지 윈도우 활용">실행 — 정지 윈도우 활용</a><ul>
+            <li>
+                <a href="#vpc-endpointstf--s3-gateway%eb%a7%8c-%eb%82%a8%ea%b8%b0%ea%b3%a0-%ec%a3%bc%ec%84%9d-%ec%b2%98%eb%a6%ac" aria-label="vpc-endpoints.tf — S3 Gateway만 남기고 주석 처리">vpc-endpoints.tf — S3 Gateway만 남기고 주석 처리</a></li>
+            <li>
+                <a href="#%ec%99%9c-%ec%a0%95%ec%a7%80-%ec%9c%88%eb%8f%84%ec%9a%b0%ea%b0%80-%ea%b0%80%ec%9e%a5-%ec%95%88%ec%a0%84%ed%95%9c-%ed%83%80%ec%9d%b4%eb%b0%8d%ec%9d%b8%ea%b0%80" aria-label="왜 정지 윈도우가 가장 안전한 타이밍인가">왜 정지 윈도우가 가장 안전한 타이밍인가</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ec%a0%95%eb%a6%ac" aria-label="정리">정리</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <h2 id="시작--vpc-카테고리에-2374">시작 — VPC 카테고리에 $23.74</h2>
+<p>AWS 청구서 화면에서 한 줄이 눈에 띄었습니다.</p>
+<blockquote>
+<p>Amazon Virtual Private Cloud: <strong>$23.74</strong></p>
+</blockquote>
+<p>VPC 리소스 자체(subnet, route table, IGW)는 무료라고 알고 있어서 의문이 생겼습니다. <em>&ldquo;VPC 자체로 돈이 나가나?&rdquo;</em></p>
+<p>답은 VPC 카테고리 <em>아래</em> 묶이는 유료 컴포넌트들 — <strong>Interface VPC Endpoint</strong>, <strong>Public IPv4</strong> 였습니다.</p>
+<h2 id="비용-분해--bills-화면-그대로-펼치기">비용 분해 — Bills 화면 그대로 펼치기</h2>
+<p>Billing → Bills → 해당 월을 선택하면 서비스 단위로 <em>수량과 단가</em>까지 다 나옵니다. VPC 카테고리만 펼쳐 보니 다음과 같았습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">Virtual Private Cloud                                              USD 23.74
+</span></span><span class="line"><span class="cl">└─ Asia Pacific (Seoul)
+</span></span><span class="line"><span class="cl">   ├─ Amazon Virtual Private Cloud Public IPv4 Addresses           USD  3.15
+</span></span><span class="line"><span class="cl">   │  ├─ $0.005 per Idle public IPv4 address per hour     48.596 Hrs  $0.24
+</span></span><span class="line"><span class="cl">   │  └─ $0.005 per In-use public IPv4 address per hour  582.549 Hrs  $2.91
+</span></span><span class="line"><span class="cl">   └─ Amazon Virtual Private Cloud VpcEndpoint                     USD 20.59
+</span></span><span class="line"><span class="cl">      ├─ $0.01  per GB data processed by VPC Endpoints     0.37 GB    $0.00
+</span></span><span class="line"><span class="cl">      └─ $0.013 per VPC Endpoint Hour                  1,584    Hrs  $20.59
+</span></span></code></pre></div><p>압도적 1위는 <code>VPC Endpoint Hour</code> — <strong>$20.59</strong>. <code>terraform-dev/vpc-endpoints.tf</code>를 확인해보니 원인이 명확했습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ grep -E <span class="s1">&#39;^resource|vpc_endpoint_type&#39;</span> terraform-dev/vpc-endpoints.tf
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_vpc_endpoint&#34;</span> <span class="s2">&#34;s3&#34;</span> <span class="o">{</span>        <span class="c1"># Gateway — 무료</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">vpc_endpoint_type</span> <span class="o">=</span> <span class="s2">&#34;Gateway&#34;</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_vpc_endpoint&#34;</span> <span class="s2">&#34;ecr_api&#34;</span> <span class="o">{</span>   <span class="c1"># Interface — 유료</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">vpc_endpoint_type</span> <span class="o">=</span> <span class="s2">&#34;Interface&#34;</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_vpc_endpoint&#34;</span> <span class="s2">&#34;ecr_dkr&#34;</span> <span class="o">{</span>   <span class="c1"># Interface — 유료</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">vpc_endpoint_type</span> <span class="o">=</span> <span class="s2">&#34;Interface&#34;</span>
+</span></span><span class="line"><span class="cl">resource <span class="s2">&#34;aws_vpc_endpoint&#34;</span> <span class="s2">&#34;logs&#34;</span> <span class="o">{</span>      <span class="c1"># Interface — 유료</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">vpc_endpoint_type</span> <span class="o">=</span> <span class="s2">&#34;Interface&#34;</span>
+</span></span></code></pre></div><p>3개의 Interface Endpoint(ECR API, ECR Docker, CloudWatch Logs)가 AZ 2개씩 떠 있는 구조 — 즉 <strong>ENI 6개</strong>. 서울 리전 단가는 ENI(=AZ)당 <strong>시간당 $0.013</strong>.</p>
+<h3 id="1584-시간--endpoint는-끌-수-없다">1,584 시간 — endpoint는 &ldquo;끌 수 없다&rdquo;</h3>
+<p>빌에 찍힌 1,584 시간을 ENI 수로 나누면:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">1,584 hr ÷ 6 ENI = ENI당 264 시간 ≈ 11일치 연속 운영
+</span></span></code></pre></div><p>여기서 <em>중요한 사실 하나</em>: <strong>Interface VPC Endpoint는 정지 상태가 없습니다.</strong> 한 번 만들어두면 <code>Available</code> 상태로 계속 과금되고, <em>지우는 것 외에는 멈출 방법이 없습니다</em>. 즉 dev 환경에서 stop 스크립트로 ECS / NAT / RDS / Valkey 등을 다 내려도 endpoint는 그대로 시간을 쌓아요. 264 시간은 <em>endpoint가 살아있던 전 기간</em>에 해당합니다.</p>
+<p>이게 dev 환경에서 endpoint가 <em>상대적으로 비싸 보이는</em> 본질적인 이유입니다 — dev에서 다른 자원들은 stop 스크립트로 운영비를 깎아내는데, endpoint만 24/7로 누적되거든요. 24시간 가동 가정의 이론 최대치는:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">6 ENI × 730 hr × $0.013 ≈ $56.94 / 월
+</span></span></code></pre></div><h3 id="vpc-카테고리-안의-진짜-분해">VPC 카테고리 안의 진짜 분해</h3>
+<table>
+  <thead>
+      <tr>
+          <th>항목</th>
+          <th>실측</th>
+          <th>비고</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Interface Endpoint × 3 (ENI 6개)</td>
+          <td><strong>$20.59</strong> (1,584 hr)</td>
+          <td>★ 제거 대상. 24/7 이론 최대치 $56.94</td>
+      </tr>
+      <tr>
+          <td>VPC Endpoint Data Processing</td>
+          <td>$0.00 (0.37 GB)</td>
+          <td>dev 트래픽이 작아 무시 가능</td>
+      </tr>
+      <tr>
+          <td>Public IPv4 In-use (ALB × 2 AZ + NAT EIP 등)</td>
+          <td>$2.91 (582 hr)</td>
+          <td>손 댈 수 없음. 자원 가동 시간만큼만</td>
+      </tr>
+      <tr>
+          <td>Public IPv4 Idle</td>
+          <td>$0.24 (48 hr)</td>
+          <td>운영 사이클 중 일시적 unassociate 흔적</td>
+      </tr>
+      <tr>
+          <td>NAT Instance × 1 (t4g.micro)</td>
+          <td>(EC2 카테고리에 별도)</td>
+          <td>유지. endpoint 제거 시 모든 outbound 수용</td>
+      </tr>
+  </tbody>
+</table>
+<p>ALB-managed EIP는 internet-facing ALB가 각 AZ의 ENI에 자동 할당한 것이라 사용자가 release 불가. 외부 트래픽을 받으려면 필수 자원이라 손대지 않습니다. <em>손볼 곳은 Interface Endpoint 3개 한 묶음</em>이었습니다.</p>
+<h2 id="의사결정--interface-endpoint-vs-nat의-트레이드오프">의사결정 — Interface Endpoint vs NAT의 트레이드오프</h2>
+<p>두 방식 모두 <em>private subnet에서 AWS 서비스에 도달하는</em> 수단이지만, 강점이 다릅니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>측면</th>
+          <th>Interface Endpoint</th>
+          <th>NAT (Instance/Gateway)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>가용성</td>
+          <td>AZ별 별도 ENI, AZ 장애 무관</td>
+          <td>단일 NAT은 SPOF, AZ별 NAT은 비용 증가</td>
+      </tr>
+      <tr>
+          <td>보안 감사</td>
+          <td>AWS 트래픽이 인터넷을 경유하지 않음</td>
+          <td>NAT 거쳐 인터넷으로</td>
+      </tr>
+      <tr>
+          <td>트래픽 비용</td>
+          <td>endpoint 시간당 + 데이터 처리비</td>
+          <td>NAT 시간당 + 데이터 처리비</td>
+      </tr>
+      <tr>
+          <td>고정 비용</td>
+          <td>AZ당 $0.013/시간 × 사용한 서비스 수 (24/7 누적)</td>
+          <td>NAT Instance: ~$6/월, NAT Gateway: ~$43/월</td>
+      </tr>
+      <tr>
+          <td><em>stop 가능 여부</em></td>
+          <td><strong>불가</strong> — 지우는 것만이 정지</td>
+          <td>NAT Instance: stop 가능 / NAT Gateway: 불가</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="prod와-dev의-가용성-비대칭">prod와 dev의 가용성 비대칭</h3>
+<p><strong>prod 환경</strong>에서는 Interface Endpoint가 정당화됩니다.</p>
+<ul>
+<li>AZ 분산된 endpoint가 단일 NAT보다 가용성이 좋음</li>
+<li>대용량 트래픽에서는 NAT 데이터 처리비가 endpoint 고정 비용을 추월</li>
+<li>보안 감사상 AWS 서비스 트래픽이 NAT을 안 거치는 게 선호됨</li>
+<li>24/7 가동되는 워크로드라 &ldquo;endpoint는 끌 수 없다&quot;는 단점이 단점이 아님</li>
+</ul>
+<p><strong>dev 환경</strong>은 가치가 다릅니다.</p>
+<ul>
+<li>트래픽 자체가 작음 (실측 데이터 처리비 $0.00)</li>
+<li>SLA가 느슨 — AZ 장애 시 잠시 끊겨도 OK</li>
+<li><em>나머지 자원이 stop 스크립트로 절약되는 상황</em>에서 endpoint만 24/7 과금되어 상대 비중이 자연스럽게 커짐</li>
+</ul>
+<p>같은 자원이라도 dev와 prod에서 <em>얻는 가치가 다릅니다</em>. <strong>prod의 best practice가 dev에서는 비용 낭비가 되는 영역</strong>입니다.</p>
+<p><strong>결정</strong>: dev에서는 Interface Endpoint 3개를 제거하고 기존 NAT Instance로 우회. prod는 손대지 않음 (Interface Endpoint 유지).</p>
+<h2 id="실행--정지-윈도우-활용">실행 — 정지 윈도우 활용</h2>
+<p>dev는 마침 stop 스크립트로 다 내려가 있는 상태였습니다 — ECS 0, ASG 0, NAT/Valkey/RDS 정지. <strong>VPC Endpoint를 사용할 클라이언트가 하나도 없는 시점</strong>이라 전환 비용이 가장 낮은 순간이었습니다.</p>
+<h3 id="vpc-endpointstf--s3-gateway만-남기고-주석-처리">vpc-endpoints.tf — S3 Gateway만 남기고 주석 처리</h3>
+<p>S3 Gateway Endpoint는 무료이고 ECR 이미지 레이어가 S3에 저장되므로 유지. 나머지 3개 Interface + 그들이 공유하던 SG 1개 = 정확히 4개만 주석 처리.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-diff" data-lang="diff"><span class="line"><span class="cl">  # ── S3 Gateway Endpoint (무료) — 유지
+</span></span><span class="line"><span class="cl">  resource &#34;aws_vpc_endpoint&#34; &#34;s3&#34; {
+</span></span><span class="line"><span class="cl">    vpc_id            = aws_vpc.main.id
+</span></span><span class="line"><span class="cl">    vpc_endpoint_type = &#34;Gateway&#34;
+</span></span><span class="line"><span class="cl">    route_table_ids   = [aws_route_table.private.id]
+</span></span><span class="line"><span class="cl">  }
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gd">- resource &#34;aws_security_group&#34; &#34;vpce&#34;   { ... }
+</span></span></span><span class="line"><span class="cl"><span class="gd">- resource &#34;aws_vpc_endpoint&#34;  &#34;ecr_api&#34; { ... Interface }
+</span></span></span><span class="line"><span class="cl"><span class="gd">- resource &#34;aws_vpc_endpoint&#34;  &#34;ecr_dkr&#34; { ... Interface }
+</span></span></span><span class="line"><span class="cl"><span class="gd">- resource &#34;aws_vpc_endpoint&#34;  &#34;logs&#34;    { ... Interface }
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ terraform plan
+</span></span><span class="line"><span class="cl"><span class="c1"># aws_security_group.vpce       will be destroyed</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># aws_vpc_endpoint.ecr_api      will be destroyed</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># aws_vpc_endpoint.ecr_dkr      will be destroyed</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># aws_vpc_endpoint.logs         will be destroyed</span>
+</span></span><span class="line"><span class="cl">Plan: <span class="m">0</span> to add, <span class="m">0</span> to change, <span class="m">4</span> to destroy.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ terraform apply
+</span></span><span class="line"><span class="cl">Apply complete! Resources: <span class="m">0</span> added, <span class="m">0</span> changed, <span class="m">4</span> destroyed.
+</span></span></code></pre></div><h3 id="왜-정지-윈도우가-가장-안전한-타이밍인가">왜 정지 윈도우가 가장 안전한 타이밍인가</h3>
+<p>서비스가 돌아가는 중에 VPC Endpoint를 삭제하면, 기존에 연결되어 있던 시스템들이 이전 주소(사설 IP)를 계속 사용하다가 실패할 수 있습니다.</p>
+<p>하지만 서비스가 이미 멈춰 있는 상태에서는 요청을 보내는 주체가 없어서, 이런 연결 문제나 캐시 문제 없이 안전하게 변경을 적용할 수 있습니다.</p>
+<h2 id="정리">정리</h2>
+<table>
+  <thead>
+      <tr>
+          <th>결정</th>
+          <th>이유</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>dev의 Interface Endpoint 3개 제거</td>
+          <td>실측 $20.59 / 이론 최대 $56.94. 24/7 누적되는 유일한 자원이라 dev에서 상대 비중이 큼</td>
+      </tr>
+      <tr>
+          <td>prod는 손대지 않음</td>
+          <td>가용성·보안 감사·트래픽 규모상 Interface Endpoint가 정당화됨</td>
+      </tr>
+      <tr>
+          <td>정지 윈도우에 변경</td>
+          <td>DNS 캐시 / 연결 풀 같은 stateful 자원의 전이 비용 zero</td>
+      </tr>
+      <tr>
+          <td>S3 Gateway Endpoint는 유지</td>
+          <td>무료이고 ECR 이미지 레이어가 S3에 저장</td>
+      </tr>
+  </tbody>
+</table>
+<p>핵심 통찰 두 가지를 남깁니다.</p>
+<ol>
+<li><strong>Interface Endpoint는 정지 상태가 없다.</strong> stop 스크립트로 다른 자원을 깎는 dev 환경에서 endpoint만 24/7 누적되며 상대 비중이 자연스럽게 커집니다. 이 <em>비대칭</em>이 &ldquo;dev에서 endpoint를 빼라&quot;는 결정을 이끌어내는 핵심 논리입니다.</li>
+<li><strong>환경별 자원 가치는 비대칭이다.</strong> 같은 자원이라도 dev와 prod에서 가치가 다릅니다. prod의 best practice를 dev에 그대로 가져가면 비용 낭비가 되는 영역이 존재합니다.</li>
+</ol>
+<hr>
+<p>VPC endpoint 제거 및 dev 재시작 직후 통신 확인을 위해 SSH 대신 SSM Session Manager를 사용하려 했으나 SSM이 응답하지 않는 문제가 발생했습니다. 이는 NAT과는 무관한 AL2023 minimal AMI 구성 이슈였습니다. 해당 내용은 <a href="/posts/nat-ssm-al2023-minimal-ami/">별도 글</a>에서 다룹니다.</p>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/aws/">aws</a>
+      <a href="http://localhost:1313/tags/vpc-endpoint/">vpc-endpoint</a>
+      <a href="http://localhost:1313/tags/cost-optimization/">cost-optimization</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="next" href="http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/">
+    <span class="title">다음 페이지 »</span>
+    <span>NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

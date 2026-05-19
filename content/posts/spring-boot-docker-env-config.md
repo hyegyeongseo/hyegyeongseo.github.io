@@ -26,33 +26,33 @@ application.properties가 포함되지 않은 상태로 컨테이너를 실행�
 > → 로그인 기능 정상 동작
 
 ## 해결 방법
-### 4-1. .env 파일 설정
+### .env 파일 설정
 
 .env에 민감정보를 작성하고, docker-compose가 이를 컨테이너 환경변수로 전달하도록 설정합니다.
 
 .env 예시
-```dotenv
+```bash
 SPRING_DATASOURCE_PASSWORD=XXXX
 ```
-### 4-2. docker-compose.yml에서 환경변수 참조
+### docker-compose.yml에서 환경변수 참조
 docker-compose.yml 예시
 ```yaml
 env_file:
   - .env
 ```
 
-### 4-3. Spring Boot에서 환경변수 참조
+### Spring Boot에서 환경변수 참조
 
 application.properties 예시
 ```properties
 spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 ```
 
-### 4-4. .gitignore 수정
+### .gitignore 수정
 - application.properties는 Git에 포함하고, 민감정보는 환경변수(.env)로 분리합니다.
 - .env 파일은 민감 정보를 포함하므로 .gitignore에 추가하여 Git에 포함되지 않도록 합니다.
 
-### 4-5. 핵심 정리
+### 핵심 정리
 - 민감정보는 .env 한 곳에서만 관리하고, application.properties와 docker-compose.yml은 이를 참조만 합니다.
 - 같은 값을 여러 파일에 하드코딩하지 않으므로, 비밀번호 변경 시 .env만 수정하면 됩니다.
 

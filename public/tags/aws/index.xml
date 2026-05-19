@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Aws on 기록 블로그</title>
+    <link>http://localhost:1313/tags/aws/</link>
+    <description>Recent content in Aws on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Sun, 17 May 2026 00:00:00 +0900</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/aws/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정</title>
+      <link>http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/</link>
+      <pubDate>Sun, 17 May 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/</guid>
+      <description>AWS dev 환경 VPC 비용 최적화 — Interface VPC Endpoint를 NAT Instance로 전환한 의사결정과 운영 이슈 분석</description>
+    </item>
+    <item>
+      <title>NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)</title>
+      <link>http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/</link>
+      <pubDate>Sun, 17 May 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/</guid>
+      <description>NAT 문제처럼 보였던 SSM 연결 실패를 추적하다, AL2023 minimal AMI에 amazon-ssm-agent가 없다는 함정을 발견한 과정</description>
+    </item>
+    <item>
+      <title>Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유</title>
+      <link>http://localhost:1313/posts/alb-spring-boot-actuator-health-check/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/alb-spring-boot-actuator-health-check/</guid>
+      <description>ALB health check가 Spring Security에 의해 401로 실패했던 문제를 actuator permitAll 설정으로 해결한 과정</description>
+    </item>
+    <item>
+      <title>Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정</title>
+      <link>http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/</guid>
+      <description>Spring Boot의 readiness probe가 fail로 잡혀 ALB가 503을 반환한 문제를 추적해, Valkey 비밀번호가 IaC와 EC2 instance 사이에 어긋나 있던 원인을 확인하고 user_data 시점 특성에 따라 instance를 수동 replace한 과정</description>
+    </item>
+    <item>
+      <title>Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA</title>
+      <link>http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/</guid>
+      <description>RDS SSL 검증을 VERIFY_IDENTITY로 설정했지만 HikariPool 초기화가 trust anchor 에러로 실패한 문제를 추적해, JVM cacerts에 RDS CA가 없었다는 원인을 확인하고 Dockerfile에 import 단계를 추가한 과정</description>
+    </item>
+    <item>
+      <title>ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제</title>
+      <link>http://localhost:1313/posts/ecs-arm64-exec-format-error/</link>
+      <pubDate>Fri, 08 May 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/ecs-arm64-exec-format-error/</guid>
+      <description>Graviton(ARM64) 기반 ECS에서 발생한 exec format error를 추적해 amd64 이미지 아키텍처 mismatch 문제를 해결한 과정</description>
+    </item>
+    <item>
+      <title>ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식</title>
+      <link>http://localhost:1313/posts/ecs-task-definition-entrypoint-command/</link>
+      <pubDate>Fri, 08 May 2026 00:00:00 +0900</pubDate>
+      <guid>http://localhost:1313/posts/ecs-task-definition-entrypoint-command/</guid>
+      <description>ECS task definition의 command와 Docker ENTRYPOINT/CMD 동작 차이 때문에 발생한 `unknown command &amp;#34;sh&amp;#34;` 에러를 추적하고 해결한 과정</description>
+    </item>
+  </channel>
+</rss>

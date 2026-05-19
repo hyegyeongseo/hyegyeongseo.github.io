@@ -37,6 +37,11 @@ timezone = "Asia/Seoul"
 
 [markup]
   [markup.highlight]
+    # noClasses=false → chroma renders class names (.k, .nf, .s, ...) instead of inline styles,
+    # so the syntax theme can be controlled from custom.css and switch between light/dark.
+    noClasses = false
+    # style is still used as a fallback for the few classes we don't override.
     style = "dracula"
     lineNos = false
     codeFences = true
+    guessSyntax = true

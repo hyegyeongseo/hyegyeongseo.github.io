@@ -18,17 +18,17 @@ Vite dev 서버(`npm run dev`)로 실행 시에는 로그인 페이지가 정상
 ## 문제 재현 및 추가 실험
 문제를 더 정확히 이해하기 위해 아래 4가지 케이스로 나누어 테스트했습니다.
 
-```
-1. PrivateRoute ❌ + nginx.conf ❌ → 흰 화면
-2. PrivateRoute ❌ + nginx.conf ⭕ → 흰 화면
-3. PrivateRoute ⭕ + nginx.conf ❌ → 로그인 페이지는 뜨지만 새로고침 시 404
-4. PrivateRoute ⭕ + nginx.conf ⭕ → 로그인 페이지 로딩 후 새로고침 시에도 페이지 정상 로딩
-```
+| PrivateRoute | nginx.conf | 결과 |
+| --- | --- | --- |
+| ❌ | ❌ | 흰 화면 |
+| ❌ | ⭕ | 흰 화면 |
+| ⭕ | ❌ | 로그인 페이지는 뜨지만 새로고침 시 404 |
+| ⭕ | ⭕ | 로그인 페이지 로딩 후 새로고침 시에도 정상 |
 
 → 실험을 통해 nginx 설정과 인증 로직은 서로 다른 문제를 해결하며, 둘 다 필요하다는 것을 확인했습니다.
 
 ## 원인 분석
-### 4-1. nginx와 SPA 라우팅의 차이
+### nginx와 SPA 라우팅의 차이
 
 Vite dev server는 Node.js 기반이라 모든 요청을 받아서 index.html로 전달해주기 때문에 SPA 라우팅이 자동으로 동작했습니다.
 
@@ -38,7 +38,7 @@ React Router는 클라이언트 사이드 라우팅을 사용합니다.
 
 반면 nginx는 정적 파일 서버이기 때문에:
 
-```
+```text
 GET /login
 → /login 파일 찾음
 → 없으면 404
@@ -50,9 +50,9 @@ GET /login
 
 ---
 
-### 4-2. PrivateRoute의 역할
+### PrivateRoute의 역할
 
-```
+```jsx
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("accessToken");
   return token ? children : <Navigate to="/login" replace />;
@@ -74,17 +74,17 @@ const PrivateRoute = ({ children }) => {
 
 ---
 
-### 4-3. 왜 새로고침 시 404가 발생했는가
+### 왜 새로고침 시 404가 발생했는가
 
 초기 진입 시:
 
-```
+```text
 / → index.html → React 실행 → /login으로 리다이렉트
 ```
 
 하지만 새로고침 시:
 
-```
+```text
 /login → nginx 요청 → 파일 없음 → 404
 ```
 
@@ -92,7 +92,7 @@ const PrivateRoute = ({ children }) => {
 
 ---
 
-### 4-4. 핵심 정리
+### 핵심 정리
 
 | 요소 | 레이어 | 역할 |
 | --- | --- | --- |
@@ -102,9 +102,9 @@ const PrivateRoute = ({ children }) => {
 → 두 요소는 서로 다른 레이어에서 동작하며, 둘 다 필요합니다.
 
 ## 해결 방법
-### 5-1. nginx 설정 추가
+### nginx 설정 추가
 
-```
+```nginx.conf
 location / {
   try_files $uri $uri/ /index.html;
 }
@@ -114,9 +114,9 @@ location / {
 
 ---
 
-### 5-2. Dockerfile에서 설정 적용
+### Dockerfile에서 설정 적용
 
-```
+```dockerfile
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 ```
 
@@ -124,7 +124,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 ---
 
-### 5-3. 적용 결과
+### 적용 결과
 
 - `/login` 페이지에 정상 접근 가능
 - 새로고침 시에도 404 발생 ❌
