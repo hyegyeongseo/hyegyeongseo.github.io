@@ -3,6 +3,7 @@ title: "ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이�
 description: "Graviton(ARM64) 기반 ECS에서 발생한 exec format error를 추적해 amd64 이미지 아키텍처 mismatch 문제를 해결한 과정"
 date: 2026-05-08
 tags: ["aws", "ecs", "docker", "arm64", "graviton", "ci-cd", "github actions"]
+categories: ["Troubleshooting"]
 ---
 
 ## 진행 사항

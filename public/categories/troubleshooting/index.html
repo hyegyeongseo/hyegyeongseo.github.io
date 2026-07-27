@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Troubleshooting | 기록 블로그</title>
+<meta name="keywords" content="">
+<meta name="description" content="문제를 발견하고 원인을 찾아 해결한 기록">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/categories/troubleshooting/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/categories/troubleshooting/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/categories/troubleshooting/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/categories/troubleshooting/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="Troubleshooting">
+  <meta property="og:description" content="문제를 발견하고 원인을 찾아 해결한 기록">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="website">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Troubleshooting">
+  <meta name="twitter:description" content="문제를 발견하고 원인을 찾아 해결한 기록">
+
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span class="active">Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header">
+  <h1>
+    Troubleshooting
+  </h1>
+  <div class="post-description">
+    문제를 발견하고 원인을 찾아 해결한 기록
+  </div>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 전부 Healthy인데, HPA는 죽어 있었다 prod EKS에 관측 스택(로그·메트릭·트레이스)이 전부 떠 있고 ArgoCD도 모두 Healthy였습니다. 그런데 정기 점검 중 이런 걸 봤습니다.
+$ kubectl get hpa -A NAME TARGETS AGE backend cpu:&lt;unknown&gt;/70% 12d fastapi-embed cpu:&lt;unknown&gt;/70% 12d fastapi-guide cpu:&lt;unknown&gt;/70% 12d HPA 3개가 전부 &lt;unknown&gt;, 그것도 12일째. 어떤 대시보드에도, ArgoCD에도 경보는 없었습니다.
+이건 “장애가 났다&#34;가 아니라 “정상처럼 보이는 상태에서 숨어 있던 리스크” 였습니다. 저에게는 이 유형이 더 무섭습니다 — 아무도 모르니까요.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — k8s는 60초를 주는데, 앱이 안 쓰고 있었다 파드를 롤링 재시작하다가, 종료되는 파드가 Completed가 아니라 Error 로 끝나는 걸 봤습니다.
+backend-...-9lqc2 1/1 Terminating 0 3d14h backend-...-9lqc2 0/1 Error 0 3d14h 확인해 보니 같은 클러스터인데 서비스마다 종료 정책이 달랐습니다.
+서비스 설정 SIGTERM 수신 시 fastapi-guide graceful timeout 설정됨 진행 중 요청 마무리 후 종료 backend server.shutdown 미설정 → Spring 기본 immediate 기다리지 않고 커넥터 종료 Kubernetes는 terminationGracePeriodSeconds: 60으로 종료 유예를 주고 있었지만, backend는 Spring Boot 기본 종료 모드(immediate)를 쓰고 있어 그 시간을 활용하지 못하는 구조였습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-24 00:00:00 +0000 UTC'>July 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기" href="http://localhost:1313/posts/graceful-shutdown-drain/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 관측을 켰더니 비용이 컨트롤 플레인을 넘었다 prod 비용을 실측했더니 관리형 Prometheus(AMP)가 EKS 컨트롤 플레인보다 컸습니다. AMP는 수집 샘플 수로 과금되는데, 수집 설정(config.alloy)에는 메트릭 필터가 하나도 없었습니다. 수집되는 모든 시계열이 그대로 AMP로 remote_write되고 있었던 거죠.
+관측성을 늘리는 건 좋은데, “무엇을 얼마나 보내는지&#34;를 안 보고 늘리면 비용이 조용히 새 나갑니다.
+가설 — “node-exporter가 주범이겠지” 처음 심증은 node-exporter였습니다. node-exporter는 노드당 1,000개가 넘는 시계열을 기본으로 내보내는데, 대시보드·알림이 쓰는 건 일부뿐이니 그걸 자르면 될 것 같았습니다. 그럴듯한 가설이었습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-25 00:00:00 +0000 UTC'>July 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기" href="http://localhost:1313/posts/amp-spanmetrics-cost/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 다 맞는데 DB에 못 붙는다 prod EKS를 재기동한 뒤 backend가 ArgoCD에서 Degraded로 뜨고 CrashLoop에 빠졌습니다. 로그는 DB Connect timed out.
+그런데 확인해 보면 전부 정상이었습니다.
+RDS는 available DB 쪽 보안그룹 인바운드도 새 보안그룹 ID를 허용하도록 갱신 완료 재기동으로 클러스터가 재생성되면서 파드용 SG ID가 바뀐 것도 인지하고, 오버레이를 갱신해 커밋까지 해둔 상태 “설정은 다 맞는데 안 되는” 상황이었습니다.
+조사 — 설정이 아니라 ‘반영’을 봤다 RDS 상태 → 보안그룹 인바운드 규칙 → 파드 쪽 네트워크 순으로 좁혀 갔습니다. 앞의 둘이 멀쩡하니 남는 건 선언한 설정이 실제 네트워크에 반영됐는가였죠.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-23 00:00:00 +0000 UTC'>June 23, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다" href="http://localhost:1313/posts/sgp-branch-eni-timing/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>배경 — CI가 클러스터 대신 git을 만진다 GitOps로 옮기면서 CI의 역할이 바뀌었습니다. 예전엔 CI가 클러스터를 직접 갱신했지만, 이제는 이미지를 만들고 오버레이의 이미지 태그를 git에 커밋하는 것까지만 합니다. 클러스터 반영은 ArgoCD가 git을 보고 알아서 하고요.
+그런데 이 구조는 git을 배포 상태의 데이터베이스로 쓴다는 뜻이기도 합니다. 그러면 데이터베이스에서 겪는 문제가 그대로 따라옵니다 — 동시성과 복제 일관성.
+문제 ① 동시 배포가 서로를 밀어낸다 모노레포라 여러 서비스가 한 커밋으로 함께 배포되는 일이 잦았습니다. 그러면 각 서비스의 CD가 동시에 실행되어 같은 브랜치에 push를 시도합니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기" href="http://localhost:1313/posts/gitops-overlay-bump-race/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 dev 환경의 VPC Interface Endpoint 3개를 제거하고 기존 NAT Instance로 outbound를 우회시키는 작업이 별도 글에서 마무리됐습니다. 변경은 정지 윈도우에서 깔끔하게 4개 destroy만 일어났고, 다음 단계는 단순히 dev를 다시 켜는 것이었습니다.
+NAT, Valkey, RDS 차례로 start. NAT을 거친 outbound가 정상인지를 SSH 대신 SSM Session Manager로 검증해 보기로 했습니다 — SSM Agent의 등록 자체가 NAT 경로를 통한 공개 SSM endpoint 도달에 성공해야만 일어나는 일이라, 간접 검증이 되거든요. 콘솔에서 EC2 → Valkey → SSM Session Manager 탭을 열어봤습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0000 UTC'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)" href="http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Flyway Invalid version: 1 디버깅 기록 — 인라인 주석과 보이지 않는 공백 2단 함정
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 backend에 Flyway를 도입하면서 V1__baseline.sql 패턴을 설정하던 중이었습니다. application.properties의 baseline 설정 줄 옆에, 미래의 본인을 위해 친절한 인라인 주석을 달았습니다.
+spring.flyway.baseline-version=1 # 기존 DB는 V1 미실행, 빈 DB는 V1 실행 → 둘 다 V1 보존 배포 후 backend 부팅이 실패했습니다. 그리고 같은 Invalid version: 1 에러를 두 번 만났습니다. 첫 번째는 위 인라인 주석이 원인이었고, 그걸 풀고 나니 두 번째 cycle이 시작됐습니다. Flyway 자체의 원리는 별도 글에서 다루고, 이 글은 그 설정을 들여다보면서 만난 두 함정에 대한 기록입니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0000 UTC'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Flyway Invalid version: 1 디버깅 기록 — 인라인 주석과 보이지 않는 공백 2단 함정" href="http://localhost:1313/posts/flyway-baseline-version-trailing-space/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 ECS 위에 띄운 Spring Boot backend를 ALB target group에 등록하고, /actuator/health를 health check path로 설정해 운영하는 구조였습니다.
+발생한 문제 컨테이너는 정상적으로 RUNNING이었고, CloudWatch 로그에도 Spring Boot의 부팅 완료 로그(Tomcat started on port(s), Started ... in N.NNN seconds)가 정상적으로 찍혀 있었습니다. JVM은 정상적으로 실행 중이었지만, ALB target group health check는 계속 실패하며 unhealthy 상태로 유지되고 있었습니다.
+인프라가 application에 보내는 health check 요청이 어딘가에서 막혀 있었습니다.
+원인 분석 ALB가 받은 응답 확인 application이 살아있는데 ALB만 unhealthy라면, ALB가 application에 보낸 요청이 실제로 어떤 응답을 받고 있는지를 먼저 확인해야 했습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0000 UTC'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유" href="http://localhost:1313/posts/alb-spring-boot-actuator-health-check/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 dev 환경의 Spring Boot backend가 Valkey(Redis fork)를 종속 리소스로 사용하는 구조였습니다. dev 환경에서는 비용 절약을 위해 ElastiCache 대신 EC2 인스턴스에 Valkey를 직접 설치해 운영했고, Terraform으로 관리하면서 user_data에서 valkey.conf의 requirepass를 주입하는 패턴이었습니다.
+Spring Boot Actuator의 readiness probe는 Valkey 연결 상태를 함께 점검하도록 설정되어 있어, Valkey 연결이 실패하면 readiness가 DOWN으로 잡힙니다.
+발생한 문제 ALB target이 unhealthy로 잡혔습니다. 응답 코드는 503이었습니다.
+$ aws elbv2 describe-target-health --target-group-arn &#34;$TG_ARN&#34; &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; | 10.0.10.209| unhealthy| Target.ResponseCodeMismatch | Health checks failed: [503] | &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; application까지는 요청이 도달하고 있었지만, Spring Boot가 자기 자신을 “준비 안 됨&#34;이라고 응답하고 있는 상태였습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0000 UTC'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정" href="http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 ECS에 띄운 Spring Boot backend가 RDS(MySQL)에 SSL로 연결하는 구조였습니다. 로컬과 운영 환경에서 SSL 모드를 다르게 가져가도록, application.properties에서 환경변수로 받게 해두었습니다.
+# application.properties # 로컬은 PREFERRED, ECS는 VERIFY_IDENTITY spring.datasource.url=jdbc:mysql://...?sslMode=${DB_SSL_MODE:PREFERRED} ECS task definition에서는 DB_SSL_MODE=VERIFY_IDENTITY로 운영 등급 SSL 검증이 활성화되도록 환경변수를 주입했습니다.
+발생한 문제 ECS에 배포한 후 Spring Boot가 부팅을 시작하다 HikariPool 초기화 단계에서 막혔습니다.
+HikariPool : DraweHikariCP - Exception during pool initialization com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure Caused by: javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Path does not chain with any of the trust anchors application 단까지는 부팅이 진행됐지만, DB 연결 풀을 만드는 단계에서 SSL handshake가 실패했습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0000 UTC'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA" href="http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="next" href="http://localhost:1313/categories/troubleshooting/page/2/">다음 페이지&nbsp;&nbsp;»
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

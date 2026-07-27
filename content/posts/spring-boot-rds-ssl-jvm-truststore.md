@@ -3,6 +3,7 @@ title: "Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발�
 description: "RDS SSL 검증을 VERIFY_IDENTITY로 설정했지만 HikariPool 초기화가 trust anchor 에러로 실패한 문제를 추적해, JVM cacerts에 RDS CA가 없었다는 원인을 확인하고 Dockerfile에 import 단계를 추가한 과정"
 date: 2026-05-09
 tags: ["aws", "rds", "spring boot", "ssl", "tls", "jvm", "hikaricp", "docker"]
+categories: ["Troubleshooting"]
 ---
 
 ## 진행 사항

@@ -6,12 +6,12 @@
     <description>Recent content in Al2023 on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Sun, 17 May 2026 00:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 17 May 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/al2023/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)</title>
       <link>http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/</link>
-      <pubDate>Sun, 17 May 2026 00:00:00 +0900</pubDate>
+      <pubDate>Sun, 17 May 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/</guid>
       <description>NAT 문제처럼 보였던 SSM 연결 실패를 추적하다, AL2023 minimal AMI에 amazon-ssm-agent가 없다는 함정을 발견한 과정</description>
     </item>

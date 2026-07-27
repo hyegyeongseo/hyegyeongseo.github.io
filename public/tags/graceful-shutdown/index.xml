@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Graceful-Shutdown on 기록 블로그</title>
+    <link>http://localhost:1313/tags/graceful-shutdown/</link>
+    <description>Recent content in Graceful-Shutdown on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/graceful-shutdown/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기</title>
+      <link>http://localhost:1313/posts/graceful-shutdown-drain/</link>
+      <pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/graceful-shutdown-drain/</guid>
+      <description>Kubernetes가 60초 유예를 줬는데 앱은 그 유예를 안 쓰고 있었다. 오진을 두 번 걷어내고, &amp;#39;로그가 찍힌다&amp;#39;가 아니라 &amp;#39;실제로 드레인한다&amp;#39;를 대조 실험으로 증명한 기록.</description>
+    </item>
+  </channel>
+</rss>

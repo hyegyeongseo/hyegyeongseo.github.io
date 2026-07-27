@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나 | 기록 블로그</title>
+<meta name="keywords" content="observability, alerting, amp, prometheus, grafana, iac">
+<meta name="description" content="알림 룰을 대시보드 도구가 아니라 메트릭 저장소 쪽에 둔 이유. 룰을 코드로 관리하고, 저장 단위를 나누고, 기존 통지 경로를 재사용해 운영한 기록.">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/alerting-with-amp-not-grafana/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나">
+  <meta property="og:description" content="알림 룰을 대시보드 도구가 아니라 메트릭 저장소 쪽에 둔 이유. 룰을 코드로 관리하고, 저장 단위를 나누고, 기존 통지 경로를 재사용해 운영한 기록.">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-25T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-07-27T00:00:00+00:00">
+    <meta property="article:tag" content="Observability">
+    <meta property="article:tag" content="Alerting">
+    <meta property="article:tag" content="Amp">
+    <meta property="article:tag" content="Prometheus">
+    <meta property="article:tag" content="Grafana">
+    <meta property="article:tag" content="Iac">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나">
+  <meta name="twitter:description" content="알림 룰을 대시보드 도구가 아니라 메트릭 저장소 쪽에 둔 이유. 룰을 코드로 관리하고, 저장 단위를 나누고, 기존 통지 경로를 재사용해 운영한 기록.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나",
+      "item": "http://localhost:1313/posts/alerting-with-amp-not-grafana/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나",
+  "name": "OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나",
+  "description": "알림 룰을 대시보드 도구가 아니라 메트릭 저장소 쪽에 둔 이유. 룰을 코드로 관리하고, 저장 단위를 나누고, 기존 통지 경로를 재사용해 운영한 기록.",
+  "keywords": [
+    "observability", "alerting", "amp", "prometheus", "grafana", "iac"
+  ],
+  "articleBody": " Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 이 글 문제 — 보는 것과 알리는 것이 한 곳에 묶이면 ②편에서 무엇을 알릴지 고르고 문구까지 정했다면, 남는 문제는 알림 룰을 어디에서 평가하고, 어떤 경로로 운영자에게 전달할 것인가였습니다.\n대시보드 도구(Grafana)는 알림 기능도 제공합니다. 거기서 다 하면 편해 보이죠. 그런데 그러면 “보는 것\"과 “알리는 것\"이 한 컴포넌트에 묶입니다.\n대시보드를 손보다 알림 룰이 흔들릴 수 있고 알림 때문에 대시보드 구성을 못 바꾸게 되고 UI로 만든 룰은 누가 왜 바꿨는지 6개월 뒤에 알 수 없습니다 결정 — 룰은 메트릭 저장소 쪽에 알림 룰을 대시보드가 아니라 메트릭 저장소(AMP) 에 뒀습니다. Grafana 데이터소스에는 알림 관리를 끄는 설정을 명시했고요.\n# Grafana의 AMP 데이터소스 manageAlerts: false 이 한 줄이 “Grafana로는 알림을 관리하지 않는다” 는 선언입니다. 그래서 Grafana의 Alerting 메뉴에는 룰이 하나도 안 뜹니다 — 고장이 아니라 의도예요. 나중에 “왜 비어 있지?“라고 헷갈릴 일도 이 설정 하나로 설명됩니다.\n즉, Grafana는 조회 UI이고, 알림의 진실(source of truth)은 AMP에 있다는 역할 분리였습니다.\n얻은 건 세 가지였습니다.\n대시보드를 마음대로 고쳐도 알림이 흔들리지 않는다 Grafana가 내려가도 알림은 계속 발화한다 — 룰 평가와 발송이 저장소 쪽에서 돌고, Grafana는 조회 UI일 뿐이라 대시보드를 못 봐도 평가는 멈추지 않는다 룰이 코드로 남는다 (아래) 룰을 코드로 — 단일 소스, 환경별 적재 룰은 YAML 파일 묶음이 단일 소스입니다. 파일을 고치면 리뷰와 이력이 남고, 롤백도 되돌리기 한 번이죠.\n재미있는 건 내용은 같은데 적재 경로만 환경마다 다르다는 점입니다.\n환경 저장소 적재 방식 dev ①편의 관리형 SaaS 룰 파일이 바뀌면 CI가 자동 적재 prod AMP Terraform이 파일을 그대로 읽어 리소스로 관리 prod 쪽이 특히 편했습니다. YAML을 고치면 terraform plan에 diff가 그대로 뜨고, apply로 반영됩니다. 별도 적재 명령이나 콘솔 작업 없이, 실제 룰 상태를 코드와 일치시킬 수 있었습니다.\n저장 단위를 셋으로 나눈 이유 룰을 한 덩어리로 두지 않고 대상에 따라 세 묶음으로 나눴습니다.\n묶음 대상 성격 backend Spring Boot (오류율·지연·JVM·커넥션 풀·서킷) 플랫폼 중립 fastapi embed / guide (오류율·지연·LLM·VLM) 플랫폼 중립 infra 노드·쿠버네티스 오브젝트 EKS 전제 나눈 이유는 변경 주기가 다르기 때문입니다. 앱 룰을 고친다고 인프라 룰까지 함께 배포될 이유가 없으니까요.\n앱 룰이 플랫폼 중립인 건 의도한 설계입니다. 룰이 메트릭 이름을 기준으로 쓰였고 ECS·EKS가 같은 이름을 내보내니, 같은 룰 한 벌이 양쪽에 그대로 적용됩니다 — 마이그레이션 중에도 알림이 끊기지 않았죠.\n반대로 infra 룰은 EKS 전제라 주의가 필요합니다. 쿠버네티스 오브젝트 지표에 의존하기 때문에, 클러스터를 내리면 “kube-state-metrics가 없다” 는 알림이 발화합니다. 그래서 teardown 절차에 해당 룰 묶음도 함께 정리하는 단계를 넣었습니다.\n부재를 감지하는 룰(absent() 계열)은 배포 순서에도 민감합니다. 대상 컴포넌트를 올리기 전에 룰을 먼저 적재하면 즉시 오발화하거든요.\n통지 경로 — 새로 만들지 않고 재사용 발화된 알림은 Alertmanager → SNS → Lambda → Discord로 갑니다. AWS Chatbot이 Discord를 지원하지 않아 Lambda가 SNS 메시지를 받아 웹훅으로 POST하는 구조인데, 이미 있던 경로를 그대로 재사용했습니다. 새 통지 채널을 만들지 않은 거죠.\n②편에서 라벨(심각도·서비스·계층)을 설계했는데, 그게 여기서 메시지 헤더와 색상으로 이어집니다. 심각도에 따라 색이 달라져서 채팅 목록에서 펼치지 않고도 급한 것이 구분됩니다.\n여기엔 숨은 계약이 하나 있습니다. 알림 쪽이 만드는 메시지 헤더 형식(상태·심각도·알림명·서비스)과 Lambda의 파서가 짝으로 묶여 있어서, 한쪽 형식을 바꾸면 다른 쪽도 같이 고쳐야 합니다. 안 그러면 알림이 죽지는 않지만 제목·심각도·서비스명이 빠진 기본 형태로 표시됩니다 — 조용히 나빠지는 쪽이라 눈치채기 어려워서 코드 주석으로 명시해 뒀습니다.\n정리 보는 곳과 알리는 곳을 분리하면 서로를 안 흔든다. 그 선언은 설정 한 줄이지만 운영 방식 전체를 결정한다. 룰이 코드에 있으면 “지금 무엇이 걸려 있는지\"가 항상 확인 가능하다. UI로 만든 룰은 6개월 뒤에 추적할 수 없다. 저장 단위는 변경 주기로 나눈다. 앱 룰과 인프라 룰은 함께 배포될 이유가 없다. 플랫폼 전제가 있는 룰은 그 전제를 절차에 적어 둔다. 클러스터를 내릴 때 함께 정리해야 하는 룰이 있다. 통지는 새로 만들기보다 있는 경로를 재사용한다. 대신 형식이 계약이라는 걸 코드에 남긴다. 결국 이 설계의 핵심은 “Grafana는 조회 도구로 쓰되, 알림의 상태와 이력은 Git과 AMP가 책임지게 한다” 였습니다.\n관측성은 데이터를 모으고(①), 무엇을 어떻게 알릴지 정하고(②), 그 룰을 어디에 두고 어떻게 굴릴지(③)까지가 한 세트였습니다.\n",
+  "wordCount" : "618",
+  "inLanguage": "en",
+  "datePublished": "2026-06-25T00:00:00Z",
+  "dateModified": "2026-07-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/alerting-with-amp-not-grafana/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나
+      </h1>
+      <p class="post-description">알림 룰을 대시보드 도구가 아니라 메트릭 저장소 쪽에 둔 이유. 룰을 코드로 관리하고, 저장 단위를 나누고, 기존 통지 경로를 재사용해 운영한 기록.</p>
+      <div class="post-meta"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%eb%ac%b8%ec%a0%9c--%eb%b3%b4%eb%8a%94-%ea%b2%83%ea%b3%bc-%ec%95%8c%eb%a6%ac%eb%8a%94-%ea%b2%83%ec%9d%b4-%ed%95%9c-%ea%b3%b3%ec%97%90-%eb%ac%b6%ec%9d%b4%eb%a9%b4" aria-label="문제 — 보는 것과 알리는 것이 한 곳에 묶이면">문제 — 보는 것과 알리는 것이 한 곳에 묶이면</a></li>
+            <li>
+                <a href="#%ea%b2%b0%ec%a0%95--%eb%a3%b0%ec%9d%80-%eb%a9%94%ed%8a%b8%eb%a6%ad-%ec%a0%80%ec%9e%a5%ec%86%8c-%ec%aa%bd%ec%97%90" aria-label="결정 — 룰은 메트릭 저장소 쪽에">결정 — 룰은 메트릭 저장소 쪽에</a></li>
+            <li>
+                <a href="#%eb%a3%b0%ec%9d%84-%ec%bd%94%eb%93%9c%eb%a1%9c--%eb%8b%a8%ec%9d%bc-%ec%86%8c%ec%8a%a4-%ed%99%98%ea%b2%bd%eb%b3%84-%ec%a0%81%ec%9e%ac" aria-label="룰을 코드로 — 단일 소스, 환경별 적재">룰을 코드로 — 단일 소스, 환경별 적재</a></li>
+            <li>
+                <a href="#%ec%a0%80%ec%9e%a5-%eb%8b%a8%ec%9c%84%eb%a5%bc-%ec%85%8b%ec%9c%bc%eb%a1%9c-%eb%82%98%eb%88%88-%ec%9d%b4%ec%9c%a0" aria-label="저장 단위를 셋으로 나눈 이유">저장 단위를 셋으로 나눈 이유</a></li>
+            <li>
+                <a href="#%ed%86%b5%ec%a7%80-%ea%b2%bd%eb%a1%9c--%ec%83%88%eb%a1%9c-%eb%a7%8c%eb%93%a4%ec%a7%80-%ec%95%8a%ea%b3%a0-%ec%9e%ac%ec%82%ac%ec%9a%a9" aria-label="통지 경로 — 새로 만들지 않고 재사용">통지 경로 — 새로 만들지 않고 재사용</a></li>
+            <li>
+                <a href="#%ec%a0%95%eb%a6%ac" aria-label="정리">정리</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      
+<nav class="fn-series" aria-label="시리즈 목차">
+  <div class="fn-series-head">
+    <span class="fn-series-tag">Series</span>
+    <span class="fn-series-name">관측성 설계</span>
+    <span class="fn-series-count">3부작</span>
+  </div>
+  <ol class="fn-series-list">
+    <li class="fn-series-item">
+      <span class="fn-series-num">1</span>
+      <a class="fn-series-title" href="/posts/opentelemetry-observability-stack/">데이터를 어떻게 모으고 저장했는가</a>
+    </li>
+    <li class="fn-series-item">
+      <span class="fn-series-num">2</span>
+      <a class="fn-series-title" href="/posts/alert-design-what-and-how/">무엇을 알리고, 어떻게 말할 것인가</a>
+    </li>
+    <li class="fn-series-item is-current">
+      <span class="fn-series-num">3</span>
+      <span class="fn-series-title">왜 Grafana가 아니라 AMP가 알림을 책임졌나</span>
+      <span class="fn-series-here">이 글</span>
+    </li>
+  </ol>
+</nav>
+
+<h2 id="문제--보는-것과-알리는-것이-한-곳에-묶이면">문제 — 보는 것과 알리는 것이 한 곳에 묶이면</h2>
+<p><a href="/posts/alert-design-what-and-how/">②편</a>에서 무엇을 알릴지 고르고 문구까지 정했다면, 남는 문제는 <strong>알림 룰을 어디에서 평가하고, 어떤 경로로 운영자에게 전달할 것인가</strong>였습니다.</p>
+<p>대시보드 도구(Grafana)는 알림 기능도 제공합니다. 거기서 다 하면 편해 보이죠. 그런데 그러면 <strong>&ldquo;보는 것&quot;과 &ldquo;알리는 것&quot;이 한 컴포넌트에 묶입니다.</strong></p>
+<ul>
+<li>대시보드를 손보다 알림 룰이 흔들릴 수 있고</li>
+<li>알림 때문에 대시보드 구성을 못 바꾸게 되고</li>
+<li>UI로 만든 룰은 <strong>누가 왜 바꿨는지 6개월 뒤에 알 수 없습니다</strong></li>
+</ul>
+<h2 id="결정--룰은-메트릭-저장소-쪽에">결정 — 룰은 메트릭 저장소 쪽에</h2>
+<p>알림 룰을 <strong>대시보드가 아니라 메트릭 저장소(AMP)</strong> 에 뒀습니다. Grafana 데이터소스에는 알림 관리를 끄는 설정을 명시했고요.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># Grafana의 AMP 데이터소스</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">manageAlerts</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span></code></pre></div><p>이 한 줄이 <em>&ldquo;Grafana로는 알림을 관리하지 않는다&rdquo;</em> 는 선언입니다. 그래서 Grafana의 Alerting 메뉴에는 룰이 하나도 안 뜹니다 — <strong>고장이 아니라 의도</strong>예요. 나중에 &ldquo;왜 비어 있지?&ldquo;라고 헷갈릴 일도 이 설정 하나로 설명됩니다.</p>
+<p>즉, <strong>Grafana는 조회 UI이고, 알림의 진실(source of truth)은 AMP에 있다</strong>는 역할 분리였습니다.</p>
+<p>얻은 건 세 가지였습니다.</p>
+<ul>
+<li>대시보드를 마음대로 고쳐도 <strong>알림이 흔들리지 않는다</strong></li>
+<li><strong>Grafana가 내려가도 알림은 계속 발화한다</strong> — 룰 평가와 발송이 저장소 쪽에서 돌고, Grafana는 조회 UI일 뿐이라 대시보드를 못 봐도 평가는 멈추지 않는다</li>
+<li>룰이 <strong>코드로 남는다</strong> (아래)</li>
+</ul>
+<h2 id="룰을-코드로--단일-소스-환경별-적재">룰을 코드로 — 단일 소스, 환경별 적재</h2>
+<p>룰은 YAML 파일 묶음이 <strong>단일 소스</strong>입니다. 파일을 고치면 리뷰와 이력이 남고, 롤백도 되돌리기 한 번이죠.</p>
+<p>재미있는 건 <strong>내용은 같은데 적재 경로만 환경마다 다르다</strong>는 점입니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>환경</th>
+          <th>저장소</th>
+          <th>적재 방식</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>dev</td>
+          <td><a href="/posts/opentelemetry-observability-stack/">①편의 관리형 SaaS</a></td>
+          <td>룰 파일이 바뀌면 <strong>CI가 자동 적재</strong></td>
+      </tr>
+      <tr>
+          <td>prod</td>
+          <td>AMP</td>
+          <td><strong>Terraform이 파일을 그대로 읽어</strong> 리소스로 관리</td>
+      </tr>
+  </tbody>
+</table>
+<p>prod 쪽이 특히 편했습니다. YAML을 고치면 <code>terraform plan</code>에 <strong>diff가 그대로 뜨고</strong>, apply로 반영됩니다. 별도 적재 명령이나 콘솔 작업 없이, <strong>실제 룰 상태를 코드와 일치</strong>시킬 수 있었습니다.</p>
+<h2 id="저장-단위를-셋으로-나눈-이유">저장 단위를 셋으로 나눈 이유</h2>
+<p>룰을 한 덩어리로 두지 않고 대상에 따라 세 묶음으로 나눴습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>묶음</th>
+          <th>대상</th>
+          <th>성격</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>backend</td>
+          <td>Spring Boot (오류율·지연·JVM·커넥션 풀·서킷)</td>
+          <td><strong>플랫폼 중립</strong></td>
+      </tr>
+      <tr>
+          <td>fastapi</td>
+          <td>embed / guide (오류율·지연·LLM·VLM)</td>
+          <td><strong>플랫폼 중립</strong></td>
+      </tr>
+      <tr>
+          <td>infra</td>
+          <td>노드·쿠버네티스 오브젝트</td>
+          <td><strong>EKS 전제</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>나눈 이유는 변경 주기가 다르기 때문</strong>입니다. 앱 룰을 고친다고 인프라 룰까지 함께 배포될 이유가 없으니까요.</p>
+<p><strong>앱 룰이 플랫폼 중립인 건 의도한 설계</strong>입니다. 룰이 <em>메트릭 이름</em>을 기준으로 쓰였고 ECS·EKS가 같은 이름을 내보내니, 같은 룰 한 벌이 양쪽에 그대로 적용됩니다 — <a href="/posts/ecs-to-eks-cutover/">마이그레이션</a> 중에도 알림이 끊기지 않았죠.</p>
+<p>반대로 <strong>infra 룰은 EKS 전제</strong>라 주의가 필요합니다. 쿠버네티스 오브젝트 지표에 의존하기 때문에, 클러스터를 내리면 <em>&ldquo;kube-state-metrics가 없다&rdquo;</em> 는 알림이 발화합니다. 그래서 teardown 절차에 <strong>해당 룰 묶음도 함께 정리</strong>하는 단계를 넣었습니다.</p>
+<blockquote>
+<p>부재를 감지하는 룰(<code>absent()</code> 계열)은 <strong>배포 순서에도 민감</strong>합니다. 대상 컴포넌트를 올리기 <em>전에</em> 룰을 먼저 적재하면 즉시 오발화하거든요.</p>
+</blockquote>
+<h2 id="통지-경로--새로-만들지-않고-재사용">통지 경로 — 새로 만들지 않고 재사용</h2>
+<p>발화된 알림은 <strong>Alertmanager → SNS → Lambda → Discord</strong>로 갑니다. AWS Chatbot이 Discord를 지원하지 않아 Lambda가 SNS 메시지를 받아 웹훅으로 POST하는 구조인데, <strong>이미 있던 경로를 그대로 재사용</strong>했습니다. 새 통지 채널을 만들지 않은 거죠.</p>
+<p>②편에서 라벨(심각도·서비스·계층)을 설계했는데, 그게 여기서 <strong>메시지 헤더와 색상</strong>으로 이어집니다. 심각도에 따라 색이 달라져서 채팅 목록에서 펼치지 않고도 급한 것이 구분됩니다.</p>
+<p><strong>여기엔 숨은 계약이 하나 있습니다.</strong> 알림 쪽이 만드는 메시지 헤더 형식(상태·심각도·알림명·서비스)과 Lambda의 파서가 <strong>짝으로 묶여</strong> 있어서, 한쪽 형식을 바꾸면 다른 쪽도 같이 고쳐야 합니다. 안 그러면 알림이 죽지는 않지만 <strong>제목·심각도·서비스명이 빠진 기본 형태로 표시</strong>됩니다 — 조용히 나빠지는 쪽이라 눈치채기 어려워서 코드 주석으로 명시해 뒀습니다.</p>
+<h2 id="정리">정리</h2>
+<ol>
+<li><strong>보는 곳과 알리는 곳을 분리하면 서로를 안 흔든다.</strong> 그 선언은 설정 한 줄이지만 운영 방식 전체를 결정한다.</li>
+<li><strong>룰이 코드에 있으면 &ldquo;지금 무엇이 걸려 있는지&quot;가 항상 확인 가능하다.</strong> UI로 만든 룰은 6개월 뒤에 추적할 수 없다.</li>
+<li><strong>저장 단위는 변경 주기로 나눈다.</strong> 앱 룰과 인프라 룰은 함께 배포될 이유가 없다.</li>
+<li><strong>플랫폼 전제가 있는 룰은 그 전제를 절차에 적어 둔다.</strong> 클러스터를 내릴 때 함께 정리해야 하는 룰이 있다.</li>
+<li><strong>통지는 새로 만들기보다 있는 경로를 재사용한다.</strong> 대신 형식이 계약이라는 걸 코드에 남긴다.</li>
+</ol>
+<p>결국 이 설계의 핵심은 <strong>&ldquo;Grafana는 조회 도구로 쓰되, 알림의 상태와 이력은 Git과 AMP가 책임지게 한다&rdquo;</strong> 였습니다.</p>
+<p>관측성은 데이터를 모으고(①), 무엇을 어떻게 알릴지 정하고(②), 그 룰을 <strong>어디에 두고 어떻게 굴릴지</strong>(③)까지가 한 세트였습니다.</p>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/observability/">observability</a>
+      <a href="http://localhost:1313/tags/alerting/">alerting</a>
+      <a href="http://localhost:1313/tags/amp/">amp</a>
+      <a href="http://localhost:1313/tags/prometheus/">prometheus</a>
+      <a href="http://localhost:1313/tags/grafana/">grafana</a>
+      <a href="http://localhost:1313/tags/iac/">iac</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/alert-design-what-and-how/">
+    <span class="title">« 이전 페이지</span>
+    <span>OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/">
+    <span class="title">다음 페이지 »</span>
+    <span>Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

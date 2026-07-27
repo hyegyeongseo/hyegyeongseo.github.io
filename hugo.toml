@@ -2,7 +2,9 @@ baseURL = "https://hyegyeongseo.github.io/"
 languageCode = "ko"
 title = "기록 블로그"
 theme = "PaperMod"
-paginate = 10
+[pagination]
+  pagerSize = 10
+
 timezone = "Asia/Seoul"
 
 [outputs]
@@ -10,7 +12,7 @@ timezone = "Asia/Seoul"
 
 [params]
   env = "production"
-  description = "트러블슈팅 기록"
+  description = "서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra & Observability) · 문제 해결로 증명하는(Troubleshooting) 기록"
   author = "hyegyeongseo"
   defaultTheme = "auto"
   ShowReadingTime = false
@@ -19,11 +21,12 @@ timezone = "Asia/Seoul"
   ShowBreadCrumbs = false
   ShowCodeCopyButtons = true
   ShowToc = true
+  ShowLastMod = true
   TocOpen = true
 
   [params.homeInfoParams]
     Title = "기록 블로그"
-    Content = "시행착오를 기록합니다"
+    Content = "서비스를 설계하고, 운영하고, 운영 중 드러난 문제를 분석하고 해결한 기록입니다."
 
   [[params.socialIcons]]
     name = "github"
@@ -31,9 +34,21 @@ timezone = "Asia/Seoul"
 
 [menus]
   [[menus.main]]
+    name = "Software Engineering"
+    url = "/categories/software-engineering/"
+    weight = 20
+  [[menus.main]]
+    name = "Infra & Observability"
+    url = "/categories/infra-observability/"
+    weight = 30
+  [[menus.main]]
+    name = "Troubleshooting"
+    url = "/categories/troubleshooting/"
+    weight = 40
+  [[menus.main]]
     name = "Tags"
     url = "/tags/"
-    weight = 1
+    weight = 50
 
 [markup]
   [markup.highlight]
@@ -44,4 +59,4 @@ timezone = "Asia/Seoul"
     style = "dracula"
     lineNos = false
     codeFences = true
-    guessSyntax = true
+    guessSyntax = false

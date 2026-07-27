@@ -34,13 +34,45 @@
   {{/* Posts */}}
   {{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
 
-  <div class="fn-section-label">
-    All posts
-    <span class="fn-section-count" id="fn-post-count">{{ len $pages }}</span>
+  {{- $cats := slice
+      (dict "name" "Software Engineering" "term" "Software Engineering" "url" "/categories/software-engineering/"
+            "desc" "서비스를 설계하고 만드는 과정")
+      (dict "name" "Infra & Observability" "term" "Infra Observability" "url" "/categories/infra-observability/"
+            "desc" "만든 서비스를 안정적으로 운영하는 과정")
+      (dict "name" "Troubleshooting" "term" "Troubleshooting" "url" "/categories/troubleshooting/"
+            "desc" "문제를 발견하고 원인을 찾아 해결한 기록")
+  }}
+
+  {{/* 기본 화면: 카테고리 카드 */}}
+  <div id="fn-cat-section">
+    {{- range $cats }}
+    {{- $cp := where $pages "Params.categories" "intersect" (slice .term) }}
+    <div class="fn-cat-card">
+      <div class="fn-cat-head">
+        <a class="fn-cat-name" href="{{ .url | relURL }}">{{ .name }}</a>
+        <span class="fn-section-count">{{ len $cp }}</span>
+      </div>
+      <div class="fn-cat-desc">{{ .desc }}</div>
+      <div class="fn-cat-posts">
+        {{- range first 3 $cp }}
+        <a class="fn-cat-post" href="{{ .Permalink }}">
+          <span class="fn-cat-post-title">{{ .Title }}</span>
+          <time class="fn-list-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2" }}</time>
+        </a>
+        {{- end }}
+      </div>
+      <a class="fn-cat-more" href="{{ .url | relURL }}">전체 보기 →</a>
+    </div>
+    {{- end }}
   </div>
 
-  {{- if $pages }}
-  <div class="fn-list" id="fn-post-list">
+  {{/* 검색 시에만 보이는 결과 목록 */}}
+  <div class="fn-section-label" id="fn-result-label" style="display:none;">
+    Search results
+    <span class="fn-section-count" id="fn-post-count">0</span>
+  </div>
+
+  <div class="fn-list" id="fn-post-list" style="display:none;">
     {{- range $pages }}
     <a class="fn-list-item" href="{{ .Permalink }}"
        data-title="{{ .Title | lower }}"
@@ -48,9 +80,7 @@
        data-tags="{{ if .Params.tags }}{{ delimit .Params.tags "," | lower }}{{ end }}">
       <div class="fn-list-top">
         <div class="fn-list-title">{{ .Title }}</div>
-        <time class="fn-list-date" datetime="{{ .Date.Format "2006-01-02" }}">
-          {{ .Date.Format "Jan 2" }}
-        </time>
+        <time class="fn-list-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2" }}</time>
       </div>
       {{- if .Description }}
       <div class="fn-list-desc">{{ .Description }}</div>
@@ -68,36 +98,41 @@
     <p>검색 결과가 없습니다.</p>
   </div>
 
-  {{- else }}
-  <div class="fn-empty">
-    <p>아직 작성된 글이 없습니다.</p>
-  </div>
-  {{- end }}
-
 </div>
 
 <script>
 (function() {
   var s = document.getElementById('fn-search');
+  var cats = document.getElementById('fn-cat-section');
   var list = document.getElementById('fn-post-list');
+  var label = document.getElementById('fn-result-label');
   var count = document.getElementById('fn-post-count');
   var noRes = document.getElementById('fn-no-results');
-  if (!s || !list) return;
+  if (!s || !list || !cats) return;
   var items = list.querySelectorAll('.fn-list-item');
   s.addEventListener('input', function() {
     var q = s.value.toLowerCase().trim();
+    if (!q) {                        // 검색어 없음 → 카테고리 카드
+      cats.style.display = '';
+      list.style.display = 'none';
+      label.style.display = 'none';
+      noRes.style.display = 'none';
+      return;
+    }
+    cats.style.display = 'none';     // 검색 중 → 결과 목록
     var v = 0;
     items.forEach(function(el) {
       var t = el.getAttribute('data-title') || '';
       var d = el.getAttribute('data-desc') || '';
       var tg = el.getAttribute('data-tags') || '';
-      var show = !q || t.includes(q) || d.includes(q) || tg.includes(q);
+      var show = t.includes(q) || d.includes(q) || tg.includes(q);
       el.style.display = show ? '' : 'none';
       if (show) v++;
     });
-    if (count) count.textContent = v;
-    if (noRes) noRes.style.display = v === 0 ? '' : 'none';
-    if (list) list.style.display = v === 0 ? 'none' : '';
+    count.textContent = v;
+    label.style.display = '';
+    list.style.display = v === 0 ? 'none' : '';
+    noRes.style.display = v === 0 ? '' : 'none';
   });
 })();
 </script>

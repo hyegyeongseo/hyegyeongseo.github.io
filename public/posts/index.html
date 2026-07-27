@@ -10,7 +10,7 @@
 <meta name="description" content="Posts - 기록 블로그">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/posts/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -72,13 +72,13 @@
 <meta property="og:url" content="http://localhost:1313/posts/">
   <meta property="og:site_name" content="기록 블로그">
   <meta property="og:title" content="Posts">
-  <meta property="og:description" content="트러블슈팅 기록">
+  <meta property="og:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
   <meta property="og:locale" content="ko">
   <meta property="og:type" content="website">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Posts">
-  <meta name="twitter:description" content="트러블슈팅 기록">
+  <meta name="twitter:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 
 
 <script type="application/ld+json">
@@ -126,6 +126,21 @@
         </div>
         <ul id="menu" class="menu">
             <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
                 <a href="http://localhost:1313/tags/" title="Tags">
                     <span>Tags</span>
                 </a>
@@ -142,155 +157,147 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정
+    <h2 class="entry-hint-parent">AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;
     </h2>
   </header>
   <div class="entry-content">
-    <p>시작 — VPC 카테고리에 $23.74 AWS 청구서 화면에서 한 줄이 눈에 띄었습니다.
-Amazon Virtual Private Cloud: $23.74
-VPC 리소스 자체(subnet, route table, IGW)는 무료라고 알고 있어서 의문이 생겼습니다. “VPC 자체로 돈이 나가나?”
-답은 VPC 카테고리 아래 묶이는 유료 컴포넌트들 — Interface VPC Endpoint, Public IPv4 였습니다.
-비용 분해 — Bills 화면 그대로 펼치기 Billing → Bills → 해당 월을 선택하면 서비스 단위로 수량과 단가까지 다 나옵니다. VPC 카테고리만 펼쳐 보니 다음과 같았습니다.
+    <p>시작 — 사용자는 “못 그린다&#34;가 아니라 “다음을 모른다” 취미로 그림을 그리는 사람은 대개 세 곳에서 멈춥니다.
+“포즈·인체가 안 잡혀서 한참 헤맸어요.” — 원하는 자세는 머릿속에 있는데 뭘 참고해 어떻게 그릴지 모른다. “원하는 분위기의 레퍼런스를 못 찾겠어요.” — 수십 장을 검색해도 그리고 싶은 느낌이 안 나온다. “막혔을 때 누구에게 물어볼지 모르겠어요.” — 혼자 그리면 어디가 문제인지조차 모른다. 세 문제의 공통점은 “그림을 못 그린다&#34;가 아니라 “다음에 뭘 해야 할지 모른다” 는 것이었습니다. 그래서 저는 이 서비스를 잘 그렸다/못 그렸다를 판정하는 도구가 아니라 다음 한 걸음을 주는 코치로 목표를 잡았습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0900 KST'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정" href="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/"></a>
+  <footer class="entry-footer"><span title='2026-06-15 00:00:00 +0000 UTC'>June 15, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;" href="http://localhost:1313/posts/ai-drawing-coach-design/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)
+    <h2 class="entry-hint-parent">진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게
     </h2>
   </header>
   <div class="entry-content">
-    <p>진행 사항 dev 환경의 VPC Interface Endpoint 3개를 제거하고 기존 NAT Instance로 outbound를 우회시키는 작업이 별도 글에서 마무리됐습니다. 변경은 정지 윈도우에서 깔끔하게 4개 destroy만 일어났고, 다음 단계는 단순히 dev를 다시 켜는 것이었습니다.
-NAT, Valkey, RDS 차례로 start. NAT을 거친 outbound가 정상인지를 SSH 대신 SSM Session Manager로 검증해 보기로 했습니다 — SSM Agent의 등록 자체가 NAT 경로를 통한 공개 SSM endpoint 도달에 성공해야만 일어나는 일이라, 간접 검증이 되거든요. 콘솔에서 EC2 → Valkey → SSM Session Manager 탭을 열어봤습니다.
+    <p>시작 — “명암이 부족하다&#34;는데 추천은 분위기만 비슷한 그림? 그림을 올렸더니 “명암이 부족하다&#34;는 진단을 받았습니다. 그런데 추천된 레퍼런스는 분위기만 비슷한 그림뿐이라면? 사용자는 지금 무엇을 연습해야 할지 알 수 없습니다. 진단과 추천이 겉도는 거죠 — “왜 이게 내 문제랑 상관있지?”
+그래서 원칙을 세웠습니다. 추천은 취향이 아니라 ‘연습 목표’를 따라가야 한다. 진단이 “명암&#34;이라고 했으면, 추천은 반드시 그 연습에 맞는 참고여야 하고, 진단→추천의 인과가 끊기면 안 된다.
+결정 — 진단과 검색 사이에 LLM을 넣지 않았다 흔한 RAG형 추천은 보통 이렇게 짭니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0900 KST'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)" href="http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/"></a>
+  <footer class="entry-footer"><span title='2026-06-19 00:00:00 +0000 UTC'>June 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게" href="http://localhost:1313/posts/diagnosis-recommend-separation/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Git 동작 원리 정리 — commit graph, merge-base, cherry-pick
+    <h2 class="entry-hint-parent">믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다
     </h2>
   </header>
   <div class="entry-content">
-    <p>이 글을 쓰게 된 계기 팀 레포의 backend 코드를 GitHub의 Download ZIP으로 받아서 본인 개인 레포에서 한참 변경 작업을 했습니다. 이후 팀 레포의 develop에 변경사항을 합류시키려고 팀 레포를 두 번째 remote(team)로 추가하고 push를 시도했는데, *“git push 한 줄이면 끝”*일 거라 생각한 것과 달리 ! [rejected] non-fast-forward로 거부됐습니다. rebase로 풀어보려다 formatter 적용까지 겹치며 대량 modified 상태가 됐고, git reset --hard origin/develop으로 원래 상태에 복귀한 뒤 graph 관계부터 다시 진단했습니다.
-결정적인 한 줄은 다음이었습니다.
+    <p>시작 — “AI가 진짜 내 그림을 본 게 맞나?” AI 피드백이 그럴듯한데, 믿어도 되나 싶을 때가 있습니다. 같은 그림에 매번 다른 말을 하고, 없는 문제를 지적하기도 하고(환각), 어떤 도구는 점수까지 매겨 위축시킵니다. 결국 “AI가 진짜 내 그림을 본 게 맞나?” 라는 의심이 남죠.
+코치 제품에서 이 의심은 치명적입니다. “왜 지금 이걸 연습하라는지&#34;를 못 믿으면 처방을 따를 이유가 없으니까요. 그래서 저는 문제를 이렇게 바꿔 잡았습니다 — AI 시스템에서 불확실성을 어디에 허용하고, 어디서부터 통제할 것인가.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-10 00:00:00 +0900 KST'>May 10, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Git 동작 원리 정리 — commit graph, merge-base, cherry-pick" href="http://localhost:1313/posts/git-commit-graph-principles/"></a>
+  <footer class="entry-footer"><span title='2026-06-19 00:00:00 +0000 UTC'>June 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다" href="http://localhost:1313/posts/llm-role-constraint/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Flyway Invalid version: 1 디버깅 기록 — 인라인 주석과 보이지 않는 공백 2단 함정
+    <h2 class="entry-hint-parent">ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환
     </h2>
   </header>
   <div class="entry-content">
-    <p>진행 사항 backend에 Flyway를 도입하면서 V1__baseline.sql 패턴을 설정하던 중이었습니다. application.properties의 baseline 설정 줄 옆에, 미래의 본인을 위해 친절한 인라인 주석을 달았습니다.
-spring.flyway.baseline-version=1 # 기존 DB는 V1 미실행, 빈 DB는 V1 실행 → 둘 다 V1 보존 배포 후 backend 부팅이 실패했습니다. 그리고 같은 Invalid version: 1 에러를 두 번 만났습니다. 첫 번째는 위 인라인 주석이 원인이었고, 그걸 풀고 나니 두 번째 cycle이 시작됐습니다. Flyway 자체의 원리는 별도 글에서 다루고, 이 글은 그 설정을 들여다보면서 만난 두 함정에 대한 기록입니다.
+    <p>문제 — 이사가 아니라 ‘연속성’이었다 운영 중인 서비스(ECS on EC2)를 EKS로 옮겨야 했습니다. 단순 재배포가 아니라 조건이 있었습니다 — 사용자 영향과 관측 공백을 최소화하면서 옮겨야 했습니다. 시크릿(SSM)·관측(로그·메트릭·트레이스)·트래픽(DNS)의 연속성이 유지돼야 했습니다.
+그래서 이 작업의 핵심은 리소스를 만드는 일이 아니라, 변경 과정에서 어떤 상태를 보존해야 하는지 정의하는 일이었습니다. AI 코치 설계에서 불확실성을 어디서 통제할지를 결정했다면, 인프라 전환에서는 변경 위험을 어디서 통제할지가 핵심이었습니다.
+왜 ECS에서 시작했고, 왜 EKS로 갔나 처음엔 ECS(EC2)로 운영했습니다. 컨테이너를 빠르게 띄우고 운영을 시작하기엔 충분했으니까요. 옮기기로 한 이유는 얻고 싶은 운영 방식이 분명했기 때문입니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Flyway Invalid version: 1 디버깅 기록 — 인라인 주석과 보이지 않는 공백 2단 함정" href="http://localhost:1313/posts/flyway-baseline-version-trailing-space/"></a>
+  <footer class="entry-footer"><span title='2026-06-22 00:00:00 +0000 UTC'>June 22, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환" href="http://localhost:1313/posts/ecs-to-eks-cutover/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴
+    <h2 class="entry-hint-parent">GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
     </h2>
   </header>
   <div class="entry-content">
-    <p>이 글을 쓰게 된 계기 backend 레포에 Flyway를 도입하면서 baseline 패턴을 설계하는 과정에서, Spring Boot 부팅 시 Invalid version: 1이라는 에러를 만났습니다. 표면적으로는 단순한 문법 오류처럼 보였지만, 실제로는 Flyway의 데이터 모델과 baseline 패턴을 정확히 이해하지 못한 채 따라 쓰던 결과였습니다. 사건 자체는 별도 글에서 다루고, 이 글에서는 사건의 전제가 되는 Flyway의 핵심 동작 원리를 정리합니다.
-Flyway란 Flyway는 데이터베이스 스키마의 git 같은 도구입니다. 코드를 git으로 버전 관리하듯, DB 스키마 변경도 SQL 파일로 기록하고 순서대로 적용합니다.
+    <p>배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.
+부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴" href="http://localhost:1313/posts/flyway-migration-principles/"></a>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나" href="http://localhost:1313/posts/gitops-argocd-drift/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유
+    <h2 class="entry-hint-parent">ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드
     </h2>
   </header>
   <div class="entry-content">
-    <p>진행 사항 ECS 위에 띄운 Spring Boot backend를 ALB target group에 등록하고, /actuator/health를 health check path로 설정해 운영하는 구조였습니다.
-발생한 문제 컨테이너는 정상적으로 RUNNING이었고, CloudWatch 로그에도 Spring Boot의 부팅 완료 로그(Tomcat started on port(s), Started ... in N.NNN seconds)가 정상적으로 찍혀 있었습니다. JVM은 정상적으로 실행 중이었지만, ALB target group health check는 계속 실패하며 unhealthy 상태로 유지되고 있었습니다.
-인프라가 application에 보내는 health check 요청이 어딘가에서 막혀 있었습니다.
-원인 분석 ALB가 받은 응답 확인 application이 살아있는데 ALB만 unhealthy라면, ALB가 application에 보낸 요청이 실제로 어떤 응답을 받고 있는지를 먼저 확인해야 했습니다.
+    <p>배경 — Graviton으로 갔더니 빌드가 갈렸다 노드를 Graviton(arm64)으로 쓰면서 이미지도 arm64로 빌드해야 했습니다. 그런데 backend(Spring)와 fastapi(Python)는 빌드 방식이 자연히 갈렸습니다. 공통점은 셋 다 네이티브 arm64 러너(ubuntu-24.04-arm)에서 platforms: linux/arm64로 빌드하고 buildx 레지스트리 캐시를 쓴다는 것. 차이는 하나였습니다 — “무엇을 Docker 안에서 빌드하느냐.”
+backend — JAR을 Docker 밖에서 빌드해 COPY CI 단계(Docker 밖): ./gradlew bootJar → app.jar Dockerfile: COPY app.jar (base = JRE 런타임, gradle 없음) 핵심은 JAR이 아키텍처 중립(JVM 바이트코드) 이라는 점입니다. 어디서 빌드하든 결과가 같으니, Gradle 컴파일을 Docker 밖 CI 단계에서 끝내고 Dockerfile은 완성된 JAR만 COPY합니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유" href="http://localhost:1313/posts/alb-spring-boot-actuator-health-check/"></a>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드" href="http://localhost:1313/posts/arm64-ci-build-strategy/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가
     </h2>
   </header>
   <div class="entry-content">
-    <p>진행 사항 dev 환경의 Spring Boot backend가 Valkey(Redis fork)를 종속 리소스로 사용하는 구조였습니다. dev 환경에서는 비용 절약을 위해 ElastiCache 대신 EC2 인스턴스에 Valkey를 직접 설치해 운영했고, Terraform으로 관리하면서 user_data에서 valkey.conf의 requirepass를 주입하는 패턴이었습니다.
-Spring Boot Actuator의 readiness probe는 Valkey 연결 상태를 함께 점검하도록 설정되어 있어, Valkey 연결이 실패하면 readiness가 DOWN으로 잡힙니다.
-발생한 문제 ALB target이 unhealthy로 잡혔습니다. 응답 코드는 503이었습니다.
-$ aws elbv2 describe-target-health --target-group-arn &#34;$TG_ARN&#34; &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; | 10.0.10.209| unhealthy| Target.ResponseCodeMismatch | Health checks failed: [503] | &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; application까지는 요청이 도달하고 있었지만, Spring Boot가 자기 자신을 “준비 안 됨&#34;이라고 응답하고 있는 상태였습니다.
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 이 글 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 배경 — 계측 규격부터 정했다 관측성을 구축하면서 가장 먼저 결정한 건 저장소가 아니라 계측 규격(OpenTelemetry) 이었습니다. 저장소는 나중에 교체할 수 있지만, 애플리케이션 곳곳에 들어가는 계측 코드는 한 번 적용하면 바꾸기 어렵기 때문입니다.
+왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게 OpenTelemetry를 고른 이유는 특정 벤더에 묶이지 않기 위해서입니다.
+애플리케이션은 OTLP로 내보내는 것까지만 알면 됩니다. 그 신호를 어디에 담을지는 수집기(Alloy)가 정하죠. 그래서 저장소가 바뀌어도 앱 코드는 그대로 두고 수집기 설정만 바꾸면 됩니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정" href="http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/"></a>
+  <footer class="entry-footer"><span title='2026-06-23 00:00:00 +0000 UTC'>June 23, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가" href="http://localhost:1313/posts/opentelemetry-observability-stack/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
     </h2>
   </header>
   <div class="entry-content">
-    <p>진행 사항 ECS에 띄운 Spring Boot backend가 RDS(MySQL)에 SSL로 연결하는 구조였습니다. 로컬과 운영 환경에서 SSL 모드를 다르게 가져가도록, application.properties에서 환경변수로 받게 해두었습니다.
-# application.properties # 로컬은 PREFERRED, ECS는 VERIFY_IDENTITY spring.datasource.url=jdbc:mysql://...?sslMode=${DB_SSL_MODE:PREFERRED} ECS task definition에서는 DB_SSL_MODE=VERIFY_IDENTITY로 운영 등급 SSL 검증이 활성화되도록 환경변수를 주입했습니다.
-발생한 문제 ECS에 배포한 후 Spring Boot가 부팅을 시작하다 HikariPool 초기화 단계에서 막혔습니다.
-HikariPool : DraweHikariCP - Exception during pool initialization com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure Caused by: javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Path does not chain with any of the trust anchors application 단까지는 부팅이 진행됐지만, DB 연결 풀을 만드는 단계에서 SSL handshake가 실패했습니다.
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
+오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA" href="http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/"></a>
+  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나
     </h2>
   </header>
   <div class="entry-content">
-    <p>진행 사항 dev 환경용 ECS 클러스터를 구성하고, Spring Boot backend 이미지를 배포하고 있었습니다.
-발생한 문제 로컬에서는 정상 실행되던 컨테이너가 ECS 환경에서는 시작 직후 종료되었습니다.
-CloudWatch 로그에는 다음 한 줄만 찍히고 컨테이너가 즉시 죽었습니다.
-exec /opt/java/openjdk/bin/java: exec format error 원인 분석 exec format error는 무엇인가 exec format error는 실행 파일 형식이나 아키텍처가 현재 환경과 맞지 않을 때 발생하는 에러였습니다. AWS에서도 해당 에러에 대한 해결 방법을 간략히 안내하고 있습니다.
-ECS 호스트로 Graviton을 선택했으므로 호스트 아키텍처가 ARM64라는 것은 처음부터 알고 있었습니다. 모르고 있었던 건 — 그 사실이 컨테이너 이미지 빌드와 컨테이너 실행 결과에까지 영향을 줄 수 있다는 점이었습니다.
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 이 글 문제 — 보는 것과 알리는 것이 한 곳에 묶이면 ②편에서 무엇을 알릴지 고르고 문구까지 정했다면, 남는 문제는 알림 룰을 어디에서 평가하고, 어떤 경로로 운영자에게 전달할 것인가였습니다.
+대시보드 도구(Grafana)는 알림 기능도 제공합니다. 거기서 다 하면 편해 보이죠. 그런데 그러면 “보는 것&#34;과 “알리는 것&#34;이 한 컴포넌트에 묶입니다.
+대시보드를 손보다 알림 룰이 흔들릴 수 있고 알림 때문에 대시보드 구성을 못 바꾸게 되고 UI로 만든 룰은 누가 왜 바꿨는지 6개월 뒤에 알 수 없습니다 결정 — 룰은 메트릭 저장소 쪽에 알림 룰을 대시보드가 아니라 메트릭 저장소(AMP) 에 뒀습니다. Grafana 데이터소스에는 알림 관리를 끄는 설정을 명시했고요.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0900 KST'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제" href="http://localhost:1313/posts/ecs-arm64-exec-format-error/"></a>
+  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식
+    <h2 class="entry-hint-parent">Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유
     </h2>
   </header>
   <div class="entry-content">
-    <p>진행 사항 ECS 클러스터에 Grafana Alloy 컨테이너를 띄우려 했습니다. Alloy의 config 파일은 환경변수로 주입받는 패턴이었기 때문에, sh -c로 디코딩과 실행을 함께 수행하는 형태로 task definition을 작성했습니다.
-# task definition (요약) command = [ &#34;sh&#34;, &#34;-c&#34;, &#34;echo $ALLOY_CONFIG_B64 | base64 -d &gt; /tmp/config.alloy &amp;&amp; exec /bin/alloy run /tmp/config.alloy&#34; ] 발생한 문제 컨테이너가 시작 직후 종료되었습니다. CloudWatch 로그에는 다음 한 줄만 찍혀 있었습니다.
-Error: unknown command &#34;sh&#34; for &#34;/bin/alloy&#34; 원인 분석 에러 메시지를 다시 읽기 unknown command &#34;sh&#34; for &#34;/bin/alloy&#34; — 이 메시지는 alloy 바이너리가 “sh&#34;라는 subcommand를 받았다는 의미였습니다. 즉 컨테이너 안에서 실제로 실행된 명령은 다음과 같은 형태일 가능성이 높았습니다.
+    <p>문제 — 전부 Healthy인데, HPA는 죽어 있었다 prod EKS에 관측 스택(로그·메트릭·트레이스)이 전부 떠 있고 ArgoCD도 모두 Healthy였습니다. 그런데 정기 점검 중 이런 걸 봤습니다.
+$ kubectl get hpa -A NAME TARGETS AGE backend cpu:&lt;unknown&gt;/70% 12d fastapi-embed cpu:&lt;unknown&gt;/70% 12d fastapi-guide cpu:&lt;unknown&gt;/70% 12d HPA 3개가 전부 &lt;unknown&gt;, 그것도 12일째. 어떤 대시보드에도, ArgoCD에도 경보는 없었습니다.
+이건 “장애가 났다&#34;가 아니라 “정상처럼 보이는 상태에서 숨어 있던 리스크” 였습니다. 저에게는 이 유형이 더 무섭습니다 — 아무도 모르니까요.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0900 KST'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식" href="http://localhost:1313/posts/ecs-task-definition-entrypoint-command/"></a>
+  <footer class="entry-footer"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

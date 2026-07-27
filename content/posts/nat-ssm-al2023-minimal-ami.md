@@ -3,6 +3,7 @@ title: "NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minim
 description: "NAT 문제처럼 보였던 SSM 연결 실패를 추적하다, AL2023 minimal AMI에 amazon-ssm-agent가 없다는 함정을 발견한 과정"
 date: 2026-05-17
 tags: ["aws", "ssm", "nat", "al2023", "ami"]
+categories: ["Troubleshooting"]
 ---
 
 ## 진행 사항

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유 | 기록 블로그</title>
+<meta name="keywords" content="kubernetes, hpa, metrics-server, eks, iac, sre, drawe">
+<meta name="description" content="모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. &#39;고장인가 부재인가&#39;를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지.">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/hpa-metrics-server-blind-spot/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유">
+  <meta property="og:description" content="모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. &#39;고장인가 부재인가&#39;를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지.">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-07-19T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-07-27T00:00:00+00:00">
+    <meta property="article:tag" content="Kubernetes">
+    <meta property="article:tag" content="Hpa">
+    <meta property="article:tag" content="Metrics-Server">
+    <meta property="article:tag" content="Eks">
+    <meta property="article:tag" content="Iac">
+    <meta property="article:tag" content="Sre">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유">
+  <meta name="twitter:description" content="모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. &#39;고장인가 부재인가&#39;를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유",
+      "item": "http://localhost:1313/posts/hpa-metrics-server-blind-spot/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유",
+  "name": "Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유",
+  "description": "모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. '고장인가 부재인가'를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지.",
+  "keywords": [
+    "kubernetes", "hpa", "metrics-server", "eks", "iac", "sre", "drawe"
+  ],
+  "articleBody": "문제 — 전부 Healthy인데, HPA는 죽어 있었다 prod EKS에 관측 스택(로그·메트릭·트레이스)이 전부 떠 있고 ArgoCD도 모두 Healthy였습니다. 그런데 정기 점검 중 이런 걸 봤습니다.\n$ kubectl get hpa -A NAME TARGETS AGE backend cpu:/70% 12d fastapi-embed cpu:/70% 12d fastapi-guide cpu:/70% 12d HPA 3개가 전부 , 그것도 12일째. 어떤 대시보드에도, ArgoCD에도 경보는 없었습니다.\n이건 “장애가 났다\"가 아니라 “정상처럼 보이는 상태에서 숨어 있던 리스크” 였습니다. 저에게는 이 유형이 더 무섭습니다 — 아무도 모르니까요.\n왜 12일간 아무도 몰랐나 장애가 사용자에게 드러나지 않는 조건이 완벽하게 갖춰져 있었습니다.\n트래픽이 0에 가까워 스케일업할 일이 없었고, minReplicas로 파드는 떠 있어 서비스는 정상으로 보였고, 노드 스케일(Karpenter)은 자체 메트릭을 써서 무관하게 정상이었습니다. 그래서 “필요할 때 확장이 안 되는” 리스크가 12일간 조용히 잠들어 있었습니다. 진실은 대시보드가 아니라 이벤트에 있었습니다 — ArgoCD 이벤트에 FailedGetResourceMetric이 61,049회 쌓여 있었습니다.\n대시보드가 아니라 이벤트가 진실을 말할 때가 있습니다.\n조사 — “고장인가, 부재인가\"를 먼저 갈랐다 메트릭이 안 나오는 원인은 크게 둘입니다: 컴포넌트가 있는데 오작동 vs 아예 없음. 조사 방향이 완전히 달라서, 이걸 먼저 갈랐습니다.\n$ kubectl get apiservice v1beta1.metrics.k8s.io Error from server (NotFound): \"v1beta1.metrics.k8s.io\" not found Resource Metrics API가 등록조차 안 됨 → 부재. 이 한 번의 조회로 조사 대상이 런타임에서 IaC로 넘어갔습니다.\n플랫폼 모듈을 대조해 보니 — ALB 컨트롤러·ArgoCD·External Secrets·Karpenter는 전부 코드(helm_release)로 관리되는데 metrics-server만 빠져 있었습니다. HPA 매니페스트는 있었지만, 그걸 구동할 컴포넌트가 처음부터 없었던 겁니다.\n해결 플랫폼 모듈에 metrics-server를 helm_release로 추가. 차트 버전은 기억으로 하드코딩하지 않고, EKS 실제 버전을 조회하고 helm search repo로 최신 안정 버전을 확인해 고정. --kubelet-insecure-tls — EKS + Karpenter 노드는 kubelet serving cert가 클러스터 CA로 서명되지 않아(IP SAN 부재) x509로 막히는 사례가 흔합니다. 대상이 VPC 내부 노드 자신이라 노출이 제한적이라 이 플래그를 채택하되, 근본 해결(cert 로테이션+CSR 승인)은 별도 트랙으로 두고 *“이 args만 제거하면 된다”*를 코드 주석에 명시. 적용 전 terraform plan으로 1 add / 0 change / 0 destroy를 확인(다른 리소스 드리프트 없음)하고 apply. 결과: metrics-server 1/1 Running, apiservice AVAILABLE=True, HPA 3개가 → 0%/70% 정상 수치로 돌아왔습니다.\n고친 것으로 끝내지 않았다 — 사각지대를 알림으로 봉인 같은 유형의 침묵 장애가 반복되지 않도록 관측 계층을 신설했습니다. kube-state-metrics를 도입하고, HPA의 ScalingActive가 0이면 발화하는 알림(InfraHpaScalingInactive)을 걸었습니다 — “다음 12일\"은 사람이 아니라 알람이 잡습니다.\n(주의: absent() 계열 룰은 대상 컴포넌트 배포 전에 적재하면 즉시 오발화하므로, 배포 → 룰 적재 순서를 지켜야 합니다.)\n배운 점 “깔려 있다\"와 “동작한다\"는 다르다 — 관측은 배포가 아니라 경로 검증까지가 완성이다. 대시보드가 아니라 이벤트가 진실을 말할 때가 있다. 진단의 첫 질문은 “고장 vs 부재” — 갈림길을 먼저 정하면 조사 시간이 준다. 플랫폼 컴포넌트도 IaC 목록으로 관리해야 누락이 보인다. 고친 것으로 끝내지 않고 같은 부류를 감시하는 알림을 심어야 사각지대가 닫힌다. 이 경험 이후로 저는 *“수집되고 있다”*가 아니라 *“경로가 이어져 있다”*를 관측 완료의 기준으로 삼습니다.\n",
+  "wordCount" : "422",
+  "inLanguage": "en",
+  "datePublished": "2026-07-19T00:00:00Z",
+  "dateModified": "2026-07-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/hpa-metrics-server-blind-spot/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유
+      </h1>
+      <p class="post-description">모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. &#39;고장인가 부재인가&#39;를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지.</p>
+      <div class="post-meta"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%eb%ac%b8%ec%a0%9c--%ec%a0%84%eb%b6%80-healthy%ec%9d%b8%eb%8d%b0-hpa%eb%8a%94-%ec%a3%bd%ec%96%b4-%ec%9e%88%ec%97%88%eb%8b%a4" aria-label="문제 — 전부 Healthy인데, HPA는 죽어 있었다">문제 — 전부 Healthy인데, HPA는 죽어 있었다</a></li>
+            <li>
+                <a href="#%ec%99%9c-12%ec%9d%bc%ea%b0%84-%ec%95%84%eb%ac%b4%eb%8f%84-%eb%aa%b0%eb%9e%90%eb%82%98" aria-label="왜 12일간 아무도 몰랐나">왜 12일간 아무도 몰랐나</a></li>
+            <li>
+                <a href="#%ec%a1%b0%ec%82%ac--%ea%b3%a0%ec%9e%a5%ec%9d%b8%ea%b0%80-%eb%b6%80%ec%9e%ac%ec%9d%b8%ea%b0%80%eb%a5%bc-%eb%a8%bc%ec%a0%80-%ea%b0%88%eb%9e%90%eb%8b%a4" aria-label="조사 — &ldquo;고장인가, 부재인가&quot;를 먼저 갈랐다">조사 — &ldquo;고장인가, 부재인가&quot;를 먼저 갈랐다</a></li>
+            <li>
+                <a href="#%ed%95%b4%ea%b2%b0" aria-label="해결">해결</a></li>
+            <li>
+                <a href="#%ea%b3%a0%ec%b9%9c-%ea%b2%83%ec%9c%bc%eb%a1%9c-%eb%81%9d%eb%82%b4%ec%a7%80-%ec%95%8a%ec%95%98%eb%8b%a4--%ec%82%ac%ea%b0%81%ec%a7%80%eb%8c%80%eb%a5%bc-%ec%95%8c%eb%a6%bc%ec%9c%bc%eb%a1%9c-%eb%b4%89%ec%9d%b8" aria-label="고친 것으로 끝내지 않았다 — 사각지대를 알림으로 봉인">고친 것으로 끝내지 않았다 — 사각지대를 알림으로 봉인</a></li>
+            <li>
+                <a href="#%eb%b0%b0%ec%9a%b4-%ec%a0%90" aria-label="배운 점">배운 점</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <h2 id="문제--전부-healthy인데-hpa는-죽어-있었다">문제 — 전부 Healthy인데, HPA는 죽어 있었다</h2>
+<p>prod EKS에 관측 스택(로그·메트릭·트레이스)이 전부 떠 있고 ArgoCD도 모두 Healthy였습니다. 그런데 정기 점검 중 이런 걸 봤습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">$ kubectl get hpa -A
+</span></span><span class="line"><span class="cl">NAME            TARGETS           AGE
+</span></span><span class="line"><span class="cl">backend         cpu:&lt;unknown&gt;/70%  12d
+</span></span><span class="line"><span class="cl">fastapi-embed   cpu:&lt;unknown&gt;/70%  12d
+</span></span><span class="line"><span class="cl">fastapi-guide   cpu:&lt;unknown&gt;/70%  12d
+</span></span></code></pre></div><p><strong>HPA 3개가 전부 <code>&lt;unknown&gt;</code>, 그것도 12일째.</strong> 어떤 대시보드에도, ArgoCD에도 경보는 없었습니다.</p>
+<p>이건 &ldquo;장애가 났다&quot;가 아니라 <strong>&ldquo;정상처럼 보이는 상태에서 숨어 있던 리스크&rdquo;</strong> 였습니다. 저에게는 이 유형이 더 무섭습니다 — 아무도 모르니까요.</p>
+<h2 id="왜-12일간-아무도-몰랐나">왜 12일간 아무도 몰랐나</h2>
+<p>장애가 사용자에게 드러나지 않는 조건이 <em>완벽하게</em> 갖춰져 있었습니다.</p>
+<ul>
+<li>트래픽이 0에 가까워 <strong>스케일업할 일이 없었고</strong>,</li>
+<li><code>minReplicas</code>로 파드는 떠 있어 <strong>서비스는 정상으로 보였고</strong>,</li>
+<li>노드 스케일(Karpenter)은 자체 메트릭을 써서 <strong>무관하게 정상</strong>이었습니다.</li>
+</ul>
+<p>그래서 &ldquo;필요할 때 확장이 안 되는&rdquo; 리스크가 12일간 조용히 잠들어 있었습니다. 진실은 대시보드가 아니라 <strong>이벤트</strong>에 있었습니다 — ArgoCD 이벤트에 <code>FailedGetResourceMetric</code>이 <strong>61,049회</strong> 쌓여 있었습니다.</p>
+<blockquote>
+<p>대시보드가 아니라 <strong>이벤트</strong>가 진실을 말할 때가 있습니다.</p>
+</blockquote>
+<h2 id="조사--고장인가-부재인가를-먼저-갈랐다">조사 — &ldquo;고장인가, 부재인가&quot;를 먼저 갈랐다</h2>
+<p>메트릭이 안 나오는 원인은 크게 둘입니다: 컴포넌트가 <strong>있는데 오작동</strong> vs <strong>아예 없음</strong>. 조사 방향이 완전히 달라서, 이걸 <strong>먼저</strong> 갈랐습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">$ kubectl get apiservice v1beta1.metrics.k8s.io
+</span></span><span class="line"><span class="cl">Error from server (NotFound): &#34;v1beta1.metrics.k8s.io&#34; not found
+</span></span></code></pre></div><p>Resource Metrics API가 <strong>등록조차 안 됨 → 부재</strong>. 이 한 번의 조회로 조사 대상이 <em>런타임</em>에서 <em>IaC</em>로 넘어갔습니다.</p>
+<p>플랫폼 모듈을 대조해 보니 — ALB 컨트롤러·ArgoCD·External Secrets·Karpenter는 전부 코드(helm_release)로 관리되는데 <strong>metrics-server만 빠져</strong> 있었습니다. HPA 매니페스트는 있었지만, 그걸 구동할 컴포넌트가 처음부터 없었던 겁니다.</p>
+<h2 id="해결">해결</h2>
+<ul>
+<li>플랫폼 모듈에 <strong>metrics-server를 helm_release로 추가</strong>.</li>
+<li><strong>차트 버전은 기억으로 하드코딩하지 않고</strong>, EKS 실제 버전을 조회하고 <code>helm search repo</code>로 최신 안정 버전을 확인해 고정.</li>
+<li><strong><code>--kubelet-insecure-tls</code></strong> — EKS + Karpenter 노드는 kubelet serving cert가 클러스터 CA로 서명되지 않아(IP SAN 부재) x509로 막히는 사례가 흔합니다. 대상이 VPC 내부 노드 자신이라 노출이 제한적이라 이 플래그를 채택하되, 근본 해결(cert 로테이션+CSR 승인)은 별도 트랙으로 두고 *&ldquo;이 args만 제거하면 된다&rdquo;*를 코드 주석에 명시.</li>
+<li>적용 전 <code>terraform plan</code>으로 <strong>1 add / 0 change / 0 destroy</strong>를 확인(다른 리소스 드리프트 없음)하고 apply.</li>
+</ul>
+<p>결과: metrics-server 1/1 Running, apiservice AVAILABLE=True, HPA 3개가 <code>&lt;unknown&gt;</code> → <code>0%/70%</code> 정상 수치로 돌아왔습니다.</p>
+<h2 id="고친-것으로-끝내지-않았다--사각지대를-알림으로-봉인">고친 것으로 끝내지 않았다 — 사각지대를 알림으로 봉인</h2>
+<p>같은 유형의 <em>침묵 장애</em>가 반복되지 않도록 관측 계층을 신설했습니다. kube-state-metrics를 도입하고, <strong>HPA의 ScalingActive가 0이면 발화하는 알림</strong>(<code>InfraHpaScalingInactive</code>)을 걸었습니다 — &ldquo;다음 12일&quot;은 사람이 아니라 알람이 잡습니다.</p>
+<p>(주의: <code>absent()</code> 계열 룰은 대상 컴포넌트 배포 <em>전에</em> 적재하면 즉시 오발화하므로, 배포 → 룰 적재 순서를 지켜야 합니다.)</p>
+<h2 id="배운-점">배운 점</h2>
+<ol>
+<li><strong>&ldquo;깔려 있다&quot;와 &ldquo;동작한다&quot;는 다르다</strong> — 관측은 배포가 아니라 <em>경로 검증까지가</em> 완성이다.</li>
+<li>대시보드가 아니라 <strong>이벤트</strong>가 진실을 말할 때가 있다.</li>
+<li>진단의 첫 질문은 <strong>&ldquo;고장 vs 부재&rdquo;</strong> — 갈림길을 먼저 정하면 조사 시간이 준다.</li>
+<li>플랫폼 컴포넌트도 <strong>IaC 목록으로 관리</strong>해야 누락이 보인다.</li>
+<li>고친 것으로 끝내지 않고 <strong>같은 부류를 감시하는 알림</strong>을 심어야 사각지대가 닫힌다.</li>
+</ol>
+<p>이 경험 이후로 저는 *&ldquo;수집되고 있다&rdquo;*가 아니라 *&ldquo;경로가 이어져 있다&rdquo;*를 관측 완료의 기준으로 삼습니다.</p>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/kubernetes/">kubernetes</a>
+      <a href="http://localhost:1313/tags/hpa/">hpa</a>
+      <a href="http://localhost:1313/tags/metrics-server/">metrics-server</a>
+      <a href="http://localhost:1313/tags/eks/">eks</a>
+      <a href="http://localhost:1313/tags/iac/">iac</a>
+      <a href="http://localhost:1313/tags/sre/">sre</a>
+      <a href="http://localhost:1313/tags/drawe/">drawe</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/">
+    <span class="title">« 이전 페이지</span>
+    <span>OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/graceful-shutdown-drain/">
+    <span class="title">다음 페이지 »</span>
+    <span>60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

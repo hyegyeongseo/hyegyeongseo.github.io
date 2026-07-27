@@ -3,6 +3,7 @@ title: "AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instan
 description: "AWS dev 환경 VPC 비용 최적화 — Interface VPC Endpoint를 NAT Instance로 전환한 의사결정과 운영 이슈 분석"
 date: 2026-05-17
 tags: ["aws", "vpc-endpoint", "cost-optimization"]
+categories: ["Infra Observability"]
 ---
 
 ## 시작 — VPC 카테고리에 $23.74

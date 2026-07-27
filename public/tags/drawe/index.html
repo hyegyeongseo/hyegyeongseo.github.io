@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Drawe | 기록 블로그</title>
+<meta name="keywords" content="">
+<meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/tags/drawe/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/tags/drawe/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/tags/drawe/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/tags/drawe/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="Drawe">
+  <meta property="og:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="website">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Drawe">
+  <meta name="twitter:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
+
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header">
+  <h1>
+    Drawe
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>시작 — 사용자는 “못 그린다&#34;가 아니라 “다음을 모른다” 취미로 그림을 그리는 사람은 대개 세 곳에서 멈춥니다.
+“포즈·인체가 안 잡혀서 한참 헤맸어요.” — 원하는 자세는 머릿속에 있는데 뭘 참고해 어떻게 그릴지 모른다. “원하는 분위기의 레퍼런스를 못 찾겠어요.” — 수십 장을 검색해도 그리고 싶은 느낌이 안 나온다. “막혔을 때 누구에게 물어볼지 모르겠어요.” — 혼자 그리면 어디가 문제인지조차 모른다. 세 문제의 공통점은 “그림을 못 그린다&#34;가 아니라 “다음에 뭘 해야 할지 모른다” 는 것이었습니다. 그래서 저는 이 서비스를 잘 그렸다/못 그렸다를 판정하는 도구가 아니라 다음 한 걸음을 주는 코치로 목표를 잡았습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-15 00:00:00 +0000 UTC'>June 15, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;" href="http://localhost:1313/posts/ai-drawing-coach-design/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>시작 — “명암이 부족하다&#34;는데 추천은 분위기만 비슷한 그림? 그림을 올렸더니 “명암이 부족하다&#34;는 진단을 받았습니다. 그런데 추천된 레퍼런스는 분위기만 비슷한 그림뿐이라면? 사용자는 지금 무엇을 연습해야 할지 알 수 없습니다. 진단과 추천이 겉도는 거죠 — “왜 이게 내 문제랑 상관있지?”
+그래서 원칙을 세웠습니다. 추천은 취향이 아니라 ‘연습 목표’를 따라가야 한다. 진단이 “명암&#34;이라고 했으면, 추천은 반드시 그 연습에 맞는 참고여야 하고, 진단→추천의 인과가 끊기면 안 된다.
+결정 — 진단과 검색 사이에 LLM을 넣지 않았다 흔한 RAG형 추천은 보통 이렇게 짭니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-19 00:00:00 +0000 UTC'>June 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게" href="http://localhost:1313/posts/diagnosis-recommend-separation/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>시작 — “AI가 진짜 내 그림을 본 게 맞나?” AI 피드백이 그럴듯한데, 믿어도 되나 싶을 때가 있습니다. 같은 그림에 매번 다른 말을 하고, 없는 문제를 지적하기도 하고(환각), 어떤 도구는 점수까지 매겨 위축시킵니다. 결국 “AI가 진짜 내 그림을 본 게 맞나?” 라는 의심이 남죠.
+코치 제품에서 이 의심은 치명적입니다. “왜 지금 이걸 연습하라는지&#34;를 못 믿으면 처방을 따를 이유가 없으니까요. 그래서 저는 문제를 이렇게 바꿔 잡았습니다 — AI 시스템에서 불확실성을 어디에 허용하고, 어디서부터 통제할 것인가.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-19 00:00:00 +0000 UTC'>June 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다" href="http://localhost:1313/posts/llm-role-constraint/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 이사가 아니라 ‘연속성’이었다 운영 중인 서비스(ECS on EC2)를 EKS로 옮겨야 했습니다. 단순 재배포가 아니라 조건이 있었습니다 — 사용자 영향과 관측 공백을 최소화하면서 옮겨야 했습니다. 시크릿(SSM)·관측(로그·메트릭·트레이스)·트래픽(DNS)의 연속성이 유지돼야 했습니다.
+그래서 이 작업의 핵심은 리소스를 만드는 일이 아니라, 변경 과정에서 어떤 상태를 보존해야 하는지 정의하는 일이었습니다. AI 코치 설계에서 불확실성을 어디서 통제할지를 결정했다면, 인프라 전환에서는 변경 위험을 어디서 통제할지가 핵심이었습니다.
+왜 ECS에서 시작했고, 왜 EKS로 갔나 처음엔 ECS(EC2)로 운영했습니다. 컨테이너를 빠르게 띄우고 운영을 시작하기엔 충분했으니까요. 옮기기로 한 이유는 얻고 싶은 운영 방식이 분명했기 때문입니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-22 00:00:00 +0000 UTC'>June 22, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환" href="http://localhost:1313/posts/ecs-to-eks-cutover/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.
+부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나" href="http://localhost:1313/posts/gitops-argocd-drift/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>배경 — Graviton으로 갔더니 빌드가 갈렸다 노드를 Graviton(arm64)으로 쓰면서 이미지도 arm64로 빌드해야 했습니다. 그런데 backend(Spring)와 fastapi(Python)는 빌드 방식이 자연히 갈렸습니다. 공통점은 셋 다 네이티브 arm64 러너(ubuntu-24.04-arm)에서 platforms: linux/arm64로 빌드하고 buildx 레지스트리 캐시를 쓴다는 것. 차이는 하나였습니다 — “무엇을 Docker 안에서 빌드하느냐.”
+backend — JAR을 Docker 밖에서 빌드해 COPY CI 단계(Docker 밖): ./gradlew bootJar → app.jar Dockerfile: COPY app.jar (base = JRE 런타임, gradle 없음) 핵심은 JAR이 아키텍처 중립(JVM 바이트코드) 이라는 점입니다. 어디서 빌드하든 결과가 같으니, Gradle 컴파일을 Docker 밖 CI 단계에서 끝내고 Dockerfile은 완성된 JAR만 COPY합니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드" href="http://localhost:1313/posts/arm64-ci-build-strategy/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 전부 Healthy인데, HPA는 죽어 있었다 prod EKS에 관측 스택(로그·메트릭·트레이스)이 전부 떠 있고 ArgoCD도 모두 Healthy였습니다. 그런데 정기 점검 중 이런 걸 봤습니다.
+$ kubectl get hpa -A NAME TARGETS AGE backend cpu:&lt;unknown&gt;/70% 12d fastapi-embed cpu:&lt;unknown&gt;/70% 12d fastapi-guide cpu:&lt;unknown&gt;/70% 12d HPA 3개가 전부 &lt;unknown&gt;, 그것도 12일째. 어떤 대시보드에도, ArgoCD에도 경보는 없었습니다.
+이건 “장애가 났다&#34;가 아니라 “정상처럼 보이는 상태에서 숨어 있던 리스크” 였습니다. 저에게는 이 유형이 더 무섭습니다 — 아무도 모르니까요.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — k8s는 60초를 주는데, 앱이 안 쓰고 있었다 파드를 롤링 재시작하다가, 종료되는 파드가 Completed가 아니라 Error 로 끝나는 걸 봤습니다.
+backend-...-9lqc2 1/1 Terminating 0 3d14h backend-...-9lqc2 0/1 Error 0 3d14h 확인해 보니 같은 클러스터인데 서비스마다 종료 정책이 달랐습니다.
+서비스 설정 SIGTERM 수신 시 fastapi-guide graceful timeout 설정됨 진행 중 요청 마무리 후 종료 backend server.shutdown 미설정 → Spring 기본 immediate 기다리지 않고 커넥터 종료 Kubernetes는 terminationGracePeriodSeconds: 60으로 종료 유예를 주고 있었지만, backend는 Spring Boot 기본 종료 모드(immediate)를 쓰고 있어 그 시간을 활용하지 못하는 구조였습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-24 00:00:00 +0000 UTC'>July 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기" href="http://localhost:1313/posts/graceful-shutdown-drain/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 관측을 켰더니 비용이 컨트롤 플레인을 넘었다 prod 비용을 실측했더니 관리형 Prometheus(AMP)가 EKS 컨트롤 플레인보다 컸습니다. AMP는 수집 샘플 수로 과금되는데, 수집 설정(config.alloy)에는 메트릭 필터가 하나도 없었습니다. 수집되는 모든 시계열이 그대로 AMP로 remote_write되고 있었던 거죠.
+관측성을 늘리는 건 좋은데, “무엇을 얼마나 보내는지&#34;를 안 보고 늘리면 비용이 조용히 새 나갑니다.
+가설 — “node-exporter가 주범이겠지” 처음 심증은 node-exporter였습니다. node-exporter는 노드당 1,000개가 넘는 시계열을 기본으로 내보내는데, 대시보드·알림이 쓰는 건 일부뿐이니 그걸 자르면 될 것 같았습니다. 그럴듯한 가설이었습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-25 00:00:00 +0000 UTC'>July 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기" href="http://localhost:1313/posts/amp-spanmetrics-cost/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

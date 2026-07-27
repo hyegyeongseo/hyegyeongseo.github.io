@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Security-Group on 기록 블로그</title>
+    <link>http://localhost:1313/tags/security-group/</link>
+    <description>Recent content in Security-Group on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/security-group/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다</title>
+      <link>http://localhost:1313/posts/sgp-branch-eni-timing/</link>
+      <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/sgp-branch-eni-timing/</guid>
+      <description>EKS 재기동 후 DB 타임아웃. RDS도 정상이고 보안그룹 인바운드도 새 ID를 허용하는데 연결이 안 됐다. &amp;#39;설정 값&amp;#39;과 &amp;#39;데이터플레인 반영&amp;#39;을 구분하게 된 사례.</description>
+    </item>
+  </channel>
+</rss>

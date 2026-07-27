@@ -6,12 +6,12 @@
     <description>Recent content in Database on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Sat, 09 May 2026 00:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 09 May 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/database/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴</title>
       <link>http://localhost:1313/posts/flyway-migration-principles/</link>
-      <pubDate>Sat, 09 May 2026 00:00:00 +0900</pubDate>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/flyway-migration-principles/</guid>
       <description>Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다.</description>
     </item>

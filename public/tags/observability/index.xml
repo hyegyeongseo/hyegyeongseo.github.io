@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Observability on 기록 블로그</title>
+    <link>http://localhost:1313/tags/observability/</link>
+    <description>Recent content in Observability on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/observability/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가</title>
+      <link>http://localhost:1313/posts/opentelemetry-observability-stack/</link>
+      <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/opentelemetry-observability-stack/</guid>
+      <description>앱은 OTLP만 알게 하고, 수집기가 저장을 정하게 했다. dev는 SaaS로 비용을 눌렀고 prod는 데이터가 내 영역에 남도록 직접 운영했으며, 저장은 디스크가 아니라 S3에 뒀다.</description>
+    </item>
+    <item>
+      <title>OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가</title>
+      <link>http://localhost:1313/posts/alert-design-what-and-how/</link>
+      <pubDate>Wed, 24 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/alert-design-what-and-how/</guid>
+      <description>알림은 많을수록 좋은 게 아니다. 무엇을 알릴 가치가 있는지 고르고, 받은 사람이 바로 판단하고 행동할 수 있게 메시지를 구성한 기록. 그리고 일부러 끈 알림들.</description>
+    </item>
+    <item>
+      <title>OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나</title>
+      <link>http://localhost:1313/posts/alerting-with-amp-not-grafana/</link>
+      <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/alerting-with-amp-not-grafana/</guid>
+      <description>알림 룰을 대시보드 도구가 아니라 메트릭 저장소 쪽에 둔 이유. 룰을 코드로 관리하고, 저장 단위를 나누고, 기존 통지 경로를 재사용해 운영한 기록.</description>
+    </item>
+    <item>
+      <title>관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기</title>
+      <link>http://localhost:1313/posts/amp-spanmetrics-cost/</link>
+      <pubDate>Sat, 25 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/amp-spanmetrics-cost/</guid>
+      <description>관리형 Prometheus(AMP) 비용이 EKS 컨트롤 플레인보다 커졌다. &amp;#39;node-exporter겠지&amp;#39;라는 가설을 실측이 뒤집고 spanmetrics(43%)를 범인으로 지목하기까지 — 그리고 검증 도구가 나를 속인 3시간.</description>
+    </item>
+  </channel>
+</rss>

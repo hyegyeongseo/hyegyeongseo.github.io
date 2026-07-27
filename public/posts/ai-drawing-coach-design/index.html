@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39; | 기록 블로그</title>
+<meta name="keywords" content="ai-engineering, product-design, drawe, pipeline">
+<meta name="description" content="그림 피드백 서비스를 &#39;판정 도구&#39;가 아니라 &#39;다음 한 걸음을 주는 코치&#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/ai-drawing-coach-design/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/ai-drawing-coach-design/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/ai-drawing-coach-design/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;">
+  <meta property="og:description" content="그림 피드백 서비스를 &#39;판정 도구&#39;가 아니라 &#39;다음 한 걸음을 주는 코치&#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-15T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-07-27T00:00:00+00:00">
+    <meta property="article:tag" content="Ai-Engineering">
+    <meta property="article:tag" content="Product-Design">
+    <meta property="article:tag" content="Drawe">
+    <meta property="article:tag" content="Pipeline">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;">
+  <meta name="twitter:description" content="그림 피드백 서비스를 &#39;판정 도구&#39;가 아니라 &#39;다음 한 걸음을 주는 코치&#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "AI 드로잉 코치를 설계한 이유 — '못 그렸다'가 아니라 '다음에 뭘 해야 할지'",
+      "item": "http://localhost:1313/posts/ai-drawing-coach-design/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "AI 드로잉 코치를 설계한 이유 — '못 그렸다'가 아니라 '다음에 뭘 해야 할지'",
+  "name": "AI 드로잉 코치를 설계한 이유 — \u0027못 그렸다\u0027가 아니라 \u0027다음에 뭘 해야 할지\u0027",
+  "description": "그림 피드백 서비스를 '판정 도구'가 아니라 '다음 한 걸음을 주는 코치'로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.",
+  "keywords": [
+    "ai-engineering", "product-design", "drawe", "pipeline"
+  ],
+  "articleBody": "시작 — 사용자는 “못 그린다\"가 아니라 “다음을 모른다” 취미로 그림을 그리는 사람은 대개 세 곳에서 멈춥니다.\n“포즈·인체가 안 잡혀서 한참 헤맸어요.” — 원하는 자세는 머릿속에 있는데 뭘 참고해 어떻게 그릴지 모른다. “원하는 분위기의 레퍼런스를 못 찾겠어요.” — 수십 장을 검색해도 그리고 싶은 느낌이 안 나온다. “막혔을 때 누구에게 물어볼지 모르겠어요.” — 혼자 그리면 어디가 문제인지조차 모른다. 세 문제의 공통점은 “그림을 못 그린다\"가 아니라 “다음에 뭘 해야 할지 모른다” 는 것이었습니다. 그래서 저는 이 서비스를 잘 그렸다/못 그렸다를 판정하는 도구가 아니라 다음 한 걸음을 주는 코치로 목표를 잡았습니다.\n설계 원칙 셋 점수를 매기지 않는다. 등급·레벨은 초보를 위축시키고, 성장 대신 비교를 부른다. 한 끗만 짚는다. 스무 개를 지적하면 아무것도 못 고친다. “지금 이거부터\"를 준다. 왜 이 처방인지 납득시킨다. “왜 이 레퍼런스인지\"가 진단과 인과로 이어져야 신뢰가 생긴다. 특히 마지막 원칙 — 납득 — 이 이후 모든 구조적 결정(진단↔추천 분리, LLM 역할 제한, 취향을 순위로만)을 결정했습니다.\n한 장의 업로드 → 네 가지 산출 사용자가 그림 하나와 한 줄(“손가락 비율이 어색해요”)을 올리면, 요청 하나가 네 가지를 만듭니다.\n그림 업로드 + \"손가락 비율이 어색해요\" → ① 진단 관찰 가능한 시각 신호로 약한 축 상위 N개 (+가중치) → ② 한 끗 포인트 내 그림 '위에' 번호 마커로 개선 지점 → ③ 레퍼런스 그 연습 목적으로 고른 참고 3컷 + 추천 이유 → ④ 다음 단계 지금 집중 → 다음 목표 → 성장 추세 핵심은 이 네 가지가 따로 노는 기능이 아니라 한 파이프라인의 연속 산출이라는 점입니다. 관찰 → 진단 → 검색 → 코칭이 한 요청에서 순차 실행되고, 뒤 단계는 앞 단계의 결과를 근거로만 움직입니다. 그래서 사용자는 “왜 지금 이걸 연습하라는지\"를 항상 되짚을 수 있습니다.\n이 “연속 산출\"을 지키려고 내린 결정들 — 진단과 추천을 왜 분리했는지, LLM에 왜 판단을 안 맡겼는지 — 을 다음 글들에서 이어서 적습니다.\n",
+  "wordCount" : "279",
+  "inLanguage": "en",
+  "datePublished": "2026-06-15T00:00:00Z",
+  "dateModified": "2026-07-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/ai-drawing-coach-design/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;
+      </h1>
+      <p class="post-description">그림 피드백 서비스를 &#39;판정 도구&#39;가 아니라 &#39;다음 한 걸음을 주는 코치&#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.</p>
+      <div class="post-meta"><span title='2026-06-15 00:00:00 +0000 UTC'>June 15, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%ec%8b%9c%ec%9e%91--%ec%82%ac%ec%9a%a9%ec%9e%90%eb%8a%94-%eb%aa%bb-%ea%b7%b8%eb%a6%b0%eb%8b%a4%ea%b0%80-%ec%95%84%eb%8b%88%eb%9d%bc-%eb%8b%a4%ec%9d%8c%ec%9d%84-%eb%aa%a8%eb%a5%b8%eb%8b%a4" aria-label="시작 — 사용자는 &ldquo;못 그린다&quot;가 아니라 &ldquo;다음을 모른다&rdquo;">시작 — 사용자는 &ldquo;못 그린다&quot;가 아니라 &ldquo;다음을 모른다&rdquo;</a></li>
+            <li>
+                <a href="#%ec%84%a4%ea%b3%84-%ec%9b%90%ec%b9%99-%ec%85%8b" aria-label="설계 원칙 셋">설계 원칙 셋</a></li>
+            <li>
+                <a href="#%ed%95%9c-%ec%9e%a5%ec%9d%98-%ec%97%85%eb%a1%9c%eb%93%9c--%eb%84%a4-%ea%b0%80%ec%a7%80-%ec%82%b0%ec%b6%9c" aria-label="한 장의 업로드 → 네 가지 산출">한 장의 업로드 → 네 가지 산출</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <h2 id="시작--사용자는-못-그린다가-아니라-다음을-모른다">시작 — 사용자는 &ldquo;못 그린다&quot;가 아니라 &ldquo;다음을 모른다&rdquo;</h2>
+<p>취미로 그림을 그리는 사람은 대개 세 곳에서 멈춥니다.</p>
+<ul>
+<li>&ldquo;포즈·인체가 안 잡혀서 한참 헤맸어요.&rdquo; — 원하는 자세는 머릿속에 있는데 뭘 참고해 어떻게 그릴지 모른다.</li>
+<li>&ldquo;원하는 분위기의 레퍼런스를 못 찾겠어요.&rdquo; — 수십 장을 검색해도 그리고 싶은 느낌이 안 나온다.</li>
+<li>&ldquo;막혔을 때 누구에게 물어볼지 모르겠어요.&rdquo; — 혼자 그리면 어디가 문제인지조차 모른다.</li>
+</ul>
+<p>세 문제의 공통점은 <strong>&ldquo;그림을 못 그린다&quot;가 아니라 &ldquo;다음에 뭘 해야 할지 모른다&rdquo;</strong> 는 것이었습니다. 그래서 저는 이 서비스를 <em>잘 그렸다/못 그렸다를 판정하는 도구</em>가 아니라 <strong>다음 한 걸음을 주는 코치</strong>로 목표를 잡았습니다.</p>
+<h2 id="설계-원칙-셋">설계 원칙 셋</h2>
+<ul>
+<li><strong>점수를 매기지 않는다.</strong> 등급·레벨은 초보를 위축시키고, 성장 대신 비교를 부른다.</li>
+<li><strong>한 끗만 짚는다.</strong> 스무 개를 지적하면 아무것도 못 고친다. &ldquo;지금 이거부터&quot;를 준다.</li>
+<li><strong>왜 이 처방인지 납득시킨다.</strong> &ldquo;왜 이 레퍼런스인지&quot;가 진단과 인과로 이어져야 신뢰가 생긴다.</li>
+</ul>
+<p>특히 마지막 원칙 — <em>납득</em> — 이 이후 모든 구조적 결정(진단↔추천 분리, LLM 역할 제한, 취향을 순위로만)을 결정했습니다.</p>
+<h2 id="한-장의-업로드--네-가지-산출">한 장의 업로드 → 네 가지 산출</h2>
+<p>사용자가 그림 하나와 한 줄(&ldquo;손가락 비율이 어색해요&rdquo;)을 올리면, <strong>요청 하나</strong>가 네 가지를 만듭니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">그림 업로드 + &#34;손가락 비율이 어색해요&#34;
+</span></span><span class="line"><span class="cl">  → ① 진단        관찰 가능한 시각 신호로 약한 축 상위 N개 (+가중치)
+</span></span><span class="line"><span class="cl">  → ② 한 끗 포인트  내 그림 &#39;위에&#39; 번호 마커로 개선 지점
+</span></span><span class="line"><span class="cl">  → ③ 레퍼런스     그 연습 목적으로 고른 참고 3컷 + 추천 이유
+</span></span><span class="line"><span class="cl">  → ④ 다음 단계     지금 집중 → 다음 목표 → 성장 추세
+</span></span></code></pre></div><p>핵심은 이 네 가지가 <strong>따로 노는 기능이 아니라 한 파이프라인의 연속 산출</strong>이라는 점입니다. 관찰 → 진단 → 검색 → 코칭이 한 요청에서 순차 실행되고, 뒤 단계는 앞 단계의 결과를 근거로만 움직입니다. 그래서 사용자는 &ldquo;왜 지금 이걸 연습하라는지&quot;를 항상 되짚을 수 있습니다.</p>
+<p>이 &ldquo;연속 산출&quot;을 지키려고 내린 결정들 — 진단과 추천을 왜 분리했는지, LLM에 왜 판단을 안 맡겼는지 — 을 다음 글들에서 이어서 적습니다.</p>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/ai-engineering/">ai-engineering</a>
+      <a href="http://localhost:1313/tags/product-design/">product-design</a>
+      <a href="http://localhost:1313/tags/drawe/">drawe</a>
+      <a href="http://localhost:1313/tags/pipeline/">pipeline</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="next" href="http://localhost:1313/posts/diagnosis-recommend-separation/">
+    <span class="title">다음 페이지 »</span>
+    <span>진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

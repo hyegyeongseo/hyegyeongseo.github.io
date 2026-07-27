@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Kubernetes on 기록 블로그</title>
+    <link>http://localhost:1313/tags/kubernetes/</link>
+    <description>Recent content in Kubernetes on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나</title>
+      <link>http://localhost:1313/posts/gitops-argocd-drift/</link>
+      <pubDate>Sat, 20 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/gitops-argocd-drift/</guid>
+      <description>ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 &amp;#39;머지 결과&amp;#39;를 검사하게 한 설계.</description>
+    </item>
+    <item>
+      <title>Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유</title>
+      <link>http://localhost:1313/posts/hpa-metrics-server-blind-spot/</link>
+      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/hpa-metrics-server-blind-spot/</guid>
+      <description>모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. &amp;#39;고장인가 부재인가&amp;#39;를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지.</description>
+    </item>
+    <item>
+      <title>60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기</title>
+      <link>http://localhost:1313/posts/graceful-shutdown-drain/</link>
+      <pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/graceful-shutdown-drain/</guid>
+      <description>Kubernetes가 60초 유예를 줬는데 앱은 그 유예를 안 쓰고 있었다. 오진을 두 번 걷어내고, &amp;#39;로그가 찍힌다&amp;#39;가 아니라 &amp;#39;실제로 드레인한다&amp;#39;를 대조 실험으로 증명한 기록.</description>
+    </item>
+    <item>
+      <title>설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다</title>
+      <link>http://localhost:1313/posts/sgp-branch-eni-timing/</link>
+      <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/sgp-branch-eni-timing/</guid>
+      <description>EKS 재기동 후 DB 타임아웃. RDS도 정상이고 보안그룹 인바운드도 새 ID를 허용하는데 연결이 안 됐다. &amp;#39;설정 값&amp;#39;과 &amp;#39;데이터플레인 반영&amp;#39;을 구분하게 된 사례.</description>
+    </item>
+  </channel>
+</rss>

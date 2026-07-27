@@ -3,6 +3,7 @@ title: "Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이�
 description: "ALB health check가 Spring Security에 의해 401로 실패했던 문제를 actuator permitAll 설정으로 해결한 과정"
 date: 2026-05-09
 tags: ["aws", "alb", "spring boot", "spring security", "actuator", "health check"]
+categories: ["Troubleshooting"]
 ---
 
 ## 진행 사항

@@ -3,6 +3,7 @@ title: "Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴
 description: "Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다."
 date: 2026-05-09
 tags: ["flyway", "database", "migration", "spring boot"]
+categories: ["Software Engineering"]
 ---
 
 ## 이 글을 쓰게 된 계기

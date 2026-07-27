@@ -3,6 +3,7 @@ title: "ECS에서 unknown command \"sh\"가 발생한 이유 — task definition
 description: "ECS task definition의 command와 Docker ENTRYPOINT/CMD 동작 차이 때문에 발생한 `unknown command \"sh\"` 에러를 추적하고 해결한 과정"
 date: 2026-05-08
 tags: ["aws", "ecs", "docker", "task definition", "entrypoint", "cmd"]
+categories: ["Troubleshooting"]
 ---
 
 ## 진행 사항

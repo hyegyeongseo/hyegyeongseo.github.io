@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가 | 기록 블로그</title>
+<meta name="keywords" content="observability, opentelemetry, alloy, loki, tempo, amp, s3">
+<meta name="description" content="앱은 OTLP만 알게 하고, 수집기가 저장을 정하게 했다. dev는 SaaS로 비용을 눌렀고 prod는 데이터가 내 영역에 남도록 직접 운영했으며, 저장은 디스크가 아니라 S3에 뒀다.">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/opentelemetry-observability-stack/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/opentelemetry-observability-stack/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/opentelemetry-observability-stack/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가">
+  <meta property="og:description" content="앱은 OTLP만 알게 하고, 수집기가 저장을 정하게 했다. dev는 SaaS로 비용을 눌렀고 prod는 데이터가 내 영역에 남도록 직접 운영했으며, 저장은 디스크가 아니라 S3에 뒀다.">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-23T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-07-27T00:00:00+00:00">
+    <meta property="article:tag" content="Observability">
+    <meta property="article:tag" content="Opentelemetry">
+    <meta property="article:tag" content="Alloy">
+    <meta property="article:tag" content="Loki">
+    <meta property="article:tag" content="Tempo">
+    <meta property="article:tag" content="Amp">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가">
+  <meta name="twitter:description" content="앱은 OTLP만 알게 하고, 수집기가 저장을 정하게 했다. dev는 SaaS로 비용을 눌렀고 prod는 데이터가 내 영역에 남도록 직접 운영했으며, 저장은 디스크가 아니라 S3에 뒀다.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가",
+      "item": "http://localhost:1313/posts/opentelemetry-observability-stack/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가",
+  "name": "OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가",
+  "description": "앱은 OTLP만 알게 하고, 수집기가 저장을 정하게 했다. dev는 SaaS로 비용을 눌렀고 prod는 데이터가 내 영역에 남도록 직접 운영했으며, 저장은 디스크가 아니라 S3에 뒀다.",
+  "keywords": [
+    "observability", "opentelemetry", "alloy", "loki", "tempo", "amp", "s3"
+  ],
+  "articleBody": " Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 이 글 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 배경 — 계측 규격부터 정했다 관측성을 구축하면서 가장 먼저 결정한 건 저장소가 아니라 계측 규격(OpenTelemetry) 이었습니다. 저장소는 나중에 교체할 수 있지만, 애플리케이션 곳곳에 들어가는 계측 코드는 한 번 적용하면 바꾸기 어렵기 때문입니다.\n왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게 OpenTelemetry를 고른 이유는 특정 벤더에 묶이지 않기 위해서입니다.\n애플리케이션은 OTLP로 내보내는 것까지만 알면 됩니다. 그 신호를 어디에 담을지는 수집기(Alloy)가 정하죠. 그래서 저장소가 바뀌어도 앱 코드는 그대로 두고 수집기 설정만 바꾸면 됩니다.\n실제로 ECS에서 EKS로 옮길 때도 애플리케이션의 계측 코드는 그대로 두고, 수집기 배치 방식만 바꿨습니다 — ECS에서는 태스크 사이드카·인스턴스당 데몬으로 돌던 수집기를 EKS에서는 노드마다 뜨는 DaemonSet으로 옮겼고, 대시보드와 신호의 연속성은 그대로 유지됐습니다.\n파이프라인 — 수집은 한 곳으로 애플리케이션은 OTLP만 알고, 수집기(Alloy)가 저장소를 결정하는 구조입니다.\n앱·노드 │ OTLP ▼ Grafana Alloy (노드마다 DaemonSet) 수집 + PII 마스킹 + 노드 라벨 ├── metrics ──▶ AMP (관리형) ├── logs ──▶ Loki (직접 운영 · S3 백엔드) └── traces ──▶ Tempo (직접 운영 · S3 백엔드) │ └── 조회는 Grafana 가 읽기 전용으로만 수집을 Alloy 한 곳으로 모은 덕분에 얻은 게 하나 더 있습니다. PII 마스킹을 앱이 아니라 수집 계층에서 처리할 수 있다는 점입니다. 마스킹 정책을 변경해도 애플리케이션을 수정할 필요 없이 수집기 설정만 바꾸면 됩니다.\n결정 ① 환경별 운영 목적에 맞춰 저장 전략을 달리했다 관측 구조는 같게 가져가되, 환경별 운영 목적이 달라 저장 전략은 다르게 선택했습니다. 수집·마스킹 로직은 동일하게 두고 내보내는 목적지만 갈랐습니다.\n환경 저장 고른 이유 dev Grafana Cloud (관리형 SaaS) 검증용이라 띄우는 비용·운영 부담을 0에 가깝게 prod 직접 운영하는 스택 로그·트레이스가 내가 관리하는 영역 안에만 머물게 dev는 필요할 때만 켜서 확인하는 환경이라, 관측 스택까지 직접 띄우면 배보다 배꼽이 큽니다. 그래서 SaaS로 붙여 비용을 눌렀습니다.\nprod는 기준이 달랐습니다. 로그와 트레이스에는 요청 내용이 섞여 들어갈 수 있어서, 데이터가 외부 서비스로 나가지 않고 내 계정 안에 남는 구조를 원했습니다. 수집 단계에서 마스킹을 하더라도, 애초에 데이터가 머무는 경계를 좁혀 두는 편이 낫다고 봤고요.\n결정 ② 신호마다 저장을 다르게 — 그리고 디스크가 아니라 S3에 prod 안에서도 세 신호를 한 방식으로 담지 않았습니다.\n신호 저장 이유 metric AMP(관리형) 룰 평가·Alertmanager가 얹혀 옴 → 알림 인프라를 따로 안 세워도 됨 log Loki(직접 운영) 데이터를 내 영역에, 저장은 S3 trace Tempo(직접 운영) 동일 메트릭을 관리형으로 고른 건 “편해서\"가 아니라 AMP를 쓰면 룰 평가기와 Alertmanager가 딸려 오기 때문입니다. 메트릭에는 요청 본문 같은 내용이 담기지 않아 외부 관리형에 둬도 부담이 적었고요. (그래서 메트릭 self-host 대안인 Mimir는 쓰지 않았습니다.)\n저장을 인스턴스 디스크가 아니라 S3로 뺀 이유는 두 가지였습니다.\n비용 — 로그·트레이스는 계속 쌓이는데, 그만큼 블록 스토리지를 늘리는 것보다 오브젝트 스토리지가 쌉니다. 유실 위험 — 디스크에 두면 그 노드·볼륨의 수명에 데이터가 묶입니다. S3에 두면 내구성이 훨씬 높아 관측 데이터를 잃을 걱정이 줄어듭니다. 로그와 트레이스를 S3에 저장해 두니, 컴퓨트 리소스를 내려도 관측 데이터는 그대로 남았습니다. 안 쓸 때 클러스터를 중지하는 운영 방식과도 자연스럽게 맞물렸죠 — 다시 켜면 과거 로그·트레이스를 그대로 볼 수 있었습니다. 컴퓨트와 스토리지를 분리한 효과였습니다.\n정리 계측 규격을 먼저 정하면 저장소는 나중에 바꿀 수 있다. 앱은 OTLP만 알고, 어디에 담을지는 수집기가 정한다. 수집을 한 곳으로 모으면 부수 효과가 크다. 마스킹을 앱마다 구현하지 않아도 되고, 플랫폼을 옮길 때 수집기만 재배치하면 된다. 환경마다 다르게 골라도 된다. dev는 SaaS로 비용을 눌렀고, prod는 데이터가 내 영역에 남도록 직접 운영했다. 저장은 디스크가 아니라 오브젝트 스토리지로. 비용과 내구성 둘 다를 위해서, 그리고 컴퓨트와 저장을 분리하기 위해서. 하지만 데이터를 모으는 것만으로는 관측성이 완성되지 않습니다. 데이터를 저장하는 일과, 이상 징후를 판단해 운영자에게 알리는 일은 서로 다른 문제였습니다.\n다음 글에서는 무엇을 알릴 가치가 있다고 판단했는지, 그리고 받은 사람이 바로 판단하고 행동할 수 있게 메시지를 어떻게 구성했는지를 정리합니다 → 관측성 설계 ② 알림 편\n",
+  "wordCount" : "584",
+  "inLanguage": "en",
+  "datePublished": "2026-06-23T00:00:00Z",
+  "dateModified": "2026-07-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/opentelemetry-observability-stack/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가
+      </h1>
+      <p class="post-description">앱은 OTLP만 알게 하고, 수집기가 저장을 정하게 했다. dev는 SaaS로 비용을 눌렀고 prod는 데이터가 내 영역에 남도록 직접 운영했으며, 저장은 디스크가 아니라 S3에 뒀다.</p>
+      <div class="post-meta"><span title='2026-06-23 00:00:00 +0000 UTC'>June 23, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%eb%b0%b0%ea%b2%bd--%ea%b3%84%ec%b8%a1-%ea%b7%9c%ea%b2%a9%eb%b6%80%ed%84%b0-%ec%a0%95%ed%96%88%eb%8b%a4" aria-label="배경 — 계측 규격부터 정했다">배경 — 계측 규격부터 정했다</a></li>
+            <li>
+                <a href="#%ec%99%9c-opentelemetry%ec%9d%b8%ea%b0%80--%ec%a0%80%ec%9e%a5%ec%86%8c%eb%a5%bc-%ea%b0%88%ec%95%84%eb%81%bc%ec%9a%b8-%ec%88%98-%ec%9e%88%ea%b2%8c" aria-label="왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게">왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게</a></li>
+            <li>
+                <a href="#%ed%8c%8c%ec%9d%b4%ed%94%84%eb%9d%bc%ec%9d%b8--%ec%88%98%ec%a7%91%ec%9d%80-%ed%95%9c-%ea%b3%b3%ec%9c%bc%eb%a1%9c" aria-label="파이프라인 — 수집은 한 곳으로">파이프라인 — 수집은 한 곳으로</a></li>
+            <li>
+                <a href="#%ea%b2%b0%ec%a0%95--%ed%99%98%ea%b2%bd%eb%b3%84-%ec%9a%b4%ec%98%81-%eb%aa%a9%ec%a0%81%ec%97%90-%eb%a7%9e%ec%b6%b0-%ec%a0%80%ec%9e%a5-%ec%a0%84%eb%9e%b5%ec%9d%84-%eb%8b%ac%eb%a6%ac%ed%96%88%eb%8b%a4" aria-label="결정 ① 환경별 운영 목적에 맞춰 저장 전략을 달리했다">결정 ① 환경별 운영 목적에 맞춰 저장 전략을 달리했다</a></li>
+            <li>
+                <a href="#%ea%b2%b0%ec%a0%95--%ec%8b%a0%ed%98%b8%eb%a7%88%eb%8b%a4-%ec%a0%80%ec%9e%a5%ec%9d%84-%eb%8b%a4%eb%a5%b4%ea%b2%8c--%ea%b7%b8%eb%a6%ac%ea%b3%a0-%eb%94%94%ec%8a%a4%ed%81%ac%ea%b0%80-%ec%95%84%eb%8b%88%eb%9d%bc-s3%ec%97%90" aria-label="결정 ② 신호마다 저장을 다르게 — 그리고 디스크가 아니라 S3에">결정 ② 신호마다 저장을 다르게 — 그리고 디스크가 아니라 S3에</a></li>
+            <li>
+                <a href="#%ec%a0%95%eb%a6%ac" aria-label="정리">정리</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      
+<nav class="fn-series" aria-label="시리즈 목차">
+  <div class="fn-series-head">
+    <span class="fn-series-tag">Series</span>
+    <span class="fn-series-name">관측성 설계</span>
+    <span class="fn-series-count">3부작</span>
+  </div>
+  <ol class="fn-series-list">
+    <li class="fn-series-item is-current">
+      <span class="fn-series-num">1</span>
+      <span class="fn-series-title">데이터를 어떻게 모으고 저장했는가</span>
+      <span class="fn-series-here">이 글</span>
+    </li>
+    <li class="fn-series-item">
+      <span class="fn-series-num">2</span>
+      <a class="fn-series-title" href="/posts/alert-design-what-and-how/">무엇을 알리고, 어떻게 말할 것인가</a>
+    </li>
+    <li class="fn-series-item">
+      <span class="fn-series-num">3</span>
+      <a class="fn-series-title" href="/posts/alerting-with-amp-not-grafana/">왜 Grafana가 아니라 AMP가 알림을 책임졌나</a>
+    </li>
+  </ol>
+</nav>
+
+<h2 id="배경--계측-규격부터-정했다">배경 — 계측 규격부터 정했다</h2>
+<p>관측성을 구축하면서 가장 먼저 결정한 건 저장소가 아니라 <strong>계측 규격(OpenTelemetry)</strong> 이었습니다. 저장소는 나중에 교체할 수 있지만, <strong>애플리케이션 곳곳에 들어가는 계측 코드는 한 번 적용하면 바꾸기 어렵기</strong> 때문입니다.</p>
+<h2 id="왜-opentelemetry인가--저장소를-갈아끼울-수-있게">왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게</h2>
+<p>OpenTelemetry를 고른 이유는 특정 벤더에 묶이지 않기 위해서입니다.</p>
+<p>애플리케이션은 <strong>OTLP로 내보내는 것까지만</strong> 알면 됩니다. 그 신호를 어디에 담을지는 수집기(Alloy)가 정하죠. 그래서 저장소가 바뀌어도 <strong>앱 코드는 그대로 두고 수집기 설정만 바꾸면</strong> 됩니다.</p>
+<p>실제로 ECS에서 EKS로 옮길 때도 <strong>애플리케이션의 계측 코드는 그대로 두고, 수집기 배치 방식만</strong> 바꿨습니다 — ECS에서는 태스크 사이드카·인스턴스당 데몬으로 돌던 수집기를 EKS에서는 노드마다 뜨는 DaemonSet으로 옮겼고, 대시보드와 신호의 연속성은 그대로 유지됐습니다.</p>
+<h2 id="파이프라인--수집은-한-곳으로">파이프라인 — 수집은 한 곳으로</h2>
+<p><strong>애플리케이션은 OTLP만 알고, 수집기(Alloy)가 저장소를 결정하는 구조</strong>입니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">앱·노드
+</span></span><span class="line"><span class="cl">  │  OTLP
+</span></span><span class="line"><span class="cl">  ▼
+</span></span><span class="line"><span class="cl">Grafana Alloy (노드마다 DaemonSet)     수집 + PII 마스킹 + 노드 라벨
+</span></span><span class="line"><span class="cl">  ├── metrics ──▶ AMP    (관리형)
+</span></span><span class="line"><span class="cl">  ├── logs    ──▶ Loki   (직접 운영 · S3 백엔드)
+</span></span><span class="line"><span class="cl">  └── traces  ──▶ Tempo  (직접 운영 · S3 백엔드)
+</span></span><span class="line"><span class="cl">        │
+</span></span><span class="line"><span class="cl">        └── 조회는 Grafana 가 읽기 전용으로만
+</span></span></code></pre></div><p>수집을 Alloy 한 곳으로 모은 덕분에 얻은 게 하나 더 있습니다. <strong>PII 마스킹을 앱이 아니라 수집 계층에서</strong> 처리할 수 있다는 점입니다. <strong>마스킹 정책을 변경해도 애플리케이션을 수정할 필요 없이 수집기 설정만 바꾸면 됩니다.</strong></p>
+<h2 id="결정--환경별-운영-목적에-맞춰-저장-전략을-달리했다">결정 ① 환경별 운영 목적에 맞춰 저장 전략을 달리했다</h2>
+<p><strong>관측 구조는 같게 가져가되, 환경별 운영 목적이 달라 저장 전략은 다르게 선택했습니다.</strong> 수집·마스킹 로직은 동일하게 두고 내보내는 목적지만 갈랐습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>환경</th>
+          <th>저장</th>
+          <th>고른 이유</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>dev</strong></td>
+          <td>Grafana Cloud (관리형 SaaS)</td>
+          <td>검증용이라 <strong>띄우는 비용·운영 부담을 0에 가깝게</strong></td>
+      </tr>
+      <tr>
+          <td><strong>prod</strong></td>
+          <td>직접 운영하는 스택</td>
+          <td>로그·트레이스가 <strong>내가 관리하는 영역 안에만 머물게</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p>dev는 필요할 때만 켜서 확인하는 환경이라, 관측 스택까지 직접 띄우면 배보다 배꼽이 큽니다. 그래서 SaaS로 붙여 비용을 눌렀습니다.</p>
+<p>prod는 기준이 달랐습니다. 로그와 트레이스에는 요청 내용이 섞여 들어갈 수 있어서, <strong>데이터가 외부 서비스로 나가지 않고 내 계정 안에 남는 구조</strong>를 원했습니다. 수집 단계에서 마스킹을 하더라도, 애초에 데이터가 머무는 경계를 좁혀 두는 편이 낫다고 봤고요.</p>
+<h2 id="결정--신호마다-저장을-다르게--그리고-디스크가-아니라-s3에">결정 ② 신호마다 저장을 다르게 — 그리고 디스크가 아니라 S3에</h2>
+<p>prod 안에서도 세 신호를 한 방식으로 담지 않았습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>신호</th>
+          <th>저장</th>
+          <th>이유</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>metric</td>
+          <td><strong>AMP</strong>(관리형)</td>
+          <td>룰 평가·Alertmanager가 <strong>얹혀 옴</strong> → 알림 인프라를 따로 안 세워도 됨</td>
+      </tr>
+      <tr>
+          <td>log</td>
+          <td>Loki(직접 운영)</td>
+          <td>데이터를 내 영역에, 저장은 <strong>S3</strong></td>
+      </tr>
+      <tr>
+          <td>trace</td>
+          <td>Tempo(직접 운영)</td>
+          <td>동일</td>
+      </tr>
+  </tbody>
+</table>
+<p>메트릭을 관리형으로 고른 건 &ldquo;편해서&quot;가 아니라 <strong>AMP를 쓰면 룰 평가기와 Alertmanager가 딸려 오기 때문</strong>입니다. 메트릭에는 요청 본문 같은 내용이 담기지 않아 외부 관리형에 둬도 부담이 적었고요. (그래서 메트릭 self-host 대안인 Mimir는 쓰지 않았습니다.)</p>
+<p><strong>저장을 인스턴스 디스크가 아니라 S3로 뺀 이유는 두 가지</strong>였습니다.</p>
+<ul>
+<li><strong>비용</strong> — 로그·트레이스는 계속 쌓이는데, 그만큼 블록 스토리지를 늘리는 것보다 오브젝트 스토리지가 쌉니다.</li>
+<li><strong>유실 위험</strong> — 디스크에 두면 그 노드·볼륨의 수명에 데이터가 묶입니다. S3에 두면 내구성이 훨씬 높아 <strong>관측 데이터를 잃을 걱정이 줄어듭니다.</strong></li>
+</ul>
+<p>로그와 트레이스를 S3에 저장해 두니, <strong>컴퓨트 리소스를 내려도 관측 데이터는 그대로 남았습니다.</strong> 안 쓸 때 클러스터를 중지하는 운영 방식과도 자연스럽게 맞물렸죠 — 다시 켜면 과거 로그·트레이스를 그대로 볼 수 있었습니다. <strong>컴퓨트와 스토리지를 분리한 효과였습니다.</strong></p>
+<h2 id="정리">정리</h2>
+<ol>
+<li><strong>계측 규격을 먼저 정하면 저장소는 나중에 바꿀 수 있다.</strong> 앱은 OTLP만 알고, 어디에 담을지는 수집기가 정한다.</li>
+<li><strong>수집을 한 곳으로 모으면 부수 효과가 크다.</strong> 마스킹을 앱마다 구현하지 않아도 되고, 플랫폼을 옮길 때 수집기만 재배치하면 된다.</li>
+<li><strong>환경마다 다르게 골라도 된다.</strong> dev는 SaaS로 비용을 눌렀고, prod는 데이터가 내 영역에 남도록 직접 운영했다.</li>
+<li><strong>저장은 디스크가 아니라 오브젝트 스토리지로.</strong> 비용과 내구성 둘 다를 위해서, 그리고 컴퓨트와 저장을 분리하기 위해서.</li>
+</ol>
+<hr>
+<p>하지만 데이터를 모으는 것만으로는 관측성이 완성되지 않습니다. <strong>데이터를 저장하는 일과, 이상 징후를 판단해 운영자에게 알리는 일은 서로 다른 문제였습니다.</strong></p>
+<p>다음 글에서는 <strong>무엇을 알릴 가치가 있다고 판단했는지</strong>, 그리고 <em>받은 사람이 바로 판단하고 행동할 수 있게 메시지를 어떻게 구성했는지</em>를 정리합니다 → <a href="/posts/alert-design-what-and-how/">관측성 설계 ② 알림 편</a></p>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/observability/">observability</a>
+      <a href="http://localhost:1313/tags/opentelemetry/">opentelemetry</a>
+      <a href="http://localhost:1313/tags/alloy/">alloy</a>
+      <a href="http://localhost:1313/tags/loki/">loki</a>
+      <a href="http://localhost:1313/tags/tempo/">tempo</a>
+      <a href="http://localhost:1313/tags/amp/">amp</a>
+      <a href="http://localhost:1313/tags/s3/">s3</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/arm64-ci-build-strategy/">
+    <span class="title">« 이전 페이지</span>
+    <span>ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/alert-design-what-and-how/">
+    <span class="title">다음 페이지 »</span>
+    <span>OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

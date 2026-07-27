@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Grafana on 기록 블로그</title>
+    <link>http://localhost:1313/tags/grafana/</link>
+    <description>Recent content in Grafana on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/grafana/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나</title>
+      <link>http://localhost:1313/posts/alerting-with-amp-not-grafana/</link>
+      <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/alerting-with-amp-not-grafana/</guid>
+      <description>알림 룰을 대시보드 도구가 아니라 메트릭 저장소 쪽에 둔 이유. 룰을 코드로 관리하고, 저장 단위를 나누고, 기존 통지 경로를 재사용해 운영한 기록.</description>
+    </item>
+  </channel>
+</rss>

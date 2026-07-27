@@ -6,40 +6,47 @@
     <description>Recent content in Docker on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Sat, 09 May 2026 00:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드</title>
+      <link>http://localhost:1313/posts/arm64-ci-build-strategy/</link>
+      <pubDate>Sat, 20 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/arm64-ci-build-strategy/</guid>
+      <description>Graviton(arm64) 위에서 Spring과 Python 서비스를 빌드하는 방식을 왜 다르게 가져갔나. JVM 바이트코드의 아키텍처 중립성으로 QEMU 비용을 0으로 만들고, 네이티브 의존성은 buildcache로 감당한 이야기.</description>
+    </item>
     <item>
       <title>Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA</title>
       <link>http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/</link>
-      <pubDate>Sat, 09 May 2026 00:00:00 +0900</pubDate>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/</guid>
       <description>RDS SSL 검증을 VERIFY_IDENTITY로 설정했지만 HikariPool 초기화가 trust anchor 에러로 실패한 문제를 추적해, JVM cacerts에 RDS CA가 없었다는 원인을 확인하고 Dockerfile에 import 단계를 추가한 과정</description>
     </item>
     <item>
       <title>ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제</title>
       <link>http://localhost:1313/posts/ecs-arm64-exec-format-error/</link>
-      <pubDate>Fri, 08 May 2026 00:00:00 +0900</pubDate>
+      <pubDate>Fri, 08 May 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/ecs-arm64-exec-format-error/</guid>
       <description>Graviton(ARM64) 기반 ECS에서 발생한 exec format error를 추적해 amd64 이미지 아키텍처 mismatch 문제를 해결한 과정</description>
     </item>
     <item>
       <title>ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식</title>
       <link>http://localhost:1313/posts/ecs-task-definition-entrypoint-command/</link>
-      <pubDate>Fri, 08 May 2026 00:00:00 +0900</pubDate>
+      <pubDate>Fri, 08 May 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/ecs-task-definition-entrypoint-command/</guid>
       <description>ECS task definition의 command와 Docker ENTRYPOINT/CMD 동작 차이 때문에 발생한 `unknown command &amp;#34;sh&amp;#34;` 에러를 추적하고 해결한 과정</description>
     </item>
     <item>
       <title>nginx에서 React SPA 라우팅이 깨지는 문제와 해결</title>
       <link>http://localhost:1313/posts/first-post/</link>
-      <pubDate>Sun, 26 Apr 2026 00:00:00 +0900</pubDate>
+      <pubDate>Sun, 26 Apr 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/first-post/</guid>
       <description>React(Vite) 앱을 nginx 컨테이너로 실행할 때 발생한 SPA 라우팅 문제를 분석하고 해결한 과정</description>
     </item>
     <item>
       <title>Spring Boot를 도커 컨테이너로 실행 시 민감 정보 외부화</title>
       <link>http://localhost:1313/posts/spring-boot-docker-env-config/</link>
-      <pubDate>Sun, 26 Apr 2026 00:00:00 +0900</pubDate>
+      <pubDate>Sun, 26 Apr 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/spring-boot-docker-env-config/</guid>
       <description>민감정보를 application.properties 하드코딩 시 발생하는 문제 기록 및 해결</description>
     </item>

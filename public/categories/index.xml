@@ -6,6 +6,28 @@
     <description>Recent content in Categories on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Troubleshooting</title>
+      <link>http://localhost:1313/categories/troubleshooting/</link>
+      <pubDate>Sat, 25 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/troubleshooting/</guid>
+      <description>문제를 발견하고 원인을 찾아 해결한 기록</description>
+    </item>
+    <item>
+      <title>Infra &amp; Observability</title>
+      <link>http://localhost:1313/categories/infra-observability/</link>
+      <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/infra-observability/</guid>
+      <description>만든 서비스를 안정적으로 운영하는 과정</description>
+    </item>
+    <item>
+      <title>Software Engineering</title>
+      <link>http://localhost:1313/categories/software-engineering/</link>
+      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/software-engineering/</guid>
+      <description>서비스를 설계하고 만드는 과정</description>
+    </item>
   </channel>
 </rss>

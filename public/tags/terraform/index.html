@@ -7,10 +7,10 @@
 <meta name="robots" content="index, follow">
 <title>Terraform | 기록 블로그</title>
 <meta name="keywords" content="">
-<meta name="description" content="트러블슈팅 기록">
+<meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/terraform/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -72,13 +72,13 @@
 <meta property="og:url" content="http://localhost:1313/tags/terraform/">
   <meta property="og:site_name" content="기록 블로그">
   <meta property="og:title" content="Terraform">
-  <meta property="og:description" content="트러블슈팅 기록">
+  <meta property="og:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
   <meta property="og:locale" content="ko">
   <meta property="og:type" content="website">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Terraform">
-  <meta name="twitter:description" content="트러블슈팅 기록">
+  <meta name="twitter:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 
 </head>
 <body class="list" id="top">
@@ -111,6 +111,21 @@
         </div>
         <ul id="menu" class="menu">
             <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
                 <a href="http://localhost:1313/tags/" title="Tags">
                     <span>Tags</span>
                 </a>
@@ -127,6 +142,21 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 이사가 아니라 ‘연속성’이었다 운영 중인 서비스(ECS on EC2)를 EKS로 옮겨야 했습니다. 단순 재배포가 아니라 조건이 있었습니다 — 사용자 영향과 관측 공백을 최소화하면서 옮겨야 했습니다. 시크릿(SSM)·관측(로그·메트릭·트레이스)·트래픽(DNS)의 연속성이 유지돼야 했습니다.
+그래서 이 작업의 핵심은 리소스를 만드는 일이 아니라, 변경 과정에서 어떤 상태를 보존해야 하는지 정의하는 일이었습니다. AI 코치 설계에서 불확실성을 어디서 통제할지를 결정했다면, 인프라 전환에서는 변경 위험을 어디서 통제할지가 핵심이었습니다.
+왜 ECS에서 시작했고, 왜 EKS로 갔나 처음엔 ECS(EC2)로 운영했습니다. 컨테이너를 빠르게 띄우고 운영을 시작하기엔 충분했으니까요. 옮기기로 한 이유는 얻고 싶은 운영 방식이 분명했기 때문입니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-22 00:00:00 +0000 UTC'>June 22, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환" href="http://localhost:1313/posts/ecs-to-eks-cutover/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정
     </h2>
   </header>
@@ -137,7 +167,7 @@ Spring Boot Actuator의 readiness probe는 Valkey 연결 상태를 함께 점검
 $ aws elbv2 describe-target-health --target-group-arn &#34;$TG_ARN&#34; &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; | 10.0.10.209| unhealthy| Target.ResponseCodeMismatch | Health checks failed: [503] | &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; application까지는 요청이 도달하고 있었지만, Spring Boot가 자기 자신을 “준비 안 됨&#34;이라고 응답하고 있는 상태였습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0000 UTC'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정" href="http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/"></a>
 </article>
     </main>

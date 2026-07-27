@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Rag on 기록 블로그</title>
+    <link>http://localhost:1313/tags/rag/</link>
+    <description>Recent content in Rag on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/rag/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게</title>
+      <link>http://localhost:1313/posts/diagnosis-recommend-separation/</link>
+      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/diagnosis-recommend-separation/</guid>
+      <description>진단 결과를 LLM으로 재해석하지 않고 그대로 검색 조건으로 쓴 이유. hard(협상 불가)와 soft(순위만)를 가른 추천 설계.</description>
+    </item>
+  </channel>
+</rss>

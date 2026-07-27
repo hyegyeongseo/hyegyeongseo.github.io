@@ -6,12 +6,19 @@
     <description>Recent content in Github Actions on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Fri, 08 May 2026 00:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/github-actions/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기</title>
+      <link>http://localhost:1313/posts/gitops-overlay-bump-race/</link>
+      <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/gitops-overlay-bump-race/</guid>
+      <description>여러 서비스의 CD가 같은 브랜치에 동시에 push하다 실패했다. 그리고 환경을 브랜치로 나눈 구조에선 승격이 운영 이미지를 과거로 되돌릴 수 있었다. 복구 자동화와 사전 차단, 두 층으로 막은 기록.</description>
+    </item>
     <item>
       <title>ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제</title>
       <link>http://localhost:1313/posts/ecs-arm64-exec-format-error/</link>
-      <pubDate>Fri, 08 May 2026 00:00:00 +0900</pubDate>
+      <pubDate>Fri, 08 May 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/ecs-arm64-exec-format-error/</guid>
       <description>Graviton(ARM64) 기반 ECS에서 발생한 exec format error를 추적해 amd64 이미지 아키텍처 mismatch 문제를 해결한 과정</description>
     </item>

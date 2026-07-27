@@ -1,0 +1,28 @@
+{{/* 시리즈 내비게이션 — front matter 의 series / series_order 로 자동 구성
+     사용: {{< series >}}  (글 본문 맨 위)                                   */}}
+{{- $name := .Page.Params.series }}
+{{- if $name }}
+  {{- $parts := where (where site.RegularPages "Type" "in" site.Params.mainSections) "Params.series" $name }}
+  {{- $parts = sort $parts "Params.series_order" }}
+<nav class="fn-series" aria-label="시리즈 목차">
+  <div class="fn-series-head">
+    <span class="fn-series-tag">Series</span>
+    <span class="fn-series-name">{{ $name }}</span>
+    <span class="fn-series-count">{{ len $parts }}부작</span>
+  </div>
+  <ol class="fn-series-list">
+    {{- range $parts }}
+    {{- $isCurrent := eq .File.Path $.Page.File.Path }}
+    <li class="fn-series-item{{ if $isCurrent }} is-current{{ end }}">
+      <span class="fn-series-num">{{ .Params.series_order }}</span>
+      {{- if $isCurrent }}
+      <span class="fn-series-title">{{ .Params.series_title | default .Title }}</span>
+      <span class="fn-series-here">이 글</span>
+      {{- else }}
+      <a class="fn-series-title" href="{{ .RelPermalink }}">{{ .Params.series_title | default .Title }}</a>
+      {{- end }}
+    </li>
+    {{- end }}
+  </ol>
+</nav>
+{{- end }}

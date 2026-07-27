@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Software Engineering on 기록 블로그</title>
+    <link>http://localhost:1313/categories/software-engineering/</link>
+    <description>Recent content in Software Engineering on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/software-engineering/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;</title>
+      <link>http://localhost:1313/posts/ai-drawing-coach-design/</link>
+      <pubDate>Mon, 15 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/ai-drawing-coach-design/</guid>
+      <description>그림 피드백 서비스를 &amp;#39;판정 도구&amp;#39;가 아니라 &amp;#39;다음 한 걸음을 주는 코치&amp;#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.</description>
+    </item>
+    <item>
+      <title>진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게</title>
+      <link>http://localhost:1313/posts/diagnosis-recommend-separation/</link>
+      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/diagnosis-recommend-separation/</guid>
+      <description>진단 결과를 LLM으로 재해석하지 않고 그대로 검색 조건으로 쓴 이유. hard(협상 불가)와 soft(순위만)를 가른 추천 설계.</description>
+    </item>
+    <item>
+      <title>믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다</title>
+      <link>http://localhost:1313/posts/llm-role-constraint/</link>
+      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/llm-role-constraint/</guid>
+      <description>AI 시스템에서 불확실성을 어디에 허용하고 어디서 통제할 것인가. VLM 관찰·코드 결정·LLM 설명의 경계를 나눈 설계.</description>
+    </item>
+    <item>
+      <title>Git 동작 원리 정리 — commit graph, merge-base, cherry-pick</title>
+      <link>http://localhost:1313/posts/git-commit-graph-principles/</link>
+      <pubDate>Sun, 10 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/git-commit-graph-principles/</guid>
+      <description>unrelated histories, merge-base, cherry-pick을 중심으로 Git의 commit graph 동작 원리를 정리</description>
+    </item>
+    <item>
+      <title>Flyway 동작 원리 정리 — flyway_schema_history와 baseline 패턴</title>
+      <link>http://localhost:1313/posts/flyway-migration-principles/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/flyway-migration-principles/</guid>
+      <description>Flyway의 데이터 모델과 baseline 패턴을 정리합니다. flyway_schema_history, checksum, migration 실행 흐름을 중심으로 설명합니다.</description>
+    </item>
+    <item>
+      <title>Spring Boot를 도커 컨테이너로 실행 시 민감 정보 외부화</title>
+      <link>http://localhost:1313/posts/spring-boot-docker-env-config/</link>
+      <pubDate>Sun, 26 Apr 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/spring-boot-docker-env-config/</guid>
+      <description>민감정보를 application.properties 하드코딩 시 발생하는 문제 기록 및 해결</description>
+    </item>
+  </channel>
+</rss>

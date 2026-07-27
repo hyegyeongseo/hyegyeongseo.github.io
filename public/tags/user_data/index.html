@@ -7,10 +7,10 @@
 <meta name="robots" content="index, follow">
 <title>User_data | 기록 블로그</title>
 <meta name="keywords" content="">
-<meta name="description" content="트러블슈팅 기록">
+<meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/user_data/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -72,13 +72,13 @@
 <meta property="og:url" content="http://localhost:1313/tags/user_data/">
   <meta property="og:site_name" content="기록 블로그">
   <meta property="og:title" content="User_data">
-  <meta property="og:description" content="트러블슈팅 기록">
+  <meta property="og:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
   <meta property="og:locale" content="ko">
   <meta property="og:type" content="website">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="User_data">
-  <meta name="twitter:description" content="트러블슈팅 기록">
+  <meta name="twitter:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 
 </head>
 <body class="list" id="top">
@@ -111,6 +111,21 @@
         </div>
         <ul id="menu" class="menu">
             <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
                 <a href="http://localhost:1313/tags/" title="Tags">
                     <span>Tags</span>
                 </a>
@@ -137,7 +152,7 @@ Spring Boot Actuator의 readiness probe는 Valkey 연결 상태를 함께 점검
 $ aws elbv2 describe-target-health --target-group-arn &#34;$TG_ARN&#34; &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; | 10.0.10.209| unhealthy| Target.ResponseCodeMismatch | Health checks failed: [503] | &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; application까지는 요청이 도달하고 있었지만, Spring Boot가 자기 자신을 “준비 안 됨&#34;이라고 응답하고 있는 상태였습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0000 UTC'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정" href="http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/"></a>
 </article>
     </main>

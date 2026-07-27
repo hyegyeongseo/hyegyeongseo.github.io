@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Reliability on 기록 블로그</title>
+    <link>http://localhost:1313/tags/reliability/</link>
+    <description>Recent content in Reliability on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/reliability/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다</title>
+      <link>http://localhost:1313/posts/llm-role-constraint/</link>
+      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/llm-role-constraint/</guid>
+      <description>AI 시스템에서 불확실성을 어디에 허용하고 어디서 통제할 것인가. VLM 관찰·코드 결정·LLM 설명의 경계를 나눈 설계.</description>
+    </item>
+  </channel>
+</rss>

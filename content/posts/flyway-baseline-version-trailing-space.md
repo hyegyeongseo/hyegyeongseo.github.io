@@ -3,6 +3,7 @@ title: "Flyway Invalid version: 1 디버깅 기록 — 인라인 주석과 보�
 description: "Spring Boot에 Flyway baseline을 설정하다 같은 에러를 두 번 만난 디버깅 기록. 첫 cycle은 .properties의 인라인 주석 함정, 두 번째 cycle은 보이지 않는 trailing space 한 칸. cat -A 한 명령으로 가설을 사실로 바꿨던 과정"
 date: 2026-05-09
 tags: ["flyway", "spring boot", "properties"]
+categories: ["Troubleshooting"]
 ---
 
 ## 진행 사항

@@ -3,6 +3,7 @@ title: "Spring Boot를 도커 컨테이너로 실행 시 민감 정보 외부화
 description: "민감정보를 application.properties 하드코딩 시 발생하는 문제 기록 및 해결"
 date: 2026-04-26
 tags: ["spring boot", "docker"]
+categories: ["Software Engineering"]
 ---
 
 ## 진행 사항

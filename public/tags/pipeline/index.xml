@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Pipeline on 기록 블로그</title>
+    <link>http://localhost:1313/tags/pipeline/</link>
+    <description>Recent content in Pipeline on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/pipeline/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;</title>
+      <link>http://localhost:1313/posts/ai-drawing-coach-design/</link>
+      <pubDate>Mon, 15 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/ai-drawing-coach-design/</guid>
+      <description>그림 피드백 서비스를 &amp;#39;판정 도구&amp;#39;가 아니라 &amp;#39;다음 한 걸음을 주는 코치&amp;#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.</description>
+    </item>
+  </channel>
+</rss>

@@ -3,6 +3,7 @@ title: "Git 동작 원리 정리 — commit graph, merge-base, cherry-pick"
 description: "unrelated histories, merge-base, cherry-pick을 중심으로 Git의 commit graph 동작 원리를 정리"
 date: 2026-05-10
 tags: ["git"]
+categories: ["Software Engineering"]
 ---
 
 ## 이 글을 쓰게 된 계기

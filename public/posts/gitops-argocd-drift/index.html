@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나 | 기록 블로그</title>
+<meta name="keywords" content="gitops, argocd, cicd, eks, kubernetes, sre, drawe">
+<meta name="description" content="ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 &#39;머지 결과&#39;를 검사하게 한 설계.">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/gitops-argocd-drift/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/gitops-argocd-drift/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/gitops-argocd-drift/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나">
+  <meta property="og:description" content="ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 &#39;머지 결과&#39;를 검사하게 한 설계.">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-20T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-07-27T00:00:00+00:00">
+    <meta property="article:tag" content="Gitops">
+    <meta property="article:tag" content="Argocd">
+    <meta property="article:tag" content="Cicd">
+    <meta property="article:tag" content="Eks">
+    <meta property="article:tag" content="Kubernetes">
+    <meta property="article:tag" content="Sre">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나">
+  <meta name="twitter:description" content="ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 &#39;머지 결과&#39;를 검사하게 한 설계.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나",
+      "item": "http://localhost:1313/posts/gitops-argocd-drift/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나",
+  "name": "GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나",
+  "description": "ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 '머지 결과'를 검사하게 한 설계.",
+  "keywords": [
+    "gitops", "argocd", "cicd", "eks", "kubernetes", "sre", "drawe"
+  ],
+  "articleBody": "배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.\n부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.\nEKS로 옮기면서 이 기준점을 git으로 옮기고 싶었습니다. 핵심 질문은 하나였습니다 — 배포 상태를 어디에 두고, 무엇을 단일 출처로 삼을 것인가.\n선택지 — push형 vs pull형 방식 성격 트레이드오프 CI가 kubectl apply (push형) CI가 클러스터를 직접 변경 git↔실제 상태를 지속적으로 대조·복원하려면 별도 구현이 필요 · CI가 클러스터 자격증명을 보유 ArgoCD GitOps (pull형, 채택) git이 단일 출처 초기 학습 비용 + 운영 컴포넌트 추가 Flux 기능 유사 앱 트리 시각화·UI에서 ArgoCD 선호 왜 ArgoCD였나 git = 배포 상태의 단일 출처. main에 push하면 ArgoCD가 auto-sync(prune + selfHeal)로 클러스터를 git 상태에 수렴시킵니다. 이력·롤백이 전부 git으로 추적됩니다 — 배포는 커밋, 롤백은 revert. CI와 CD의 책임 분리. CI는 이미지 빌드 + 오버레이 newTag bump 커밋까지만 합니다. CD(클러스터 반영)는 ArgoCD 몫이라, CI에 클러스터 자격증명이 필요 없습니다. 공격면이 줄어듭니다. selfHeal로 드리프트 자동 원복. 콘솔에서 손으로 바꾼 것(“몰래 고친 것”)이 git 상태로 되돌아갑니다. 수동 변경이 남지 않습니다. 운영에서 만난 문제 — branch-per-env 드리프트 이론은 깔끔하지만 운영은 그렇지 않았습니다. 환경을 브랜치로 나누자(dev=develop, prod=main) prod 오버레이 파일이 두 브랜치에 복제되는 구조가 됐습니다.\ndevelop에도 prod 오버레이가 복제돼 있어서, 낡은 prod 오버레이가 main으로 승격되면 실제 운영 이미지가 과거 버전으로 되돌아갈 수 있었습니다. 배포가 앞이 아니라 뒤로 가는 것이죠. 이걸 2층으로 막았습니다.\n자동 동기화(평시) — CD가 main의 prod bump를 하면 develop 사본도 함께 동기화. 사본이 낡지 않게 상시 유지. drift-gate(승격 시) — main 대상 PR을 머지하면 prod가 바뀌는지 검사하는 게이트가 승격을 차단. drift-gate가 ‘diff’가 아니라 ‘머지 결과’를 검사하는 이유 이 부분이 설계의 핵심입니다. 흔히 PR의 diff를 보고 싶지만, diff는 충돌 자동 해소 이전 상태라 부정확합니다. “이 PR을 머지하면 prod가 정말 바뀌는가\"는 실제 머지했을 때의 트리(refs/pull/N/merge)를 봐야 정확히 판정됩니다.\n그래서 게이트는 머지 결과 트리를 검사합니다. 정상 케이스(3-way 병합이 main 값을 유지)는 “같음\"으로 통과해 오탐이 0입니다. 게이트는 변경 의도를 검사하는 것이 아니라, 머지 이후 실제 운영 상태를 검사합니다 — 이게 게이트를 신뢰할 수 있게 만든 지점입니다.\n(오버레이 동시 bump가 겹쳐 non-fast-forward로 충돌하는 race도 있었는데, 이건 별도 글에서 다룹니다 — 작업트리 정리 + rebase 진행 가드 + 재시도로 해결.)\n서비스별 이미지 빌드 전략 — 짧게 배포 파이프라인에서 backend(Spring)와 fastapi(Python)의 이미지 빌드 방식을 다르게 가져갔습니다. backend는 아키텍처 중립인 JAR을 CI에서 먼저 빌드하고 Docker에는 결과물만 COPY했고, fastapi는 mediapipe·CLIP 같은 아키텍처 의존 라이브러리가 있어 Docker 내부에서 arm64 기준으로 빌드했습니다. 서비스 특성에 따라 빌드 전략은 달라도, GitOps 관점에서는 둘 다 git이 배포 상태의 기준이 되도록 유지했습니다.\n(빌드 방식의 arm64/QEMU·buildcache·ECR lifecycle 디테일은 ARM64 CI 빌드 전략 글로 분리했습니다.)\n적용 결과와 운영 철학 배포 = git 커밋, 롤백 = revert가 됐습니다. 마이그레이션·재기동 때도 ArgoCD가 클러스터를 git 상태로 수렴시켜 재현성이 확보됐습니다. 콘솔을 열지 않아도 “지금 prod가 무엇을 추적하는가\"가 main의 오버레이 경로에 그대로 드러납니다.\nGitOps의 핵심은 ArgoCD가 아닙니다. 배포 상태를 git으로 선언하고, 선언과 실제 상태 사이의 드리프트를 어떻게 관리할지 설계하는 일입니다. ArgoCD는 그 설계를 실행하는 도구였습니다.\ngit을 단일 출처로 — 배포·롤백·이력이 한곳에 CI와 CD의 책임 분리로 공격면 축소 드리프트를 2층으로 막고, 게이트는 추측이 아니라 머지 결과를 본다 ",
+  "wordCount" : "565",
+  "inLanguage": "en",
+  "datePublished": "2026-06-20T00:00:00Z",
+  "dateModified": "2026-07-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/gitops-argocd-drift/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
+      </h1>
+      <p class="post-description">ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 &#39;머지 결과&#39;를 검사하게 한 설계.</p>
+      <div class="post-meta"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%eb%b0%b0%ea%b2%bd--%eb%b0%b0%ed%8f%ac-%ec%83%81%ed%83%9c%ec%9d%98-%eb%8b%a8%ec%9d%bc-%ec%b6%9c%ec%b2%98%ea%b0%80-git%ec%9d%b4-%ec%95%84%eb%8b%88%eb%9d%bc-aws%ec%97%90-%ec%9e%88%ec%97%88%eb%8b%a4" aria-label="배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다">배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다</a></li>
+            <li>
+                <a href="#%ec%84%a0%ed%83%9d%ec%a7%80--push%ed%98%95-vs-pull%ed%98%95" aria-label="선택지 — push형 vs pull형">선택지 — push형 vs pull형</a></li>
+            <li>
+                <a href="#%ec%99%9c-argocd%ec%98%80%eb%82%98" aria-label="왜 ArgoCD였나">왜 ArgoCD였나</a></li>
+            <li>
+                <a href="#%ec%9a%b4%ec%98%81%ec%97%90%ec%84%9c-%eb%a7%8c%eb%82%9c-%eb%ac%b8%ec%a0%9c--branch-per-env-%eb%93%9c%eb%a6%ac%ed%94%84%ed%8a%b8" aria-label="운영에서 만난 문제 — branch-per-env 드리프트">운영에서 만난 문제 — branch-per-env 드리프트</a><ul>
+            <li>
+                <a href="#drift-gate%ea%b0%80-diff%ea%b0%80-%ec%95%84%eb%8b%88%eb%9d%bc-%eb%a8%b8%ec%a7%80-%ea%b2%b0%ea%b3%bc%eb%a5%bc-%ea%b2%80%ec%82%ac%ed%95%98%eb%8a%94-%ec%9d%b4%ec%9c%a0" aria-label="drift-gate가 &lsquo;diff&rsquo;가 아니라 &lsquo;머지 결과&rsquo;를 검사하는 이유">drift-gate가 &lsquo;diff&rsquo;가 아니라 &lsquo;머지 결과&rsquo;를 검사하는 이유</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ec%84%9c%eb%b9%84%ec%8a%a4%eb%b3%84-%ec%9d%b4%eb%af%b8%ec%a7%80-%eb%b9%8c%eb%93%9c-%ec%a0%84%eb%9e%b5--%ec%a7%a7%ea%b2%8c" aria-label="서비스별 이미지 빌드 전략 — 짧게">서비스별 이미지 빌드 전략 — 짧게</a></li>
+            <li>
+                <a href="#%ec%a0%81%ec%9a%a9-%ea%b2%b0%ea%b3%bc%ec%99%80-%ec%9a%b4%ec%98%81-%ec%b2%a0%ed%95%99" aria-label="적용 결과와 운영 철학">적용 결과와 운영 철학</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <h2 id="배경--배포-상태의-단일-출처가-git이-아니라-aws에-있었다">배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다</h2>
+<p>ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 <strong><code>:커밋SHA</code></strong> 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 <strong>새 리비전을 등록</strong>한 뒤(<code>register-task-definition</code>) <strong>서비스를 갱신</strong>하고(<code>update-service</code>) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.</p>
+<p>부족했던 건 <em>이력</em>이 아니라 <strong>운영 상태의 기준점</strong>이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 <strong>git이 아니라 AWS의 &lsquo;현재 살아있는 task definition&rsquo;</strong> 에서 읽어 왔다는 점입니다(<code>describe-task-definition</code> → 이미지만 교체 → 재등록). 즉 <strong>배포 명세(desired state)의 출처가 git이 아니라 AWS</strong>였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, <em>지금 무엇이 어떻게 떠 있는가</em>를 <strong>선언하거나 보장하지는 않았습니다.</strong> 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.</p>
+<p>EKS로 옮기면서 이 <strong>기준점을 git으로</strong> 옮기고 싶었습니다. 핵심 질문은 하나였습니다 — <strong>배포 상태를 어디에 두고, 무엇을 단일 출처로 삼을 것인가.</strong></p>
+<h2 id="선택지--push형-vs-pull형">선택지 — push형 vs pull형</h2>
+<table>
+  <thead>
+      <tr>
+          <th>방식</th>
+          <th>성격</th>
+          <th>트레이드오프</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>CI가 <code>kubectl apply</code> (push형)</td>
+          <td>CI가 클러스터를 직접 변경</td>
+          <td>git↔실제 상태를 지속적으로 대조·복원하려면 별도 구현이 필요 · CI가 클러스터 자격증명을 보유</td>
+      </tr>
+      <tr>
+          <td><strong>ArgoCD GitOps (pull형, 채택)</strong></td>
+          <td>git이 단일 출처</td>
+          <td>초기 학습 비용 + 운영 컴포넌트 추가</td>
+      </tr>
+      <tr>
+          <td>Flux</td>
+          <td>기능 유사</td>
+          <td>앱 트리 시각화·UI에서 ArgoCD 선호</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="왜-argocd였나">왜 ArgoCD였나</h2>
+<ul>
+<li><strong>git = 배포 상태의 단일 출처.</strong> <code>main</code>에 push하면 ArgoCD가 auto-sync(prune + selfHeal)로 클러스터를 git 상태에 <strong>수렴</strong>시킵니다. 이력·롤백이 전부 git으로 추적됩니다 — <strong>배포는 커밋, 롤백은 revert.</strong></li>
+<li><strong>CI와 CD의 책임 분리.</strong> CI는 이미지 빌드 + 오버레이 <code>newTag</code> bump 커밋<strong>까지만</strong> 합니다. CD(클러스터 반영)는 ArgoCD 몫이라, <strong>CI에 클러스터 자격증명이 필요 없습니다.</strong> 공격면이 줄어듭니다.</li>
+<li><strong>selfHeal로 드리프트 자동 원복.</strong> 콘솔에서 손으로 바꾼 것(&ldquo;몰래 고친 것&rdquo;)이 git 상태로 되돌아갑니다. 수동 변경이 남지 않습니다.</li>
+</ul>
+<h2 id="운영에서-만난-문제--branch-per-env-드리프트">운영에서 만난 문제 — branch-per-env 드리프트</h2>
+<p>이론은 깔끔하지만 운영은 그렇지 않았습니다. 환경을 브랜치로 나누자(dev=<code>develop</code>, prod=<code>main</code>) <strong>prod 오버레이 파일이 두 브랜치에 복제</strong>되는 구조가 됐습니다.</p>
+<p><code>develop</code>에도 prod 오버레이가 복제돼 있어서, <strong>낡은 prod 오버레이가 <code>main</code>으로 승격되면 실제 운영 이미지가 과거 버전으로 되돌아갈 수 있었습니다.</strong> 배포가 앞이 아니라 뒤로 가는 것이죠. 이걸 <strong>2층으로 막았습니다.</strong></p>
+<ol>
+<li><strong>자동 동기화(평시)</strong> — CD가 <code>main</code>의 prod bump를 하면 <code>develop</code> 사본도 함께 동기화. 사본이 낡지 않게 상시 유지.</li>
+<li><strong>drift-gate(승격 시)</strong> — <code>main</code> 대상 PR을 머지하면 prod가 바뀌는지 검사하는 게이트가 승격을 차단.</li>
+</ol>
+<h3 id="drift-gate가-diff가-아니라-머지-결과를-검사하는-이유">drift-gate가 &lsquo;diff&rsquo;가 아니라 &lsquo;머지 결과&rsquo;를 검사하는 이유</h3>
+<p>이 부분이 설계의 핵심입니다. 흔히 PR의 <strong>diff</strong>를 보고 싶지만, diff는 <em>충돌 자동 해소 이전</em> 상태라 부정확합니다. &ldquo;이 PR을 머지하면 prod가 정말 바뀌는가&quot;는 <strong>실제 머지했을 때의 트리</strong>(<code>refs/pull/N/merge</code>)를 봐야 정확히 판정됩니다.</p>
+<p>그래서 게이트는 머지 결과 트리를 검사합니다. 정상 케이스(3-way 병합이 <code>main</code> 값을 유지)는 &ldquo;같음&quot;으로 통과해 <strong>오탐이 0</strong>입니다. <strong>게이트는 변경 의도를 검사하는 것이 아니라, 머지 이후 실제 운영 상태를 검사합니다</strong> — 이게 게이트를 신뢰할 수 있게 만든 지점입니다.</p>
+<p>(오버레이 동시 bump가 겹쳐 non-fast-forward로 충돌하는 race도 있었는데, 이건 별도 글에서 다룹니다 — 작업트리 정리 + rebase 진행 가드 + 재시도로 해결.)</p>
+<h2 id="서비스별-이미지-빌드-전략--짧게">서비스별 이미지 빌드 전략 — 짧게</h2>
+<p>배포 파이프라인에서 backend(Spring)와 fastapi(Python)의 이미지 빌드 방식을 다르게 가져갔습니다. backend는 아키텍처 중립인 JAR을 CI에서 먼저 빌드하고 Docker에는 결과물만 COPY했고, fastapi는 mediapipe·CLIP 같은 아키텍처 의존 라이브러리가 있어 Docker 내부에서 arm64 기준으로 빌드했습니다. <strong>서비스 특성에 따라 빌드 전략은 달라도, GitOps 관점에서는 둘 다 git이 배포 상태의 기준이 되도록 유지했습니다.</strong></p>
+<p>(빌드 방식의 arm64/QEMU·buildcache·ECR lifecycle 디테일은 <a href="/posts/arm64-ci-build-strategy/">ARM64 CI 빌드 전략</a> 글로 분리했습니다.)</p>
+<h2 id="적용-결과와-운영-철학">적용 결과와 운영 철학</h2>
+<p>배포 = git 커밋, 롤백 = revert가 됐습니다. 마이그레이션·재기동 때도 ArgoCD가 클러스터를 git 상태로 수렴시켜 <strong>재현성</strong>이 확보됐습니다. 콘솔을 열지 않아도 &ldquo;지금 prod가 무엇을 추적하는가&quot;가 <code>main</code>의 오버레이 경로에 그대로 드러납니다.</p>
+<p><strong>GitOps의 핵심은 ArgoCD가 아닙니다.</strong> 배포 상태를 git으로 선언하고, 선언과 실제 상태 사이의 드리프트를 어떻게 관리할지 설계하는 일입니다. ArgoCD는 그 설계를 실행하는 도구였습니다.</p>
+<ul>
+<li><strong>git을 단일 출처로</strong> — 배포·롤백·이력이 한곳에</li>
+<li><strong>CI와 CD의 책임 분리로</strong> 공격면 축소</li>
+<li><strong>드리프트를 2층으로 막고</strong>, 게이트는 <em>추측이 아니라 머지 결과</em>를 본다</li>
+</ul>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/gitops/">gitops</a>
+      <a href="http://localhost:1313/tags/argocd/">argocd</a>
+      <a href="http://localhost:1313/tags/cicd/">cicd</a>
+      <a href="http://localhost:1313/tags/eks/">eks</a>
+      <a href="http://localhost:1313/tags/kubernetes/">kubernetes</a>
+      <a href="http://localhost:1313/tags/sre/">sre</a>
+      <a href="http://localhost:1313/tags/drawe/">drawe</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/ecs-to-eks-cutover/">
+    <span class="title">« 이전 페이지</span>
+    <span>ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/arm64-ci-build-strategy/">
+    <span class="title">다음 페이지 »</span>
+    <span>ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

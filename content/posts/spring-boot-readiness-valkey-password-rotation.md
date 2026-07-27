@@ -3,6 +3,7 @@ title: "Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — V
 description: "Spring Boot의 readiness probe가 fail로 잡혀 ALB가 503을 반환한 문제를 추적해, Valkey 비밀번호가 IaC와 EC2 instance 사이에 어긋나 있던 원인을 확인하고 user_data 시점 특성에 따라 instance를 수동 replace한 과정"
 date: 2026-05-09
 tags: ["aws", "alb", "spring boot", "valkey", "redis", "terraform", "ec2", "user_data", "readiness"]
+categories: ["Troubleshooting"]
 ---
 
 ## 진행 사항

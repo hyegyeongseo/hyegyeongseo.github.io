@@ -7,10 +7,10 @@
 <meta name="robots" content="index, follow">
 <title>Aws | 기록 블로그</title>
 <meta name="keywords" content="">
-<meta name="description" content="트러블슈팅 기록">
+<meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/aws/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.2c32d61c46fa48f73c4f2d7b5287ee08a8f60ed48d02af0366a04f3627cc7902.css" integrity="sha256-LDLWHEb6SPc8Ty17UofuCKj2DtSNAq8DZqBPNifMeQI=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -72,13 +72,13 @@
 <meta property="og:url" content="http://localhost:1313/tags/aws/">
   <meta property="og:site_name" content="기록 블로그">
   <meta property="og:title" content="Aws">
-  <meta property="og:description" content="트러블슈팅 기록">
+  <meta property="og:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
   <meta property="og:locale" content="ko">
   <meta property="og:type" content="website">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Aws">
-  <meta name="twitter:description" content="트러블슈팅 기록">
+  <meta name="twitter:description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 
 </head>
 <body class="list" id="top">
@@ -111,6 +111,21 @@
         </div>
         <ul id="menu" class="menu">
             <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
                 <a href="http://localhost:1313/tags/" title="Tags">
                     <span>Tags</span>
                 </a>
@@ -138,7 +153,7 @@ VPC 리소스 자체(subnet, route table, IGW)는 무료라고 알고 있어서 
 비용 분해 — Bills 화면 그대로 펼치기 Billing → Bills → 해당 월을 선택하면 서비스 단위로 수량과 단가까지 다 나옵니다. VPC 카테고리만 펼쳐 보니 다음과 같았습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0900 KST'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0000 UTC'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정" href="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/"></a>
 </article>
 
@@ -152,7 +167,7 @@ VPC 리소스 자체(subnet, route table, IGW)는 무료라고 알고 있어서 
 NAT, Valkey, RDS 차례로 start. NAT을 거친 outbound가 정상인지를 SSH 대신 SSM Session Manager로 검증해 보기로 했습니다 — SSM Agent의 등록 자체가 NAT 경로를 통한 공개 SSM endpoint 도달에 성공해야만 일어나는 일이라, 간접 검증이 되거든요. 콘솔에서 EC2 → Valkey → SSM Session Manager 탭을 열어봤습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0900 KST'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0000 UTC'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)" href="http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/"></a>
 </article>
 
@@ -168,7 +183,7 @@ NAT, Valkey, RDS 차례로 start. NAT을 거친 outbound가 정상인지를 SSH 
 원인 분석 ALB가 받은 응답 확인 application이 살아있는데 ALB만 unhealthy라면, ALB가 application에 보낸 요청이 실제로 어떤 응답을 받고 있는지를 먼저 확인해야 했습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0000 UTC'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to Spring Boot actuator와 ALB health check를 함께 맞춰야 했던 이유" href="http://localhost:1313/posts/alb-spring-boot-actuator-health-check/"></a>
 </article>
 
@@ -184,7 +199,7 @@ Spring Boot Actuator의 readiness probe는 Valkey 연결 상태를 함께 점검
 $ aws elbv2 describe-target-health --target-group-arn &#34;$TG_ARN&#34; &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; | 10.0.10.209| unhealthy| Target.ResponseCodeMismatch | Health checks failed: [503] | &#43;-------------&#43;-----------&#43;-----------------------------&#43;--------------------------------&#43; application까지는 요청이 도달하고 있었지만, Spring Boot가 자기 자신을 “준비 안 됨&#34;이라고 응답하고 있는 상태였습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0000 UTC'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to Spring Boot readiness probe DOWN으로 ALB가 503을 받던 이유 — Valkey 비밀번호 위치 어긋남과 user_data 함정" href="http://localhost:1313/posts/spring-boot-readiness-valkey-password-rotation/"></a>
 </article>
 
@@ -200,7 +215,7 @@ $ aws elbv2 describe-target-health --target-group-arn &#34;$TG_ARN&#34; &#43;---
 HikariPool : DraweHikariCP - Exception during pool initialization com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure Caused by: javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Path does not chain with any of the trust anchors application 단까지는 부팅이 진행됐지만, DB 연결 풀을 만드는 단계에서 SSL handshake가 실패했습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0900 KST'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <footer class="entry-footer"><span title='2026-05-09 00:00:00 +0000 UTC'>May 9, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to Spring Boot에서 RDS SSL 연결 시 CertPathValidatorException이 발생한 이유 — JVM truststore와 RDS CA" href="http://localhost:1313/posts/spring-boot-rds-ssl-jvm-truststore/"></a>
 </article>
 
@@ -217,7 +232,7 @@ exec /opt/java/openjdk/bin/java: exec format error 원인 분석 exec format err
 ECS 호스트로 Graviton을 선택했으므로 호스트 아키텍처가 ARM64라는 것은 처음부터 알고 있었습니다. 모르고 있었던 건 — 그 사실이 컨테이너 이미지 빌드와 컨테이너 실행 결과에까지 영향을 줄 수 있다는 점이었습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0900 KST'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0000 UTC'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to ECS에서 exec format error가 발생한 이유 — Graviton(ARM64) 이미지 아키텍처 문제" href="http://localhost:1313/posts/ecs-arm64-exec-format-error/"></a>
 </article>
 
@@ -232,7 +247,7 @@ ECS 호스트로 Graviton을 선택했으므로 호스트 아키텍처가 ARM64�
 Error: unknown command &#34;sh&#34; for &#34;/bin/alloy&#34; 원인 분석 에러 메시지를 다시 읽기 unknown command &#34;sh&#34; for &#34;/bin/alloy&#34; — 이 메시지는 alloy 바이너리가 “sh&#34;라는 subcommand를 받았다는 의미였습니다. 즉 컨테이너 안에서 실제로 실행된 명령은 다음과 같은 형태일 가능성이 높았습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0900 KST'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0000 UTC'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식" href="http://localhost:1313/posts/ecs-task-definition-entrypoint-command/"></a>
 </article>
     </main>
