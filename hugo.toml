@@ -34,21 +34,21 @@ timezone = "Asia/Seoul"
 
 [menus]
   [[menus.main]]
-    name = "Projects"
-    url = "/categories/projects/"
-    weight = 10
-  [[menus.main]]
     name = "Software Engineering"
     url = "/categories/software-engineering/"
-    weight = 20
+    weight = 10
   [[menus.main]]
     name = "Infra & Observability"
     url = "/categories/infra-observability/"
-    weight = 30
+    weight = 20
   [[menus.main]]
     name = "Troubleshooting"
     url = "/categories/troubleshooting/"
-    weight = 40
+    weight = 30
+  [[menus.main]]
+    name = "Projects"
+    url = "/categories/projects/"
+    weight = 40  
   [[menus.main]]
     name = "Tags"
     url = "/tags/"

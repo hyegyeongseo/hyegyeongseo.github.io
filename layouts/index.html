@@ -35,14 +35,14 @@
   {{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
 
   {{- $cats := slice
-      (dict "name" "Projects" "term" "Projects" "url" "/categories/projects/"
-            "desc" "만든 것들 — 무엇을 왜 만들었고, 어떤 결정을 했나")
       (dict "name" "Software Engineering" "term" "Software Engineering" "url" "/categories/software-engineering/"
             "desc" "서비스를 설계하고 만드는 과정")
       (dict "name" "Infra & Observability" "term" "Infra Observability" "url" "/categories/infra-observability/"
             "desc" "만든 서비스를 안정적으로 운영하는 과정")
       (dict "name" "Troubleshooting" "term" "Troubleshooting" "url" "/categories/troubleshooting/"
             "desc" "문제를 발견하고 원인을 찾아 해결한 기록")
+      (dict "name" "Projects" "term" "Projects" "url" "/categories/projects/"
+            "desc" "만든 것들 — 무엇을 왜 만들었고, 어떤 결정을 했나")            
   }}
 
   {{/* 기본 화면: 카테고리 카드 */}}

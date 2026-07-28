@@ -113,9 +113,6 @@
     <loc>http://localhost:1313/tags/slo/</loc>
     <lastmod>2026-07-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/sre/</loc>
-    <lastmod>2026-07-28T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/tags/</loc>
     <lastmod>2026-07-28T00:00:00+00:00</lastmod>
   </url><url>
@@ -138,6 +135,9 @@
     <lastmod>2026-07-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/prometheus/</loc>
+    <lastmod>2026-07-27T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/sre/</loc>
     <lastmod>2026-07-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/categories/troubleshooting/</loc>

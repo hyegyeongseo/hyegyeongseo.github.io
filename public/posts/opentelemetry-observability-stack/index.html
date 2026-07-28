@@ -120,7 +120,7 @@
     "observability", "opentelemetry", "alloy", "loki", "tempo", "amp", "s3"
   ],
   "articleBody": " Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 이 글 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 배경 — 계측 규격부터 정했다 관측성을 구축하면서 가장 먼저 결정한 건 저장소가 아니라 계측 규격(OpenTelemetry) 이었습니다. 저장소는 나중에 교체할 수 있지만, 애플리케이션 곳곳에 들어가는 계측 코드는 한 번 적용하면 바꾸기 어렵기 때문입니다.\n왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게 OpenTelemetry를 고른 이유는 특정 벤더에 묶이지 않기 위해서입니다.\n애플리케이션은 OTLP로 내보내는 것까지만 알면 됩니다. 그 신호를 어디에 담을지는 수집기(Alloy)가 정하죠. 그래서 저장소가 바뀌어도 앱 코드는 그대로 두고 수집기 설정만 바꾸면 됩니다.\n실제로 ECS에서 EKS로 옮길 때도 애플리케이션의 계측 코드는 그대로 두고, 수집기 배치 방식만 바꿨습니다 — ECS에서는 태스크 사이드카·인스턴스당 데몬으로 돌던 수집기를 EKS에서는 노드마다 뜨는 DaemonSet으로 옮겼고, 대시보드와 신호의 연속성은 그대로 유지됐습니다.\n파이프라인 — 수집은 한 곳으로 애플리케이션은 OTLP만 알고, 수집기(Alloy)가 저장소를 결정하는 구조입니다.\n앱·노드 │ OTLP ▼ Grafana Alloy (노드마다 DaemonSet) 수집 + PII 마스킹 + 노드 라벨 ├── metrics ──▶ AMP (관리형) ├── logs ──▶ Loki (직접 운영 · S3 백엔드) └── traces ──▶ Tempo (직접 운영 · S3 백엔드) │ └── 조회는 Grafana 가 읽기 전용으로만 ",
-  "wordCount" : "571",
+  "wordCount" : "584",
   "inLanguage": "en",
   "datePublished": "2026-06-23T00:00:00Z",
   "dateModified": "2026-07-27T00:00:00Z",
@@ -173,11 +173,6 @@
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/categories/projects/" title="Projects">
-                    <span>Projects</span>
-                </a>
-            </li>
-            <li>
                 <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
                     <span>Software Engineering</span>
                 </a>
@@ -190,6 +185,11 @@
             <li>
                 <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
                     <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/projects/" title="Projects">
+                    <span>Projects</span>
                 </a>
             </li>
             <li>
@@ -350,7 +350,7 @@
 </ol>
 <hr>
 <p>하지만 데이터를 모으는 것만으로는 관측성이 완성되지 않습니다. <strong>데이터를 저장하는 일과, 이상 징후를 판단해 운영자에게 알리는 일은 서로 다른 문제였습니다.</strong></p>
-<p>다음 글에서는 <strong>무엇을 알릴 가치가 있다고 판단했는지</strong>, 그리고 *받은 사람이 바로 판</p>
+<p>다음 글에서는 <strong>무엇을 알릴 가치가 있다고 판단했는지</strong>, 그리고 <em>받은 사람이 바로 판단하고 행동할 수 있게 메시지를 어떻게 구성했는지</em>를 정리합니다 → <a href="/posts/alert-design-what-and-how/">관측성 설계 ② 알림 편</a></p>
 
     </div>
     <div class="fn-tags-bottom">

@@ -80,7 +80,7 @@
     <meta property="article:tag" content="Gitops">
     <meta property="article:tag" content="Argocd">
     <meta property="article:tag" content="Cicd">
-    <meta property="article:tag" content="Github-Actions">
+    <meta property="article:tag" content="Github Actions">
     <meta property="article:tag" content="Sre">
 
   <meta name="twitter:card" content="summary">
@@ -119,7 +119,7 @@
     "gitops", "argocd", "cicd", "github-actions", "sre"
   ],
   "articleBody": "배경 — CI가 클러스터 대신 git을 만진다 GitOps로 옮기면서 CI의 역할이 바뀌었습니다. 예전엔 CI가 클러스터를 직접 갱신했지만, 이제는 이미지를 만들고 오버레이의 이미지 태그를 git에 커밋하는 것까지만 합니다. 클러스터 반영은 ArgoCD가 git을 보고 알아서 하고요.\n",
-  "wordCount" : "442",
+  "wordCount" : "456",
   "inLanguage": "en",
   "datePublished": "2026-06-25T00:00:00Z",
   "dateModified": "2026-07-27T00:00:00Z",
@@ -172,11 +172,6 @@
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/categories/projects/" title="Projects">
-                    <span>Projects</span>
-                </a>
-            </li>
-            <li>
                 <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
                     <span>Software Engineering</span>
                 </a>
@@ -189,6 +184,11 @@
             <li>
                 <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
                     <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/projects/" title="Projects">
+                    <span>Projects</span>
                 </a>
             </li>
             <li>
@@ -283,7 +283,7 @@
 <ol>
 <li><strong>GitOps에서 git은 데이터베이스다.</strong> 동시성(경합)과 복제 일관성(드리프트) 문제가 그대로 옮겨온다 — 브랜치 전략을 짤 때 이걸 염두에 둬야 한다.</li>
 <li><strong>방어는 두 층으로.</strong> 복구 자동화(rebase 재시도)만으로도, 사전 차단(게이트)만으로도 부족하다. 평시에 어긋나지 않게 하고, 그래도 어긋나면 승격에서 잡는다.</li>
-<li>**검사는 &ldquo;그럴 것 같다&quot;가 아니라 &ldquo;�</li>
+<li><strong>검사는 &ldquo;그럴 것 같다&quot;가 아니라 &ldquo;이렇게 된다&quot;를 봐야 한다.</strong> diff가 아니라 머지 결과를 검사한 이유이고, 오탐 0이 게이트의 신뢰를 만든다.</li>
 </ol>
 
     </div>

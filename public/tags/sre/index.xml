@@ -6,22 +6,8 @@
     <description>Recent content in Sre on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/sre/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>DraWe — 그림에서 막히는 지점을 짚고 다음 연습까지 잇는 AI 드로잉 코치 (팀 프로젝트)</title>
-      <link>http://localhost:1313/posts/project-drawe/</link>
-      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/project-drawe/</guid>
-      <description>창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가이드 기능을 개발하고, 서비스를 운영하기 위한 AWS 클라우드 인프라와 GitOps·Observability 기반 운영 체계를 구축했습니다.</description>
-    </item>
-    <item>
-      <title>ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환</title>
-      <link>http://localhost:1313/posts/ecs-to-eks-cutover/</link>
-      <pubDate>Mon, 22 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/ecs-to-eks-cutover/</guid>
-      <description>운영 중인 서비스를 서비스 영향 없이 EKS로 전환한 과정. 병행 구축·Dark verify·토글 컷오버로 전환을 검증 가능한 절차로 만들고, 롤백과 종료까지 운영 절차로 남긴 기록.</description>
-    </item>
     <item>
       <title>GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나</title>
       <link>http://localhost:1313/posts/gitops-argocd-drift/</link>
@@ -42,13 +28,6 @@
       <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/hpa-metrics-server-blind-spot/</guid>
       <description>모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. &amp;#39;고장인가 부재인가&amp;#39;를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지.</description>
-    </item>
-    <item>
-      <title>60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기</title>
-      <link>http://localhost:1313/posts/graceful-shutdown-drain/</link>
-      <pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/graceful-shutdown-drain/</guid>
-      <description>Kubernetes가 60초 유예를 줬는데 앱은 그 유예를 안 쓰고 있었다. 오진을 두 번 걷어내고, &amp;#39;로그가 찍힌다&amp;#39;가 아니라 &amp;#39;실제로 드레인한다&amp;#39;를 대조 실험으로 증명한 기록.</description>
     </item>
     <item>
       <title>관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기</title>
