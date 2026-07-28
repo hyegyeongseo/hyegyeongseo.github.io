@@ -4,7 +4,7 @@ date: 2026-07-24
 lastmod: 2026-07-27
 weight: 55
 description: "Kubernetes가 60초 유예를 줬는데 앱은 그 유예를 안 쓰고 있었다. 오진을 두 번 걷어내고, '로그가 찍힌다'가 아니라 '실제로 드레인한다'를 대조 실험으로 증명한 기록."
-tags: ["kubernetes", "graceful-shutdown", "spring-boot", "sre", "drawe"]
+tags: ["kubernetes", "graceful-shutdown", "spring-boot", "drawe"]
 categories: ["Troubleshooting"]
 ---
 
@@ -61,14 +61,7 @@ Graceful shutdown complete   → 7ms
 **3차 — 통제된 실험(파드를 지정해 삭제).**
 변수를 하나만 남겼습니다. 대상을 지정해 삭제하고, A에만 부하를 건 뒤 삭제·B는 idle로 삭제했습니다.
 
-```text
-════════ graceful shutdown drain ════════
-  A 부하중     7120 ms
-  B idle          7 ms
-─────────────────────────────────────────
-  요청 9건 / 코드: 9× 200 / 잘린 요청: 0건
-════════════════════════════════════════
-```
+![같은 방식으로 지운 두 파드 — 7120ms vs 7ms](/images/posts/graceful-drain-compare.png)
 
 idle 파드(B)는 즉시 종료됐고, 요청을 처리 중이던 파드(A)는 약 7초 동안 드레인한 뒤 종료됐습니다. 같은 설정·같은 삭제 방식인데 갈린 변수는 *"종료 순간 처리 중인 요청이 있었는가"* 하나뿐입니다. B가 대조군이 되어, 7.1초가 고정 오버헤드가 아니라 **드레인한 만큼의 시간**임을 증명합니다. 7초를 기다려 요청 9건 전부 200으로 완료했고 잘린 흔적은 0건입니다. **적용 전**에는 in-flight 호출이 `InterruptedException`으로 종료된 로그를 확인했고, **적용 후**에는 동일 조건에서 요청 9건이 모두 200으로 완료되는 것을 확인했습니다.
 

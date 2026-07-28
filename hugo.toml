@@ -34,6 +34,10 @@ timezone = "Asia/Seoul"
 
 [menus]
   [[menus.main]]
+    name = "Projects"
+    url = "/categories/projects/"
+    weight = 10
+  [[menus.main]]
     name = "Software Engineering"
     url = "/categories/software-engineering/"
     weight = 20

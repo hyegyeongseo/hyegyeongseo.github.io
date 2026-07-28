@@ -20,16 +20,7 @@ VPC 리소스 자체(subnet, route table, IGW)는 무료라고 알고 있어서 
 
 Billing → Bills → 해당 월을 선택하면 서비스 단위로 *수량과 단가*까지 다 나옵니다. VPC 카테고리만 펼쳐 보니 다음과 같았습니다.
 
-```text
-Virtual Private Cloud                                              USD 23.74
-└─ Asia Pacific (Seoul)
-   ├─ Amazon Virtual Private Cloud Public IPv4 Addresses           USD  3.15
-   │  ├─ $0.005 per Idle public IPv4 address per hour     48.596 Hrs  $0.24
-   │  └─ $0.005 per In-use public IPv4 address per hour  582.549 Hrs  $2.91
-   └─ Amazon Virtual Private Cloud VpcEndpoint                     USD 20.59
-      ├─ $0.01  per GB data processed by VPC Endpoints     0.37 GB    $0.00
-      └─ $0.013 per VPC Endpoint Hour                  1,584    Hrs  $20.59
-```
+![청구서 화면 — VPC 카테고리를 펼치면 라인아이템별 수량·단가·발생액이 그대로 나온다](/images/posts/dev-bills-line-items.png)
 
 압도적 1위는 `VPC Endpoint Hour` — **$20.59**. `terraform-dev/vpc-endpoints.tf`를 확인해보니 원인이 명확했습니다.
 
@@ -73,7 +64,7 @@ resource "aws_vpc_endpoint" "logs" {      # Interface — 유료
 | Public IPv4 Idle | $0.24 (48 hr) | 운영 사이클 중 일시적 unassociate 흔적 |
 | NAT Instance × 1 (t4g.micro) | (EC2 카테고리에 별도) | 유지. endpoint 제거 시 모든 outbound 수용 |
 
-ALB-managed EIP는 internet-facing ALB가 각 AZ의 ENI에 자동 할당한 것이라 사용자가 release 불가. 외부 트래픽을 받으려면 필수 자원이라 손대지 않습니다. *손볼 곳은 Interface Endpoint 3개 한 묶음*이었습니다.
+ALB의 퍼블릭 IPv4는 internet-facing ALB가 각 AZ의 ENI에 자동 할당하는 AWS 관리 주소라(EIP가 아니라 직접 지정·해제 불가) 사용자가 release할 수 없습니다. 외부 트래픽을 받으려면 필수 자원이라 손대지 않습니다. *손볼 곳은 Interface Endpoint 3개 한 묶음*이었습니다.
 
 ## 의사결정 — Interface Endpoint vs NAT의 트레이드오프
 

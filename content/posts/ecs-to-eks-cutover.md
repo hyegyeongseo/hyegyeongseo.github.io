@@ -4,7 +4,7 @@ description: "운영 중인 서비스를 서비스 영향 없이 EKS로 전환�
 date: 2026-06-22
 lastmod: 2026-07-27
 weight: 40
-tags: ["eks", "ecs", "migration", "gitops", "terraform", "drawe", "sre"]
+tags: ["eks", "ecs", "migration", "gitops", "terraform", "drawe"]
 categories: ["Infra Observability"]
 ---
 
@@ -58,6 +58,8 @@ categories: ["Infra Observability"]
 ## 롤백을 '콜드 스탠바이'로 남긴 이유
 
 컷오버 후에도 구 ALB와 ECS 경로를 **의도적으로 유지**했습니다. 단, 서버(ECS 태스크)는 비용 때문에 내려두고 **ALB·리스너 규칙·대상 그룹이라는 "틀"만** 남겼습니다. 이게 **콜드 스탠바이**입니다.
+
+![구 ECS ALB 리소스 맵 — 대상 그룹은 남아 있지만 대상 0개, "틀"만 남긴 상태](/images/posts/ecs-alb-cold-standby.png)
 
 그래서 롤백은 2단계입니다 — ① ECS 서비스 재기동(대상 그룹에 태스크 재등록) → ② 토글을 원복해 DNS를 구 ALB로. *토글만으로는 불완전*합니다(대상 0개 → 503). 앞단 인프라를 재생성하지 않아도 되는 게 유지의 실익이고, 서버까지 켜두는 핫 스탠바이 대비 **서버 비용은 아낀** 트레이드오프입니다.
 

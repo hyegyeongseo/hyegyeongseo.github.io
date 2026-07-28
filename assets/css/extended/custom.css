@@ -988,6 +988,10 @@ body {
   margin: 2rem auto;
   display: block;
   max-width: 100%;
+  /* 폭에 맞춘 뒤에도 지나치게 긴 캡처(전체 스크롤샷 등)만 걸러내는 상한.
+     한두 화면짜리 캡처는 그대로, 4~5화면짜리는 줄어든다. */
+  max-height: 140vh;
+  width: auto;
   border: 1px solid var(--fn-border);
 }
 
@@ -1187,4 +1191,55 @@ a.fn-series-title:hover { color: var(--fn-accent-text); border-bottom-color: var
 .fn-series-here {
   font-size: .68rem; font-weight: 600; color: var(--fn-accent-text);
   background: var(--fn-accent-light); padding: 1px 6px; border-radius: 4px; white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   다이어그램 — {{< diagram >}} shortcode 용
+   ══════════════════════════════════════════════════════════════════ */
+
+/* 나머지 색은 기존 변수를 그대로 쓴다(--entry · --fn-border · --primary ·
+   --secondary · --fn-accent · --fn-accent-light · --fn-border-hover).
+   아래 둘만 새로 둔다: 다크에서 --fn-bg-surface 가 --entry 와 같은 값이라
+   박스와 데이터 스토어가 구분되지 않기 때문. */
+:root {
+  --fn-diagram-surface: #F8FAFB;
+  --fn-diagram-muted: #64748B;
+}
+
+.dark {
+  --fn-diagram-surface: #101014;
+  --fn-diagram-muted: #9CA3AF;
+}
+
+.fn-diagram {
+  margin: 32px 0;
+}
+
+.fn-diagram-canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: inherit;   /* 본문 Pretendard 상속 */
+}
+
+.fn-diagram figcaption {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--secondary);
+}
+
+/* 좁은 화면에선 축소해 글자를 뭉개는 대신 가로 스크롤.
+   다이어그램은 폭 660px 기준으로 그려져 있음. */
+@media (max-width: 620px) {
+  .fn-diagram-canvas {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(to right, #000 92%, transparent 100%);
+  }
+  .fn-diagram-canvas svg {
+    width: 620px;
+    max-width: none;
+  }
 }

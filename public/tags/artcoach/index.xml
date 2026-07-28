@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Artcoach on 기록 블로그</title>
+    <link>http://localhost:1313/tags/artcoach/</link>
+    <description>Recent content in Artcoach on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/artcoach/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>artcoach — 검색만 있던 제품에 에이전트를 만들어 넣기까지 (개인 프로젝트)</title>
+      <link>http://localhost:1313/posts/project-artcoach/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/project-artcoach/</guid>
+      <description>&amp;#39;창작 지원 AI 에이전트&amp;#39;를 표방했지만 실제로 동작하는 건 레퍼런스 검색뿐이었습니다. 관찰→진단→행동 제시를 하는 에이전트를 개인 프로젝트로 만들어 검증하고, 팀 프로젝트 DraWe에 도입해 한 끗 가이드와 완성작 갤러리가 됐습니다.</description>
+    </item>
+  </channel>
+</rss>

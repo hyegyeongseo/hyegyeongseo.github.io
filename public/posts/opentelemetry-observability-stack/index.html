@@ -10,7 +10,7 @@
 <meta name="description" content="앱은 OTLP만 알게 하고, 수집기가 저장을 정하게 했다. dev는 SaaS로 비용을 눌렀고 prod는 데이터가 내 영역에 남도록 직접 운영했으며, 저장은 디스크가 아니라 S3에 뒀다.">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/posts/opentelemetry-observability-stack/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -119,8 +119,8 @@
   "keywords": [
     "observability", "opentelemetry", "alloy", "loki", "tempo", "amp", "s3"
   ],
-  "articleBody": " Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 이 글 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 배경 — 계측 규격부터 정했다 관측성을 구축하면서 가장 먼저 결정한 건 저장소가 아니라 계측 규격(OpenTelemetry) 이었습니다. 저장소는 나중에 교체할 수 있지만, 애플리케이션 곳곳에 들어가는 계측 코드는 한 번 적용하면 바꾸기 어렵기 때문입니다.\n왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게 OpenTelemetry를 고른 이유는 특정 벤더에 묶이지 않기 위해서입니다.\n애플리케이션은 OTLP로 내보내는 것까지만 알면 됩니다. 그 신호를 어디에 담을지는 수집기(Alloy)가 정하죠. 그래서 저장소가 바뀌어도 앱 코드는 그대로 두고 수집기 설정만 바꾸면 됩니다.\n실제로 ECS에서 EKS로 옮길 때도 애플리케이션의 계측 코드는 그대로 두고, 수집기 배치 방식만 바꿨습니다 — ECS에서는 태스크 사이드카·인스턴스당 데몬으로 돌던 수집기를 EKS에서는 노드마다 뜨는 DaemonSet으로 옮겼고, 대시보드와 신호의 연속성은 그대로 유지됐습니다.\n파이프라인 — 수집은 한 곳으로 애플리케이션은 OTLP만 알고, 수집기(Alloy)가 저장소를 결정하는 구조입니다.\n앱·노드 │ OTLP ▼ Grafana Alloy (노드마다 DaemonSet) 수집 + PII 마스킹 + 노드 라벨 ├── metrics ──▶ AMP (관리형) ├── logs ──▶ Loki (직접 운영 · S3 백엔드) └── traces ──▶ Tempo (직접 운영 · S3 백엔드) │ └── 조회는 Grafana 가 읽기 전용으로만 수집을 Alloy 한 곳으로 모은 덕분에 얻은 게 하나 더 있습니다. PII 마스킹을 앱이 아니라 수집 계층에서 처리할 수 있다는 점입니다. 마스킹 정책을 변경해도 애플리케이션을 수정할 필요 없이 수집기 설정만 바꾸면 됩니다.\n결정 ① 환경별 운영 목적에 맞춰 저장 전략을 달리했다 관측 구조는 같게 가져가되, 환경별 운영 목적이 달라 저장 전략은 다르게 선택했습니다. 수집·마스킹 로직은 동일하게 두고 내보내는 목적지만 갈랐습니다.\n환경 저장 고른 이유 dev Grafana Cloud (관리형 SaaS) 검증용이라 띄우는 비용·운영 부담을 0에 가깝게 prod 직접 운영하는 스택 로그·트레이스가 내가 관리하는 영역 안에만 머물게 dev는 필요할 때만 켜서 확인하는 환경이라, 관측 스택까지 직접 띄우면 배보다 배꼽이 큽니다. 그래서 SaaS로 붙여 비용을 눌렀습니다.\nprod는 기준이 달랐습니다. 로그와 트레이스에는 요청 내용이 섞여 들어갈 수 있어서, 데이터가 외부 서비스로 나가지 않고 내 계정 안에 남는 구조를 원했습니다. 수집 단계에서 마스킹을 하더라도, 애초에 데이터가 머무는 경계를 좁혀 두는 편이 낫다고 봤고요.\n결정 ② 신호마다 저장을 다르게 — 그리고 디스크가 아니라 S3에 prod 안에서도 세 신호를 한 방식으로 담지 않았습니다.\n신호 저장 이유 metric AMP(관리형) 룰 평가·Alertmanager가 얹혀 옴 → 알림 인프라를 따로 안 세워도 됨 log Loki(직접 운영) 데이터를 내 영역에, 저장은 S3 trace Tempo(직접 운영) 동일 메트릭을 관리형으로 고른 건 “편해서\"가 아니라 AMP를 쓰면 룰 평가기와 Alertmanager가 딸려 오기 때문입니다. 메트릭에는 요청 본문 같은 내용이 담기지 않아 외부 관리형에 둬도 부담이 적었고요. (그래서 메트릭 self-host 대안인 Mimir는 쓰지 않았습니다.)\n저장을 인스턴스 디스크가 아니라 S3로 뺀 이유는 두 가지였습니다.\n비용 — 로그·트레이스는 계속 쌓이는데, 그만큼 블록 스토리지를 늘리는 것보다 오브젝트 스토리지가 쌉니다. 유실 위험 — 디스크에 두면 그 노드·볼륨의 수명에 데이터가 묶입니다. S3에 두면 내구성이 훨씬 높아 관측 데이터를 잃을 걱정이 줄어듭니다. 로그와 트레이스를 S3에 저장해 두니, 컴퓨트 리소스를 내려도 관측 데이터는 그대로 남았습니다. 안 쓸 때 클러스터를 중지하는 운영 방식과도 자연스럽게 맞물렸죠 — 다시 켜면 과거 로그·트레이스를 그대로 볼 수 있었습니다. 컴퓨트와 스토리지를 분리한 효과였습니다.\n정리 계측 규격을 먼저 정하면 저장소는 나중에 바꿀 수 있다. 앱은 OTLP만 알고, 어디에 담을지는 수집기가 정한다. 수집을 한 곳으로 모으면 부수 효과가 크다. 마스킹을 앱마다 구현하지 않아도 되고, 플랫폼을 옮길 때 수집기만 재배치하면 된다. 환경마다 다르게 골라도 된다. dev는 SaaS로 비용을 눌렀고, prod는 데이터가 내 영역에 남도록 직접 운영했다. 저장은 디스크가 아니라 오브젝트 스토리지로. 비용과 내구성 둘 다를 위해서, 그리고 컴퓨트와 저장을 분리하기 위해서. 하지만 데이터를 모으는 것만으로는 관측성이 완성되지 않습니다. 데이터를 저장하는 일과, 이상 징후를 판단해 운영자에게 알리는 일은 서로 다른 문제였습니다.\n다음 글에서는 무엇을 알릴 가치가 있다고 판단했는지, 그리고 받은 사람이 바로 판단하고 행동할 수 있게 메시지를 어떻게 구성했는지를 정리합니다 → 관측성 설계 ② 알림 편\n",
-  "wordCount" : "584",
+  "articleBody": " Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 이 글 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 배경 — 계측 규격부터 정했다 관측성을 구축하면서 가장 먼저 결정한 건 저장소가 아니라 계측 규격(OpenTelemetry) 이었습니다. 저장소는 나중에 교체할 수 있지만, 애플리케이션 곳곳에 들어가는 계측 코드는 한 번 적용하면 바꾸기 어렵기 때문입니다.\n왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게 OpenTelemetry를 고른 이유는 특정 벤더에 묶이지 않기 위해서입니다.\n애플리케이션은 OTLP로 내보내는 것까지만 알면 됩니다. 그 신호를 어디에 담을지는 수집기(Alloy)가 정하죠. 그래서 저장소가 바뀌어도 앱 코드는 그대로 두고 수집기 설정만 바꾸면 됩니다.\n실제로 ECS에서 EKS로 옮길 때도 애플리케이션의 계측 코드는 그대로 두고, 수집기 배치 방식만 바꿨습니다 — ECS에서는 태스크 사이드카·인스턴스당 데몬으로 돌던 수집기를 EKS에서는 노드마다 뜨는 DaemonSet으로 옮겼고, 대시보드와 신호의 연속성은 그대로 유지됐습니다.\n파이프라인 — 수집은 한 곳으로 애플리케이션은 OTLP만 알고, 수집기(Alloy)가 저장소를 결정하는 구조입니다.\n앱·노드 │ OTLP ▼ Grafana Alloy (노드마다 DaemonSet) 수집 + PII 마스킹 + 노드 라벨 ├── metrics ──▶ AMP (관리형) ├── logs ──▶ Loki (직접 운영 · S3 백엔드) └── traces ──▶ Tempo (직접 운영 · S3 백엔드) │ └── 조회는 Grafana 가 읽기 전용으로만 ",
+  "wordCount" : "571",
   "inLanguage": "en",
   "datePublished": "2026-06-23T00:00:00Z",
   "dateModified": "2026-07-27T00:00:00Z",
@@ -172,6 +172,11 @@
             </div>
         </div>
         <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
             <li>
                 <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
                     <span>Software Engineering</span>
@@ -274,7 +279,8 @@
 </span></span><span class="line"><span class="cl">  └── traces  ──▶ Tempo  (직접 운영 · S3 백엔드)
 </span></span><span class="line"><span class="cl">        │
 </span></span><span class="line"><span class="cl">        └── 조회는 Grafana 가 읽기 전용으로만
-</span></span></code></pre></div><p>수집을 Alloy 한 곳으로 모은 덕분에 얻은 게 하나 더 있습니다. <strong>PII 마스킹을 앱이 아니라 수집 계층에서</strong> 처리할 수 있다는 점입니다. <strong>마스킹 정책을 변경해도 애플리케이션을 수정할 필요 없이 수집기 설정만 바꾸면 됩니다.</strong></p>
+</span></span></code></pre></div><p><img alt="&ldquo;노드마다 DaemonSet&quot;의 실물 — DESIRED 5가 노드 수와 같고, Alloy 파드가 노드마다 하나씩 떠 있다" loading="lazy" src="/images/posts/alloy-daemonset.png"></p>
+<p>수집을 Alloy 한 곳으로 모은 덕분에 얻은 게 하나 더 있습니다. <strong>PII 마스킹을 앱이 아니라 수집 계층에서</strong> 처리할 수 있다는 점입니다. <strong>마스킹 정책을 변경해도 애플리케이션을 수정할 필요 없이 수집기 설정만 바꾸면 됩니다.</strong></p>
 <h2 id="결정--환경별-운영-목적에-맞춰-저장-전략을-달리했다">결정 ① 환경별 운영 목적에 맞춰 저장 전략을 달리했다</h2>
 <p><strong>관측 구조는 같게 가져가되, 환경별 운영 목적이 달라 저장 전략은 다르게 선택했습니다.</strong> 수집·마스킹 로직은 동일하게 두고 내보내는 목적지만 갈랐습니다.</p>
 <table>
@@ -344,7 +350,7 @@
 </ol>
 <hr>
 <p>하지만 데이터를 모으는 것만으로는 관측성이 완성되지 않습니다. <strong>데이터를 저장하는 일과, 이상 징후를 판단해 운영자에게 알리는 일은 서로 다른 문제였습니다.</strong></p>
-<p>다음 글에서는 <strong>무엇을 알릴 가치가 있다고 판단했는지</strong>, 그리고 <em>받은 사람이 바로 판단하고 행동할 수 있게 메시지를 어떻게 구성했는지</em>를 정리합니다 → <a href="/posts/alert-design-what-and-how/">관측성 설계 ② 알림 편</a></p>
+<p>다음 글에서는 <strong>무엇을 알릴 가치가 있다고 판단했는지</strong>, 그리고 *받은 사람이 바로 판</p>
 
     </div>
     <div class="fn-tags-bottom">

@@ -6,8 +6,148 @@
     <description>Recent content in Tags on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ai-Engineering</title>
+      <link>http://localhost:1313/tags/ai-engineering/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/ai-engineering/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Argocd</title>
+      <link>http://localhost:1313/tags/argocd/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/argocd/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Artcoach</title>
+      <link>http://localhost:1313/tags/artcoach/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/artcoach/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Django</title>
+      <link>http://localhost:1313/tags/django/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/django/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Drawe</title>
+      <link>http://localhost:1313/tags/drawe/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/drawe/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Eks</title>
+      <link>http://localhost:1313/tags/eks/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/eks/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Fastapi</title>
+      <link>http://localhost:1313/tags/fastapi/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/fastapi/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Gitops</title>
+      <link>http://localhost:1313/tags/gitops/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/gitops/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Kubeadm</title>
+      <link>http://localhost:1313/tags/kubeadm/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/kubeadm/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Kubernetes</title>
+      <link>http://localhost:1313/tags/kubernetes/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/kubernetes/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Llm</title>
+      <link>http://localhost:1313/tags/llm/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/llm/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Observability</title>
+      <link>http://localhost:1313/tags/observability/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/observability/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Personal</title>
+      <link>http://localhost:1313/tags/personal/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/personal/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Project</title>
+      <link>http://localhost:1313/tags/project/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/project/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Qdrant</title>
+      <link>http://localhost:1313/tags/qdrant/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/qdrant/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Server-Job-History</title>
+      <link>http://localhost:1313/tags/server-job-history/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/server-job-history/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Slo</title>
+      <link>http://localhost:1313/tags/slo/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/slo/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Sre</title>
+      <link>http://localhost:1313/tags/sre/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/sre/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Team</title>
+      <link>http://localhost:1313/tags/team/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/team/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Vlm</title>
+      <link>http://localhost:1313/tags/vlm/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/vlm/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Amp</title>
       <link>http://localhost:1313/tags/amp/</link>
@@ -20,20 +160,6 @@
       <link>http://localhost:1313/tags/cost/</link>
       <pubDate>Sat, 25 Jul 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/cost/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Drawe</title>
-      <link>http://localhost:1313/tags/drawe/</link>
-      <pubDate>Sat, 25 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/drawe/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Observability</title>
-      <link>http://localhost:1313/tags/observability/</link>
-      <pubDate>Sat, 25 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/observability/</guid>
       <description></description>
     </item>
     <item>
@@ -51,13 +177,6 @@
       <description></description>
     </item>
     <item>
-      <title>Sre</title>
-      <link>http://localhost:1313/tags/sre/</link>
-      <pubDate>Sat, 25 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/sre/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Graceful-Shutdown</title>
       <link>http://localhost:1313/tags/graceful-shutdown/</link>
       <pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
@@ -65,24 +184,10 @@
       <description></description>
     </item>
     <item>
-      <title>Kubernetes</title>
-      <link>http://localhost:1313/tags/kubernetes/</link>
-      <pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/kubernetes/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Spring Boot</title>
+      <title>Spring-Boot</title>
       <link>http://localhost:1313/tags/spring-boot/</link>
       <pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/spring-boot/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Eks</title>
-      <link>http://localhost:1313/tags/eks/</link>
-      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/eks/</guid>
       <description></description>
     </item>
     <item>
@@ -114,13 +219,6 @@
       <description></description>
     </item>
     <item>
-      <title>Argocd</title>
-      <link>http://localhost:1313/tags/argocd/</link>
-      <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/argocd/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Cicd</title>
       <link>http://localhost:1313/tags/cicd/</link>
       <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
@@ -128,17 +226,10 @@
       <description></description>
     </item>
     <item>
-      <title>Github Actions</title>
+      <title>Github-Actions</title>
       <link>http://localhost:1313/tags/github-actions/</link>
       <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/github-actions/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Gitops</title>
-      <link>http://localhost:1313/tags/gitops/</link>
-      <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/gitops/</guid>
       <description></description>
     </item>
     <item>
@@ -254,20 +345,6 @@
       <description></description>
     </item>
     <item>
-      <title>Ai-Engineering</title>
-      <link>http://localhost:1313/tags/ai-engineering/</link>
-      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/ai-engineering/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Llm</title>
-      <link>http://localhost:1313/tags/llm/</link>
-      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/llm/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Product-Design</title>
       <link>http://localhost:1313/tags/product-design/</link>
       <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
@@ -293,13 +370,6 @@
       <link>http://localhost:1313/tags/search/</link>
       <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/search/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Vlm</title>
-      <link>http://localhost:1313/tags/vlm/</link>
-      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/vlm/</guid>
       <description></description>
     </item>
     <item>

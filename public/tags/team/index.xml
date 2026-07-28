@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Team on 기록 블로그</title>
+    <link>http://localhost:1313/tags/team/</link>
+    <description>Recent content in Team on 기록 블로그</description>
+    <generator>Hugo</generator>
+    <language>ko</language>
+    <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/team/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>DraWe — 그림에서 막히는 지점을 짚고 다음 연습까지 잇는 AI 드로잉 코치 (팀 프로젝트)</title>
+      <link>http://localhost:1313/posts/project-drawe/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/project-drawe/</guid>
+      <description>창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가이드 기능을 개발하고, 서비스를 운영하기 위한 AWS 클라우드 인프라와 GitOps·Observability 기반 운영 체계를 구축했습니다.</description>
+    </item>
+  </channel>
+</rss>

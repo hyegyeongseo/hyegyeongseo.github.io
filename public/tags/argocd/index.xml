@@ -6,8 +6,15 @@
     <description>Recent content in Argocd on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/argocd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)</title>
+      <link>http://localhost:1313/posts/project-server-job-history/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/project-server-job-history/</guid>
+      <description>서버 운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만든 개인 프로젝트. 목적은 앱이 아니라 운영 패턴의 검증이었습니다.</description>
+    </item>
     <item>
       <title>GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나</title>
       <link>http://localhost:1313/posts/gitops-argocd-drift/</link>

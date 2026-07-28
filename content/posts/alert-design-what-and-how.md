@@ -110,6 +110,10 @@ annotations:
 
 특히 `layer`를 나눈 게 도움이 됐습니다. 같은 "느리다"도 앱 로직 문제인지, 런타임(JVM·커넥션 풀) 포화인지, AI 외부 호출 문제인지, 노드 자원 문제인지에 따라 볼 곳이 다르니까요.
 
+![실제로 발화한 알림 — warning·critical 2단계와 자동 해제](/images/posts/alert-discord.png)
+
+부하 테스트 중 실제로 발화한 알림입니다. warning(5%)·critical(10%)이 각각 뜨고 부하가 끝나자 자동 해제됐습니다. `BackendHigh5xxRate`와 `ReferenceSearchSlowP95`가 **함께** 떠서 원인 축(임베딩·벡터 검색)이 좁혀집니다.
+
 이 라벨들은 통지 단계에서 **메시지 헤더와 색상**으로 이어집니다. 그래서 채팅 목록에서 **펼치지 않고도 급한 것과 아닌 것이 구분**되죠. 그 전달 구조는 [③편](/posts/alerting-with-amp-not-grafana/)에서 다룹니다.
 
 ## 3부 · 오탐을 줄이는 건 조건 설계다

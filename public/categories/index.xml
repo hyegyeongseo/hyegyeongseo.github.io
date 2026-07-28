@@ -6,8 +6,15 @@
     <description>Recent content in Categories on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Projects</title>
+      <link>http://localhost:1313/categories/projects/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/projects/</guid>
+      <description>만든 것들 — 무엇을 왜 만들었고, 어떤 결정을 했나</description>
+    </item>
     <item>
       <title>Troubleshooting</title>
       <link>http://localhost:1313/categories/troubleshooting/</link>

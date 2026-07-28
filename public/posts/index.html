@@ -10,7 +10,7 @@
 <meta name="description" content="Posts - 기록 블로그">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/posts/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.3f84e5b7b57bd6e167d64bb12963888c9c13a1ae0c863949d56178744c38b94c.css" integrity="sha256-P4Tlt7V71uFn1kuxKWOIjJwToa4MhjlJ1WF4dEw4uUw=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -126,6 +126,11 @@
         </div>
         <ul id="menu" class="menu">
             <li>
+                <a href="http://localhost:1313/categories/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+            <li>
                 <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
                     <span>Software Engineering</span>
                 </a>
@@ -154,6 +159,42 @@
     Posts
   </h1>
 </header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">DraWe — 그림에서 막히는 지점을 짚고 다음 연습까지 잇는 AI 드로잉 코치 (팀 프로젝트)
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가이드 기능을 개발하고, 서비스를 운영하기 위한 AWS 클라우드 인프라와 GitOps·Observability 기반 운영 체계를 구축했습니다.</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-28 00:00:00 +0000 UTC'>July 28, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to DraWe — 그림에서 막히는 지점을 짚고 다음 연습까지 잇는 AI 드로잉 코치 (팀 프로젝트)" href="http://localhost:1313/posts/project-drawe/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">artcoach — 검색만 있던 제품에 에이전트를 만들어 넣기까지 (개인 프로젝트)
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>‘AI 에이전트’를 표방했지만 실제로 동작하는 건 레퍼런스 검색뿐이었습니다. 관찰 → 진단 → 행동 제시를 하는 에이전트를 개인 프로젝트로 먼저 만들어 검증하고, 팀 프로젝트 DraWe에 도입했습니다.</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-28 00:00:00 +0000 UTC'>July 28, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to artcoach — 검색만 있던 제품에 에이전트를 만들어 넣기까지 (개인 프로젝트)" href="http://localhost:1313/posts/project-artcoach/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만들었습니다. 목적은 앱이 아니라 운영 패턴의 검증이었습니다.</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-28 00:00:00 +0000 UTC'>July 28, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)" href="http://localhost:1313/posts/project-server-job-history/"></a>
+</article>
 
 <article class="post-entry"> 
   <header class="entry-header">
@@ -254,50 +295,6 @@ backend — JAR을 Docker 밖에서 빌드해 COPY CI 단계(Docker 밖): ./grad
   </div>
   <footer class="entry-footer"><span title='2026-06-23 00:00:00 +0000 UTC'>June 23, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가" href="http://localhost:1313/posts/opentelemetry-observability-stack/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
-오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 이 글 문제 — 보는 것과 알리는 것이 한 곳에 묶이면 ②편에서 무엇을 알릴지 고르고 문구까지 정했다면, 남는 문제는 알림 룰을 어디에서 평가하고, 어떤 경로로 운영자에게 전달할 것인가였습니다.
-대시보드 도구(Grafana)는 알림 기능도 제공합니다. 거기서 다 하면 편해 보이죠. 그런데 그러면 “보는 것&#34;과 “알리는 것&#34;이 한 컴포넌트에 묶입니다.
-대시보드를 손보다 알림 룰이 흔들릴 수 있고 알림 때문에 대시보드 구성을 못 바꾸게 되고 UI로 만든 룰은 누가 왜 바꿨는지 6개월 뒤에 알 수 없습니다 결정 — 룰은 메트릭 저장소 쪽에 알림 룰을 대시보드가 아니라 메트릭 저장소(AMP) 에 뒀습니다. Grafana 데이터소스에는 알림 관리를 끄는 설정을 명시했고요.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>문제 — 전부 Healthy인데, HPA는 죽어 있었다 prod EKS에 관측 스택(로그·메트릭·트레이스)이 전부 떠 있고 ArgoCD도 모두 Healthy였습니다. 그런데 정기 점검 중 이런 걸 봤습니다.
-$ kubectl get hpa -A NAME TARGETS AGE backend cpu:&lt;unknown&gt;/70% 12d fastapi-embed cpu:&lt;unknown&gt;/70% 12d fastapi-guide cpu:&lt;unknown&gt;/70% 12d HPA 3개가 전부 &lt;unknown&gt;, 그것도 12일째. 어떤 대시보드에도, ArgoCD에도 경보는 없었습니다.
-이건 “장애가 났다&#34;가 아니라 “정상처럼 보이는 상태에서 숨어 있던 리스크” 였습니다. 저에게는 이 유형이 더 무섭습니다 — 아무도 모르니까요.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

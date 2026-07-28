@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트) | 기록 블로그</title>
+<meta name="keywords" content="server-job-history, project, personal, kubernetes, kubeadm, gitops, argocd, observability, slo, django">
+<meta name="description" content="서버 운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만든 개인 프로젝트. 목적은 앱이 아니라 운영 패턴의 검증이었습니다.">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/project-server-job-history/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/project-server-job-history/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/project-server-job-history/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)">
+  <meta property="og:description" content="서버 운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만든 개인 프로젝트. 목적은 앱이 아니라 운영 패턴의 검증이었습니다.">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-07-28T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-07-28T00:00:00+00:00">
+    <meta property="article:tag" content="Server-Job-History">
+    <meta property="article:tag" content="Project">
+    <meta property="article:tag" content="Personal">
+    <meta property="article:tag" content="Kubernetes">
+    <meta property="article:tag" content="Kubeadm">
+    <meta property="article:tag" content="Gitops">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)">
+  <meta name="twitter:description" content="서버 운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만든 개인 프로젝트. 목적은 앱이 아니라 운영 패턴의 검증이었습니다.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)",
+      "item": "http://localhost:1313/posts/project-server-job-history/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)",
+  "name": "server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)",
+  "description": "서버 운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만든 개인 프로젝트. 목적은 앱이 아니라 운영 패턴의 검증이었습니다.",
+  "keywords": [
+    "server-job-history", "project", "personal", "kubernetes", "kubeadm", "gitops", "argocd", "observability", "slo", "django"
+  ],
+  "articleBody": " 기간 2026.02 ~ 2026.06 (4개월) 인원 1명 (개인 프로젝트) 결과물 hyegyeongseo/server-job-history 제가 구축한 것 kubeadm 클러스터 — cp-1 + worker-1~3 직접 구성 (flannel · MetalLB · local-path) GitOps 배포 — ArgoCD self-heal · PreSync 마이그레이션 · sealed-secrets 관측성 3신호 — Prometheus · Loki · Tempo를 trace_id로 상관 SLO / error-budget — multi-window 알림 → Alertmanager → Slack + 런북 애플리케이션 — Django REST · 2단계 RBAC · 감사 로그 · 정정 체인 도메인 왜 만들었나 DraWe에서 EKS를 다루면서 계속 걸리는 게 있었습니다. 관리형은 컨트롤 플레인을 가려줍니다. 편하지만, 그 안에서 무슨 일이 일어나는지는 끝내 모릅니다. 그래서 노트북 VM 위에 kubeadm으로 직접 클러스터를 세웠습니다. 비용 0으로 스케줄링·CNI·스토리지·인증서를 직접 만지려고.\n앱은 그 실험의 부하이자 관측 대상이었습니다. 도메인은 운영 작업의 이력·권한·감사 — 지우면 안 되는 데이터를 다루는 설계는 흔한 CRUD 예제와 다르게 생겼을 거라고 생각했습니다.\nserver-job-history 아키텍처 — 요청 · 배포 · 관측 요청 클라이언트 → 앱 → DB 클라이언트 MetalLB LoadBalancer / NodePort namespace: app Deployment HPA 2~6 namespace: db PostgreSQL kubeadm 클러스터 — cp-1 + worker-1~3 (flannel · local-path · metrics-server) 배포 git = 단일 출처 · self-heal git ArgoCD auto-sync PreSync Job DB 마이그레이션(멱등) 롤링 업데이트 Deployment 갱신 SealedSecret → Secret git엔 암호문만 커밋 GHCR 이미지 pull (regcred) 관측 세 신호를 trace_id 하나로 상관 앱 metrics · logs · traces /metrics Prometheus stdout JSON Alloy → Loki OTLP gRPC Tempo Grafana 대시보드 · 상관 Alertmanager → Slack #alerts multi-window SLO (5m + 1h) — 지속 장애만 page 앱은 관측 대상이자 부하원이고, 나머지 전부가 실험 대상이었다 핵심 설계 결정 ① 이력은 지워지지 않는다 — 삭제 대신 정정 체인 운영 이력은 지우면 안 되는 자산입니다. 그래서 작업은 하드 삭제 불가(DELETE API 자체가 없음), 수정은 생성 후 30분 창 안에서만, 그 이후의 정정은 새 작업을 만들어 체인으로 연결하게 했습니다. GET /api/jobs/{id}/chain/ 하나로 “이 작업이 어떻게 정정돼 왔는지\"가 시간순으로 나옵니다. 삭제를 막는 대신 추적을 남기는 쪽을 택한 것이고, 이 도메인에서 가장 중요한 결정이었습니다.\n② 권한은 2단계로 — 역할 게이트 + 객체 소유권 ADMIN / OPERATOR / VIEWER 3역할이지만 역할만으로는 부족했습니다. OPERATOR가 다른 사람의 작업을 고칠 수 있으면 이력의 신뢰가 깨지니까요. 그래서 DRF permission을 역할 게이트 → 객체 소유권 두 층으로 나눴습니다. 권한 거부(403)는 흘려보내지 않고 forbidden_requests_total{path, role}로 집계합니다 — 권한 설계가 실제로 어떻게 부딪히는지를 메트릭으로 보려고.\n③ 세 신호를 trace_id로 묶는다 메트릭의 “느리다\"만으로는 원인을 모릅니다. 모든 로그 레코드에 trace_id/span_id를 주입하고 OTEL로 Django 요청 + psycopg2 쿼리에 자동 span을 걸었습니다. 실제로 답을 준 적이 있습니다 — 하나의 trace_id로 Loki 로그와 Tempo 트레이스를 교차했더니 DB 쿼리는 ms인데 요청 전체는 6.2초. 병목이 DB가 아니라는 걸 추측이 아니라 트레이싱으로 규명했습니다.\n배포는 ArgoCD가 self-heal 동기화하고, DB 마이그레이션은 PreSync Job(멱등) → 롤링 순서로 돕니다. Secret은 git에 못 올리니 sealed-secrets로 암호문만 커밋했습니다.\n결과 — 부숴서 확인한 것 개인 프로젝트 규모에서 응답속도 절대값은 의미가 없습니다. 중요한 건 측정·검증 체계가 실제로 반응하는가였습니다.\nSLO — DB를 일부러 죽이니 가용성 SLI가 100% → 41% 로 급락하고 error-budget burn이 올라가는 게 실시간으로 잡혔습니다.\n정상 DB 장애 주입 오토스케일 — k6로 부하를 걸어 CPU 86% 를 넘기니 replicas가 2 → 6 으로 늘었습니다.\n① CPU 임계 초과 ② 6 replicas로 스케일 그 밖에 노드 다운 시 재스케줄, sealed-secrets 복호화 경로, 지연 분포 p50/p95/p99를 확인했습니다.\n까다로웠던 문제 셋 GitOps ↔ HPA 소유권 충돌 — ArgoCD self-heal이 HPA가 조정한 replicas를 되돌려 플래핑이 났습니다. 둘 다 “옳은” 동작이라는 게 문제였고, ignoreDifferences(/spec/replicas)로 필드 소유권을 명시적으로 나눠 해결했습니다.\nStatefulSet + local-path의 노드 고정 — 노드를 껐더니 postgres가 Pending, prometheus가 Terminating에 멈췄습니다. PVC가 노드에 묶여 재스케줄이 안 되는 특성이었습니다.\ngunicorn 멀티워커에서 Gauge가 stale해진다 — 프로세스별 값이 남아 실제와 어긋났습니다. 매 scrape마다 DB를 집계하는 커스텀 Collector로 바꿨습니다. 상태를 프로세스에 들고 있지 말고, 물어볼 때 계산하는 쪽으로.\n영역 사용 Backend Python 3.12 · Django 5.2 · DRF · SimpleJWT · drf-spectacular Data PostgreSQL 17 Observability django-prometheus · OpenTelemetry · python-json-logger Infra Docker · GHCR · Kubernetes(kubeadm) · Kustomize · ArgoCD Monitoring kube-prometheus-stack · Loki · Tempo · Alloy · Grafana Security sealed-secrets (Bitnami) 배운 것 관리형에서는 “된다/안 된다\"만 보이는 지점에서, 직접 세운 클러스터에서는 왜 그렇게 되는지가 보였습니다 — PVC가 왜 노드에 묶이는지, self-heal이 왜 HPA와 싸우는지, 멀티프로세스 메트릭이 왜 어긋나는지.\n그리고 “구성했다\"와 “동작한다\"는 다릅니다. SLO도 HPA도 노드 복구도 일부러 부수고 나서야 진짜로 도는지 알 수 있었습니다. 가장 값어치 있었던 작업은 기능 구현이 아니라 장애를 주입해본 것이었습니다.\nGitHub hyegyeongseo/server-job-history README 아키텍처 · 검증 결과 · 스크린샷 주요 문서 ADR — 대안·트레이드오프·한계 · SLO 런북 ",
+  "wordCount" : "697",
+  "inLanguage": "en",
+  "datePublished": "2026-07-28T00:00:00Z",
+  "dateModified": "2026-07-28T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/project-server-job-history/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)
+      </h1>
+      <p class="post-description">서버 운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만든 개인 프로젝트. 목적은 앱이 아니라 운영 패턴의 검증이었습니다.</p>
+      <div class="post-meta"><span title='2026-07-28 00:00:00 +0000 UTC'>July 28, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul><ul>
+            <li>
+                <a href="#%ec%a0%9c%ea%b0%80-%ea%b5%ac%ec%b6%95%ed%95%9c-%ea%b2%83" aria-label="제가 구축한 것">제가 구축한 것</a></li></ul>
+            <li>
+                <a href="#%ec%99%9c-%eb%a7%8c%eb%93%a4%ec%97%88%eb%82%98" aria-label="왜 만들었나">왜 만들었나</a></li>
+            <li>
+                <a href="#%ed%95%b5%ec%8b%ac-%ec%84%a4%ea%b3%84-%ea%b2%b0%ec%a0%95" aria-label="핵심 설계 결정">핵심 설계 결정</a><ul>
+            <li>
+                <a href="#-%ec%9d%b4%eb%a0%a5%ec%9d%80-%ec%a7%80%ec%9b%8c%ec%a7%80%ec%a7%80-%ec%95%8a%eb%8a%94%eb%8b%a4--%ec%82%ad%ec%a0%9c-%eb%8c%80%ec%8b%a0-%ec%a0%95%ec%a0%95-%ec%b2%b4%ec%9d%b8" aria-label="① 이력은 지워지지 않는다 — 삭제 대신 정정 체인">① 이력은 지워지지 않는다 — 삭제 대신 정정 체인</a></li>
+            <li>
+                <a href="#-%ea%b6%8c%ed%95%9c%ec%9d%80-2%eb%8b%a8%ea%b3%84%eb%a1%9c--%ec%97%ad%ed%95%a0-%ea%b2%8c%ec%9d%b4%ed%8a%b8--%ea%b0%9d%ec%b2%b4-%ec%86%8c%ec%9c%a0%ea%b6%8c" aria-label="② 권한은 2단계로 — 역할 게이트 &#43; 객체 소유권">② 권한은 2단계로 — 역할 게이트 + 객체 소유권</a></li>
+            <li>
+                <a href="#-%ec%84%b8-%ec%8b%a0%ed%98%b8%eb%a5%bc-trace_id%eb%a1%9c-%eb%ac%b6%eb%8a%94%eb%8b%a4" aria-label="③ 세 신호를 trace_id로 묶는다">③ 세 신호를 trace_id로 묶는다</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ea%b2%b0%ea%b3%bc--%eb%b6%80%ec%88%b4%ec%84%9c-%ed%99%95%ec%9d%b8%ed%95%9c-%ea%b2%83" aria-label="결과 — 부숴서 확인한 것">결과 — 부숴서 확인한 것</a></li>
+            <li>
+                <a href="#%ea%b9%8c%eb%8b%a4%eb%a1%9c%ec%9b%a0%eb%8d%98-%eb%ac%b8%ec%a0%9c-%ec%85%8b" aria-label="까다로웠던 문제 셋">까다로웠던 문제 셋</a></li>
+            <li>
+                <a href="#%eb%b0%b0%ec%9a%b4-%ea%b2%83" aria-label="배운 것">배운 것</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <table>
+  <thead>
+      <tr>
+          <th></th>
+          <th></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>기간</strong></td>
+          <td>2026.02 ~ 2026.06 (4개월)</td>
+      </tr>
+      <tr>
+          <td><strong>인원</strong></td>
+          <td>1명 (개인 프로젝트)</td>
+      </tr>
+      <tr>
+          <td><strong>결과물</strong></td>
+          <td><a href="https://github.com/hyegyeongseo/server-job-history">hyegyeongseo/server-job-history</a></td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="제가-구축한-것">제가 구축한 것</h3>
+<ul>
+<li><strong>kubeadm 클러스터</strong> — cp-1 + worker-1~3 직접 구성 (flannel · MetalLB · local-path)</li>
+<li><strong>GitOps 배포</strong> — ArgoCD self-heal · PreSync 마이그레이션 · sealed-secrets</li>
+<li><strong>관측성 3신호</strong> — Prometheus · Loki · Tempo를 <code>trace_id</code>로 상관</li>
+<li><strong>SLO / error-budget</strong> — multi-window 알림 → Alertmanager → Slack + 런북</li>
+<li><strong>애플리케이션</strong> — Django REST · 2단계 RBAC · 감사 로그 · 정정 체인 도메인</li>
+</ul>
+<hr>
+<h2 id="왜-만들었나">왜 만들었나</h2>
+<p><a href="/posts/project-drawe/">DraWe</a>에서 EKS를 다루면서 계속 걸리는 게 있었습니다. <strong>관리형은 컨트롤 플레인을 가려줍니다.</strong> 편하지만, 그 안에서 무슨 일이 일어나는지는 끝내 모릅니다. 그래서 노트북 VM 위에 <strong>kubeadm으로 직접</strong> 클러스터를 세웠습니다. 비용 0으로 스케줄링·CNI·스토리지·인증서를 직접 만지려고.</p>
+<p>앱은 그 실험의 부하이자 관측 대상이었습니다. 도메인은 운영 작업의 <strong>이력·권한·감사</strong> — 지우면 안 되는 데이터를 다루는 설계는 흔한 CRUD 예제와 다르게 생겼을 거라고 생각했습니다.</p>
+<figure class="fn-diagram">
+  <div class="fn-diagram-canvas" role="img" aria-label="server-job-history 아키텍처 — 요청·배포·관측 세 흐름"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 560" preserveAspectRatio="xMidYMid meet">
+<title>server-job-history 아키텍처 — 요청 · 배포 · 관측</title>
+<defs><marker id="arw-sjh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--secondary)"/></marker></defs>
+<text x="24" y="30" font-size="13" text-anchor="start" fill="var(--fn-accent)" font-weight="700">요청</text>
+<text x="60" y="30" font-size="11" text-anchor="start" fill="var(--fn-diagram-muted)">클라이언트 → 앱 → DB</text>
+<rect x="24" y="50" width="96" height="38" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="72.0" y="73.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">클라이언트</text>
+<line x1="120" y1="69" x2="138" y2="69" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<rect x="138" y="43" width="140" height="52" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="208.0" y="67.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">MetalLB</text>
+<text x="208.0" y="82.0" font-size="10" text-anchor="middle" fill="var(--secondary)">LoadBalancer / NodePort</text>
+<line x1="278" y1="69" x2="296" y2="69" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<rect x="296" y="34" width="212" height="70" rx="10" fill="var(--fn-accent-light)" stroke="var(--fn-accent)" stroke-width="1.2" fill-opacity="0.42"/>
+<text x="310" y="55" font-size="11" text-anchor="start" fill="var(--fn-accent)" font-weight="700">namespace: app</text>
+<rect x="308" y="58" width="188" height="38" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="402.0" y="75.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">Deployment</text>
+<text x="402.0" y="90.0" font-size="10" text-anchor="middle" fill="var(--secondary)">HPA 2~6</text>
+<line x1="508" y1="77" x2="528" y2="77" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<rect x="528" y="34" width="108" height="70" rx="10" fill="none" stroke="var(--fn-border-hover)" stroke-width="1.2" stroke-dasharray="5 3"/>
+<text x="540" y="52" font-size="10.5" text-anchor="start" fill="var(--secondary)" font-weight="700">namespace: db</text>
+<rect x="538" y="58" width="88" height="38" rx="7" fill="var(--fn-diagram-surface)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="582.0" y="81.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">PostgreSQL</text>
+<text x="24" y="130" font-size="11" text-anchor="start" fill="var(--fn-diagram-muted)">kubeadm 클러스터 — cp-1 + worker-1~3 (flannel · local-path · metrics-server)</text>
+<line x1="24" y1="152" x2="636" y2="152" stroke="var(--fn-border)" stroke-width="1" fill="none"/>
+<text x="24" y="186" font-size="13" text-anchor="start" fill="var(--fn-accent)" font-weight="700">배포</text>
+<text x="60" y="186" font-size="11" text-anchor="start" fill="var(--fn-diagram-muted)">git = 단일 출처 · self-heal</text>
+<rect x="24" y="204" width="84" height="38" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="66.0" y="227.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">git</text>
+<line x1="108" y1="223" x2="126" y2="223" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<rect x="126" y="197" width="116" height="52" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="184.0" y="221.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">ArgoCD</text>
+<text x="184.0" y="236.0" font-size="10" text-anchor="middle" fill="var(--secondary)">auto-sync</text>
+<line x1="242" y1="223" x2="260" y2="223" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<rect x="260" y="197" width="168" height="52" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="344.0" y="221.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">PreSync Job</text>
+<text x="344.0" y="236.0" font-size="10" text-anchor="middle" fill="var(--secondary)">DB 마이그레이션(멱등)</text>
+<line x1="428" y1="223" x2="446" y2="223" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<rect x="446" y="197" width="190" height="52" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="541.0" y="221.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">롤링 업데이트</text>
+<text x="541.0" y="236.0" font-size="10" text-anchor="middle" fill="var(--secondary)">Deployment 갱신</text>
+<rect x="126" y="264" width="210" height="44" rx="7" fill="none" stroke="var(--fn-border)" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="231.0" y="284.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">SealedSecret → Secret</text>
+<text x="231.0" y="299.0" font-size="10" text-anchor="middle" fill="var(--secondary)">git엔 암호문만 커밋</text>
+<rect x="352" y="264" width="180" height="44" rx="7" fill="none" stroke="var(--fn-border)" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="442.0" y="284.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">GHCR</text>
+<text x="442.0" y="299.0" font-size="10" text-anchor="middle" fill="var(--secondary)">이미지 pull (regcred)</text>
+<path d="M 231 264 L 231 253 " stroke="var(--secondary)" stroke-width="1.3" fill="none" stroke-dasharray="3 3" marker-end="url(#arw-sjh)"/>
+<path d="M 442 264 L 442 253 " stroke="var(--secondary)" stroke-width="1.3" fill="none" stroke-dasharray="3 3" marker-end="url(#arw-sjh)"/>
+<line x1="24" y1="336" x2="636" y2="336" stroke="var(--fn-border)" stroke-width="1" fill="none"/>
+<text x="24" y="370" font-size="13" text-anchor="start" fill="var(--fn-accent)" font-weight="700">관측</text>
+<text x="60" y="370" font-size="11" text-anchor="start" fill="var(--fn-diagram-muted)">세 신호를 trace_id 하나로 상관</text>
+<rect x="24" y="396" width="100" height="124" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="74.0" y="456.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">앱</text>
+<text x="74.0" y="471.0" font-size="10" text-anchor="middle" fill="var(--secondary)">metrics · logs · traces</text>
+<line x1="124" y1="412" x2="204" y2="412" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<text x="164" y="407" font-size="9.5" text-anchor="middle" fill="var(--fn-diagram-muted)">/metrics</text>
+<rect x="204" y="396" width="148" height="32" rx="6" fill="var(--fn-diagram-surface)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="278.0" y="416.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">Prometheus</text>
+<line x1="352" y1="412" x2="382" y2="412" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<line x1="124" y1="458" x2="204" y2="458" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<text x="164" y="453" font-size="9.5" text-anchor="middle" fill="var(--fn-diagram-muted)">stdout JSON</text>
+<rect x="204" y="442" width="148" height="32" rx="6" fill="var(--fn-diagram-surface)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="278.0" y="462.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">Alloy → Loki</text>
+<line x1="352" y1="458" x2="382" y2="458" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<line x1="124" y1="504" x2="204" y2="504" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<text x="164" y="499" font-size="9.5" text-anchor="middle" fill="var(--fn-diagram-muted)">OTLP gRPC</text>
+<rect x="204" y="488" width="148" height="32" rx="6" fill="var(--fn-diagram-surface)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="278.0" y="508.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">Tempo</text>
+<line x1="352" y1="504" x2="382" y2="504" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<rect x="382" y="396" width="112" height="124" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="438.0" y="456.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">Grafana</text>
+<text x="438.0" y="471.0" font-size="10" text-anchor="middle" fill="var(--secondary)">대시보드 · 상관</text>
+<line x1="494" y1="458" x2="516" y2="458" stroke="var(--secondary)" stroke-width="1.3" fill="none" marker-end="url(#arw-sjh)"/>
+<rect x="516" y="431" width="120" height="54" rx="7" fill="var(--entry)" stroke="var(--fn-border)" stroke-width="1"/>
+<text x="576.0" y="456.0" font-size="12.5" text-anchor="middle" fill="var(--primary)" font-weight="600">Alertmanager</text>
+<text x="576.0" y="471.0" font-size="10" text-anchor="middle" fill="var(--secondary)">→ Slack #alerts</text>
+<text x="24" y="536" font-size="11" text-anchor="start" fill="var(--fn-diagram-muted)">multi-window SLO (5m + 1h) — 지속 장애만 page</text>
+</svg>
+</div>
+  <figcaption>앱은 관측 대상이자 부하원이고, 나머지 전부가 실험 대상이었다</figcaption>
+</figure>
+<h2 id="핵심-설계-결정">핵심 설계 결정</h2>
+<h3 id="-이력은-지워지지-않는다--삭제-대신-정정-체인">① 이력은 지워지지 않는다 — 삭제 대신 정정 체인</h3>
+<p>운영 이력은 지우면 안 되는 자산입니다. 그래서 <strong>작업은 하드 삭제 불가</strong>(DELETE API 자체가 없음), 수정은 생성 후 30분 창 안에서만, 그 이후의 정정은 <strong>새 작업을 만들어 체인으로 연결</strong>하게 했습니다. <code>GET /api/jobs/{id}/chain/</code> 하나로 &ldquo;이 작업이 어떻게 정정돼 왔는지&quot;가 시간순으로 나옵니다. <strong>삭제를 막는 대신 추적을 남기는 쪽</strong>을 택한 것이고, 이 도메인에서 가장 중요한 결정이었습니다.</p>
+<h3 id="-권한은-2단계로--역할-게이트--객체-소유권">② 권한은 2단계로 — 역할 게이트 + 객체 소유권</h3>
+<p><code>ADMIN / OPERATOR / VIEWER</code> 3역할이지만 역할만으로는 부족했습니다. OPERATOR가 <strong>다른 사람의 작업</strong>을 고칠 수 있으면 이력의 신뢰가 깨지니까요. 그래서 DRF permission을 역할 게이트 → 객체 소유권 두 층으로 나눴습니다. 권한 거부(403)는 흘려보내지 않고 <code>forbidden_requests_total{path, role}</code>로 집계합니다 — 권한 설계가 실제로 어떻게 부딪히는지를 메트릭으로 보려고.</p>
+<h3 id="-세-신호를-trace_id로-묶는다">③ 세 신호를 <code>trace_id</code>로 묶는다</h3>
+<p>메트릭의 &ldquo;느리다&quot;만으로는 원인을 모릅니다. 모든 로그 레코드에 <code>trace_id</code>/<code>span_id</code>를 주입하고 OTEL로 Django 요청 + psycopg2 쿼리에 자동 span을 걸었습니다. 실제로 답을 준 적이 있습니다 — 하나의 <code>trace_id</code>로 Loki 로그와 Tempo 트레이스를 교차했더니 <strong>DB 쿼리는 ms인데 요청 전체는 6.2초.</strong> 병목이 DB가 아니라는 걸 추측이 아니라 트레이싱으로 규명했습니다.</p>
+<p>배포는 ArgoCD가 self-heal 동기화하고, DB 마이그레이션은 <strong>PreSync Job(멱등) → 롤링</strong> 순서로 돕니다. Secret은 git에 못 올리니 sealed-secrets로 <strong>암호문만 커밋</strong>했습니다.</p>
+<h2 id="결과--부숴서-확인한-것">결과 — 부숴서 확인한 것</h2>
+<p>개인 프로젝트 규모에서 응답속도 절대값은 의미가 없습니다. 중요한 건 <strong>측정·검증 체계가 실제로 반응하는가</strong>였습니다.</p>
+<p><strong>SLO</strong> — DB를 일부러 죽이니 가용성 SLI가 100% → <strong>41%</strong> 로 급락하고 error-budget burn이 올라가는 게 실시간으로 잡혔습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>정상</th>
+          <th>DB 장애 주입</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><img alt="정상 상태 SLO 대시보드" loading="lazy" src="/images/projects/sjh-slo.png"></td>
+          <td><img alt="장애 시 error-budget burn" loading="lazy" src="/images/projects/sjh-slo-burn.png"></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>오토스케일</strong> — k6로 부하를 걸어 CPU <strong>86%</strong> 를 넘기니 replicas가 <strong>2 → 6</strong> 으로 늘었습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>① CPU 임계 초과</th>
+          <th>② 6 replicas로 스케일</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><img alt="HPA 트리거" loading="lazy" src="/images/projects/sjh-hpa-trigger.png"></td>
+          <td><img alt="6 replicas 스케일" loading="lazy" src="/images/projects/sjh-hpa-scaled.png"></td>
+      </tr>
+  </tbody>
+</table>
+<p>그 밖에 노드 다운 시 재스케줄, sealed-secrets 복호화 경로, 지연 분포 p50/p95/p99를 확인했습니다.</p>
+<h2 id="까다로웠던-문제-셋">까다로웠던 문제 셋</h2>
+<p><strong>GitOps ↔ HPA 소유권 충돌</strong> — ArgoCD self-heal이 HPA가 조정한 <code>replicas</code>를 되돌려 플래핑이 났습니다. 둘 다 &ldquo;옳은&rdquo; 동작이라는 게 문제였고, <code>ignoreDifferences(/spec/replicas)</code>로 <strong>필드 소유권을 명시적으로 나눠</strong> 해결했습니다.</p>
+<p><strong>StatefulSet + local-path의 노드 고정</strong> — 노드를 껐더니 postgres가 <code>Pending</code>, prometheus가 <code>Terminating</code>에 멈췄습니다. PVC가 노드에 묶여 재스케줄이 안 되는 특성이었습니다.</p>
+<p><strong>gunicorn 멀티워커에서 Gauge가 stale해진다</strong> — 프로세스별 값이 남아 실제와 어긋났습니다. <strong>매 scrape마다 DB를 집계하는 커스텀 Collector</strong>로 바꿨습니다. 상태를 프로세스에 들고 있지 말고, 물어볼 때 계산하는 쪽으로.</p>
+<table>
+  <thead>
+      <tr>
+          <th>영역</th>
+          <th>사용</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Backend</td>
+          <td>Python 3.12 · Django 5.2 · DRF · SimpleJWT · drf-spectacular</td>
+      </tr>
+      <tr>
+          <td>Data</td>
+          <td>PostgreSQL 17</td>
+      </tr>
+      <tr>
+          <td>Observability</td>
+          <td>django-prometheus · OpenTelemetry · python-json-logger</td>
+      </tr>
+      <tr>
+          <td>Infra</td>
+          <td>Docker · GHCR · Kubernetes(kubeadm) · Kustomize · ArgoCD</td>
+      </tr>
+      <tr>
+          <td>Monitoring</td>
+          <td>kube-prometheus-stack · Loki · Tempo · Alloy · Grafana</td>
+      </tr>
+      <tr>
+          <td>Security</td>
+          <td>sealed-secrets (Bitnami)</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="배운-것">배운 것</h2>
+<p>관리형에서는 &ldquo;된다/안 된다&quot;만 보이는 지점에서, 직접 세운 클러스터에서는 <strong>왜 그렇게 되는지</strong>가 보였습니다 — PVC가 왜 노드에 묶이는지, self-heal이 왜 HPA와 싸우는지, 멀티프로세스 메트릭이 왜 어긋나는지.</p>
+<p>그리고 <strong>&ldquo;구성했다&quot;와 &ldquo;동작한다&quot;는 다릅니다.</strong> SLO도 HPA도 노드 복구도 일부러 부수고 나서야 진짜로 도는지 알 수 있었습니다. 가장 값어치 있었던 작업은 기능 구현이 아니라 <strong>장애를 주입해본 것</strong>이었습니다.</p>
+<hr>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>GitHub</td>
+          <td><a href="https://github.com/hyegyeongseo/server-job-history">hyegyeongseo/server-job-history</a></td>
+      </tr>
+      <tr>
+          <td>README</td>
+          <td><a href="https://github.com/hyegyeongseo/server-job-history#readme">아키텍처 · 검증 결과 · 스크린샷</a></td>
+      </tr>
+      <tr>
+          <td>주요 문서</td>
+          <td><a href="https://github.com/hyegyeongseo/server-job-history/blob/main/docs/design-decisions.md">ADR — 대안·트레이드오프·한계</a> · <a href="https://github.com/hyegyeongseo/server-job-history/blob/main/docs/runbooks/error-budget.md">SLO 런북</a></td>
+      </tr>
+  </tbody>
+</table>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/server-job-history/">server-job-history</a>
+      <a href="http://localhost:1313/tags/project/">project</a>
+      <a href="http://localhost:1313/tags/personal/">personal</a>
+      <a href="http://localhost:1313/tags/kubernetes/">kubernetes</a>
+      <a href="http://localhost:1313/tags/kubeadm/">kubeadm</a>
+      <a href="http://localhost:1313/tags/gitops/">gitops</a>
+      <a href="http://localhost:1313/tags/argocd/">argocd</a>
+      <a href="http://localhost:1313/tags/observability/">observability</a>
+      <a href="http://localhost:1313/tags/slo/">slo</a>
+      <a href="http://localhost:1313/tags/django/">django</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/project-artcoach/">
+    <span class="title">« 이전 페이지</span>
+    <span>artcoach — 검색만 있던 제품에 에이전트를 만들어 넣기까지 (개인 프로젝트)</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/ai-drawing-coach-design/">
+    <span class="title">다음 페이지 »</span>
+    <span>AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

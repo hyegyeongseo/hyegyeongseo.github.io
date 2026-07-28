@@ -55,6 +55,8 @@ manageAlerts: false
 
 prod 쪽이 특히 편했습니다. YAML을 고치면 `terraform plan`에 **diff가 그대로 뜨고**, apply로 반영됩니다. 별도 적재 명령이나 콘솔 작업 없이, **실제 룰 상태를 코드와 일치**시킬 수 있었습니다.
 
+![AMP 규칙 관리 화면 — 네임스페이스 3개는 콘솔에서 만든 게 아니라 Terraform이 룰 파일을 올린 결과](/images/posts/amp-workspace-rules.png)
+
 ## 저장 단위를 셋으로 나눈 이유
 
 룰을 한 덩어리로 두지 않고 대상에 따라 세 묶음으로 나눴습니다.
@@ -78,6 +80,10 @@ prod 쪽이 특히 편했습니다. YAML을 고치면 `terraform plan`에 **diff
 발화된 알림은 **Alertmanager → SNS → Lambda → Discord**로 갑니다. AWS Chatbot이 Discord를 지원하지 않아 Lambda가 SNS 메시지를 받아 웹훅으로 POST하는 구조인데, **이미 있던 경로를 그대로 재사용**했습니다. 새 통지 채널을 만들지 않은 거죠.
 
 ②편에서 라벨(심각도·서비스·계층)을 설계했는데, 그게 여기서 **메시지 헤더와 색상**으로 이어집니다. 심각도에 따라 색이 달라져서 채팅 목록에서 펼치지 않고도 급한 것이 구분됩니다.
+
+![AMP Alertmanager 라우팅 설정](/images/posts/amp-alertmanager.png)
+
+`group_by`·`group_wait 30s`·`repeat_interval 4h`로 알림 피로를 억제하고, `send_resolved: true`가 "해제됨" 메시지를 만듭니다.
 
 **여기엔 숨은 계약이 하나 있습니다.** 알림 쪽이 만드는 메시지 헤더 형식(상태·심각도·알림명·서비스)과 Lambda의 파서가 **짝으로 묶여** 있어서, 한쪽 형식을 바꾸면 다른 쪽도 같이 고쳐야 합니다. 안 그러면 알림이 죽지는 않지만 **제목·심각도·서비스명이 빠진 기본 형태로 표시**됩니다 — 조용히 나빠지는 쪽이라 눈치채기 어려워서 코드 주석으로 명시해 뒀습니다.
 

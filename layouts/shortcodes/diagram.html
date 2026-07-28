@@ -1,0 +1,33 @@
+{{- /*
+  diagram — assets/diagrams/ 의 SVG 를 본문에 **인라인**으로 넣는다.
+
+  <img> 로 넣으면 SVG 가 사이트의 CSS 변수에 접근하지 못해서, 독자가 라이트/다크를
+  수동 토글했을 때 다이어그램만 반대 테마로 남는다. 인라인이면 var(--fn-accent) 등이
+  페이지 캐스케이드에서 그대로 해석되므로 토글에 즉시 반응한다.
+
+  사용:
+    {{< diagram src="drawe-architecture.svg"
+                alt="DraWe 운영 아키텍처 — 요청·배포·관측 세 흐름"
+                caption="요청 · 배포 · 관측 세 흐름" >}}
+
+  - src     (필수) assets/diagrams/ 기준 파일명
+  - alt     (권장) 스크린리더용 설명
+  - caption (선택) 그림 아래 캡션. 마크다운 사용 가능
+*/ -}}
+
+{{- $src := or (.Get "src") (.Get 0) -}}
+{{- $alt := .Get "alt" -}}
+{{- $caption := .Get "caption" -}}
+
+{{- with resources.Get (printf "diagrams/%s" $src) -}}
+<figure class="fn-diagram">
+  <div class="fn-diagram-canvas"{{ with $alt }} role="img" aria-label="{{ . }}"{{ end }}>
+    {{- .Content | safeHTML -}}
+  </div>
+  {{- with $caption }}
+  <figcaption>{{ . | markdownify }}</figcaption>
+  {{- end }}
+</figure>
+{{- else -}}
+{{- warnf "diagram shortcode: assets/diagrams/%s 를 찾을 수 없습니다 (%s)" $src $.Page.File.Path -}}
+{{- end -}}

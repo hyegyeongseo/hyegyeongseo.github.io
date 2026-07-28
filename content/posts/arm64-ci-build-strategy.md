@@ -36,6 +36,8 @@ fastapi는 사정이 다릅니다. **mediapipe·CLIP 같은 아키텍처별 네�
 
 fastapi 리포를 보면 **태그 없는(`-`) 이미지**가 쌓입니다. 매 빌드마다 `buildcache` 태그가 새 캐시로 옮겨가면서 옛 캐시 이미지가 태그를 잃기 때문입니다. 이건 결함이 아니라 **buildcache 최적화의 정상 부산물**입니다.
 
+![ECR 이미지 목록 — git SHA 태그·buildcache 태그와 함께 태그를 잃은 `-` 이미지가 보인다](/images/posts/ecr-images-detail.png)
+
 방치하면 ECR이 비대해지니, **lifecycle policy(Keep last 10)** 로 자동 정리합니다(정리 이벤트에서 여러 이미지가 실제로 정리되는 걸 확인). backend 리포에 이 부산물이 훨씬 적은 건 캐시를 안 써서가 아니라 — 두 파이프라인 모두 buildcache를 씁니다 — JAR을 Docker 밖에서 빌드해 COPY하므로 **캐싱되는 레이어 자체가 가볍기** 때문입니다.
 
 ## 정리 — 전략은 언어 특성을 따른다

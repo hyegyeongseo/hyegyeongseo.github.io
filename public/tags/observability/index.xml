@@ -6,8 +6,22 @@
     <description>Recent content in Observability on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/observability/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>DraWe — 그림에서 막히는 지점을 짚고 다음 연습까지 잇는 AI 드로잉 코치 (팀 프로젝트)</title>
+      <link>http://localhost:1313/posts/project-drawe/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/project-drawe/</guid>
+      <description>창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가이드 기능을 개발하고, 서비스를 운영하기 위한 AWS 클라우드 인프라와 GitOps·Observability 기반 운영 체계를 구축했습니다.</description>
+    </item>
+    <item>
+      <title>server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)</title>
+      <link>http://localhost:1313/posts/project-server-job-history/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/project-server-job-history/</guid>
+      <description>서버 운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만든 개인 프로젝트. 목적은 앱이 아니라 운영 패턴의 검증이었습니다.</description>
+    </item>
     <item>
       <title>OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가</title>
       <link>http://localhost:1313/posts/opentelemetry-observability-stack/</link>

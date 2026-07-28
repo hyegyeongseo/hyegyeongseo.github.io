@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 970 970" preserveAspectRatio="xMidYMid meet" role="img" aria-label="taxonomy 축 구축선 도식 4종 — 비율·동세·손 구조·명암">
+<title>taxonomy 축 구축선 도식 — 비율 · 동세 · 손 구조 · 명암</title>
+<style>
+    .guide { fill:none; stroke:#c7ccd4; stroke-width:2.5; }
+    .gfill { fill:#c7ccd4; opacity:.18; stroke:none; }
+    .cons  { fill:none; stroke:#e0533d; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+    .consd { fill:none; stroke:#e0533d; stroke-width:2; stroke-dasharray:6 5; }
+    .acc   { fill:none; stroke:#2f6df0;  stroke-width:2.5; stroke-linecap:round; }
+    .dot   { fill:#e0533d; stroke:none; }
+    .lbl   { fill:#3a3f47; font-family:'Pretendard','Apple SD Gothic Neo',sans-serif; font-size:14px; }
+    .cap   { fill:#3a3f47; font-family:'Pretendard','Apple SD Gothic Neo',sans-serif; font-size:13px; opacity:.8; }
+    .tag   { fill:#e0533d; font-family:sans-serif; font-size:12px; font-weight:600; }
+  
+  .lbl, .cap { fill: var(--primary, #3a3f47); }
+</style>
+<g transform="translate(0,0)">
+  <g id="guide"><line class="guide" x1="250" y1="60" x2="250" y2="420"/><circle class="gfill" cx="250" cy="82" r="22"/><path class="gfill" d="M210 150 q40 -25 80 0 l-12 108 l8 153 l-22 0 l-12 -117 l-12 117 l-22 0 l8 -153 Z"/></g>
+  <g id="construction"><line class="consd" x1="160" y1="60.0" x2="340" y2="60.0"/><line class="consd" x1="160" y1="105.0" x2="340" y2="105.0"/><line class="consd" x1="160" y1="150.0" x2="340" y2="150.0"/><line class="consd" x1="160" y1="195.0" x2="340" y2="195.0"/><line class="consd" x1="160" y1="240.0" x2="340" y2="240.0"/><line class="consd" x1="160" y1="330.0" x2="340" y2="330.0"/><line class="consd" x1="160" y1="420.0" x2="340" y2="420.0"/></g>
+  <g id="label"><circle class="consd" cx="370" cy="82.5" r="22.5"/><text class="tag" x="366" y="86.5" text-anchor="middle">0</text><circle class="consd" cx="370" cy="127.5" r="22.5"/><text class="tag" x="366" y="131.5" text-anchor="middle">1</text><circle class="consd" cx="370" cy="172.5" r="22.5"/><text class="tag" x="366" y="176.5" text-anchor="middle">2</text><circle class="consd" cx="370" cy="217.5" r="22.5"/><text class="tag" x="366" y="221.5" text-anchor="middle">3</text><circle class="consd" cx="370" cy="262.5" r="22.5"/><text class="tag" x="366" y="266.5" text-anchor="middle">4</text><circle class="consd" cx="370" cy="307.5" r="22.5"/><text class="tag" x="366" y="311.5" text-anchor="middle">5</text><circle class="consd" cx="370" cy="352.5" r="22.5"/><text class="tag" x="366" y="356.5" text-anchor="middle">6</text><circle class="consd" cx="370" cy="397.5" r="22.5"/><text class="tag" x="366" y="401.5" text-anchor="middle">7</text><text class="lbl" x="100" y="64.0">머리</text><text class="lbl" x="100" y="109.0">턱</text><text class="lbl" x="100" y="154.0">가슴</text><text class="lbl" x="100" y="199.0">허리</text><text class="lbl" x="100" y="244.0">골반</text><text class="lbl" x="100" y="334.0">무릎</text><text class="lbl" x="100" y="424.0">발</text>
+    <text class="cap" x="20" y="462">머리 1개를 자로 삼아 어깨·허리·무릎·발 위치를 점만 찍기.</text>
+  </g>
+</g>
+<g transform="translate(490,0)">
+  <g id="guide"><circle class="gfill" cx="190" cy="110" r="34"/><ellipse class="gfill" cx="240" cy="220" rx="60" ry="80"/><ellipse class="gfill" cx="300" cy="360" rx="34" ry="60"/></g>
+  <g id="construction"><path class="cons" d="M170 90 C 230 180, 200 280, 320 410"/><circle class="dot" cx="170" cy="90" r="5"/><circle class="dot" cx="320" cy="410" r="5"/></g>
+  <g id="label"><text class="lbl" x="60" y="90">머리</text><text class="lbl" x="330" y="410">지지발</text><text class="lbl" x="120" y="250" fill="#e0533d">관통하는 한 선</text>
+    <text class="cap" x="20" y="462">디테일 전에 머리→지지발을 한 곡선으로 먼저.</text>
+  </g>
+</g>
+<g transform="translate(0,490)">
+  <g id="guide"><path class="guide" d="M180 250 q-15 -70 25 -120 q35 -40 70 -10 q20 -50 45 -20 q18 -45 38 -12 q22 -35 30 5 q26 30 -8 90 q-30 60 -95 70 q-70 8 -105 -3 Z"/></g>
+  <g id="construction"><path class="cons" d="M175 250 L205 150 L300 165 L285 270 Z"/><path class="cons" d="M205 150 q12 -55 30 -50 q14 4 8 56"/><path class="cons" d="M238 150 q14 -62 32 -56 q14 4 6 62"/><path class="cons" d="M270 156 q14 -52 30 -44 q12 6 4 56"/><path class="cons" d="M295 165 q12 -38 26 -30 q10 6 2 44"/><path class="cons" d="M175 250 q-44 4 -58 40 q-6 18 14 24 q22 4 40 -24"/><path class="acc" d="M235 205 l60 -22"/><path class="acc" d="M289 178 l8 5 l-9 4"/></g>
+  <g id="label"><text class="lbl" x="300" y="250">손바닥 = 상자</text><text class="lbl" x="250" y="95">손가락 = 원통</text><text class="lbl" x="300" y="170" fill="#2f6df0">평면 방향</text>
+    <text class="cap" x="20" y="462">손 = 손바닥(상자) + 손가락(원통). 먼저 평면 방향부터.</text>
+  </g>
+</g>
+<g transform="translate(490,490)">
+  <g id="guide"></g>
+  <g id="construction"><rect x="60" y="60" width="80" height="80" fill="#f0f0f0" stroke="#3a3f47" stroke-width="1.5"/><rect x="150" y="60" width="80" height="80" fill="#9aa0a8" stroke="#3a3f47" stroke-width="1.5"/><rect x="240" y="60" width="80" height="80" fill="#33373d" stroke="#3a3f47" stroke-width="1.5"/><path d="M250 230 A90 90 0 0 1 250 410 A90 90 0 0 1 250 230" fill="#9aa0a8"/><path d="M250 230 A90 90 0 0 0 175 360 A70 70 0 0 0 250 392 Z" fill="#33373d" opacity=".9"/><circle cx="290" cy="285" r="22" fill="#f4f4f4"/><ellipse cx="290" cy="425" rx="80" ry="16" fill="#33373d" opacity=".35"/></g>
+  <g id="label"><text class="lbl" x="60" y="175">밝음</text><text class="lbl" x="150" y="175">중간</text><text class="lbl" x="240" y="175">어둠</text>
+    <text class="cap" x="20" y="462">흑백 3단(밝음·중간·어둠)으로 나눠 빠진 단계 확인.</text>
+  </g>
+</g>
+</svg>

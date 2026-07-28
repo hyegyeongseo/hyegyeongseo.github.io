@@ -49,6 +49,10 @@ Resource Metrics API가 **등록조차 안 됨 → 부재**. 이 한 번의 조�
 
 플랫폼 모듈을 대조해 보니 — ALB 컨트롤러·ArgoCD·External Secrets·Karpenter는 전부 코드(helm_release)로 관리되는데 **metrics-server만 빠져** 있었습니다. HPA 매니페스트는 있었지만, 그걸 구동할 컴포넌트가 처음부터 없었던 겁니다.
 
+![apiservice 조회 — 지금은 AVAILABLE=True](/images/posts/hpa-apiservice.png)
+
+같은 명령이 당시엔 `NotFound`였고 지금은 `AVAILABLE=True`입니다. **결과가 뒤집힌 것 자체가 복구의 증거**입니다.
+
 ## 해결
 
 - 플랫폼 모듈에 **metrics-server를 helm_release로 추가**.
@@ -57,6 +61,8 @@ Resource Metrics API가 **등록조차 안 됨 → 부재**. 이 한 번의 조�
 - 적용 전 `terraform plan`으로 **1 add / 0 change / 0 destroy**를 확인(다른 리소스 드리프트 없음)하고 apply.
 
 결과: metrics-server 1/1 Running, apiservice AVAILABLE=True, HPA 3개가 `<unknown>` → `0%/70%` 정상 수치로 돌아왔습니다.
+
+![HPA 3개가 실제 수치를 읽는다](/images/posts/hpa-recovered.png)
 
 ## 고친 것으로 끝내지 않았다 — 사각지대를 알림으로 봉인
 
