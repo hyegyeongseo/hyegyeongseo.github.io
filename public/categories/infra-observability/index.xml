@@ -6,35 +6,21 @@
     <description>Recent content in Infra &amp; Observability on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 29 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/categories/infra-observability/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환</title>
-      <link>http://localhost:1313/posts/ecs-to-eks-cutover/</link>
-      <pubDate>Mon, 22 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/ecs-to-eks-cutover/</guid>
-      <description>운영 중인 서비스를 서비스 영향 없이 EKS로 전환한 과정. 병행 구축·Dark verify·토글 컷오버로 전환을 검증 가능한 절차로 만들고, 롤백과 종료까지 운영 절차로 남긴 기록.</description>
+      <title>AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO</title>
+      <link>http://localhost:1313/posts/keyless-auth-oidc-irsa-eso/</link>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/keyless-auth-oidc-irsa-eso/</guid>
+      <description>CI도 파드도 Access Key 없이 인증하게 만든 과정. 시크릿은 레포가 아니라 SSM에 두고, IaC가 그 값을 덮어쓰지 않도록 무장해제하기까지.</description>
     </item>
     <item>
-      <title>GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나</title>
-      <link>http://localhost:1313/posts/gitops-argocd-drift/</link>
-      <pubDate>Sat, 20 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/gitops-argocd-drift/</guid>
-      <description>ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 &amp;#39;머지 결과&amp;#39;를 검사하게 한 설계.</description>
-    </item>
-    <item>
-      <title>ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드</title>
-      <link>http://localhost:1313/posts/arm64-ci-build-strategy/</link>
-      <pubDate>Sat, 20 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/arm64-ci-build-strategy/</guid>
-      <description>Graviton(arm64) 위에서 Spring과 Python 서비스를 빌드하는 방식을 왜 다르게 가져갔나. JVM 바이트코드의 아키텍처 중립성으로 QEMU 비용을 0으로 만들고, 네이티브 의존성은 buildcache로 감당한 이야기.</description>
-    </item>
-    <item>
-      <title>OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가</title>
-      <link>http://localhost:1313/posts/opentelemetry-observability-stack/</link>
-      <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/opentelemetry-observability-stack/</guid>
-      <description>앱은 OTLP만 알게 하고, 수집기가 저장을 정하게 했다. dev는 SaaS로 비용을 눌렀고 prod는 데이터가 내 영역에 남도록 직접 운영했으며, 저장은 디스크가 아니라 S3에 뒀다.</description>
+      <title>OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나</title>
+      <link>http://localhost:1313/posts/alerting-with-amp-not-grafana/</link>
+      <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/alerting-with-amp-not-grafana/</guid>
+      <description>알림 룰을 대시보드 도구가 아니라 메트릭 저장소 쪽에 둔 이유. 룰을 코드로 관리하고, 저장 단위를 나누고, 기존 통지 경로를 재사용해 운영한 기록.</description>
     </item>
     <item>
       <title>OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가</title>
@@ -44,11 +30,32 @@
       <description>알림은 많을수록 좋은 게 아니다. 무엇을 알릴 가치가 있는지 고르고, 받은 사람이 바로 판단하고 행동할 수 있게 메시지를 구성한 기록. 그리고 일부러 끈 알림들.</description>
     </item>
     <item>
-      <title>OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나</title>
-      <link>http://localhost:1313/posts/alerting-with-amp-not-grafana/</link>
-      <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/alerting-with-amp-not-grafana/</guid>
-      <description>알림 룰을 대시보드 도구가 아니라 메트릭 저장소 쪽에 둔 이유. 룰을 코드로 관리하고, 저장 단위를 나누고, 기존 통지 경로를 재사용해 운영한 기록.</description>
+      <title>OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가</title>
+      <link>http://localhost:1313/posts/opentelemetry-observability-stack/</link>
+      <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/opentelemetry-observability-stack/</guid>
+      <description>앱은 OTLP만 알게 하고, 수집기가 저장을 정하게 했다. dev는 SaaS로 비용을 눌렀고 prod는 데이터가 내 영역에 남도록 직접 운영했으며, 저장은 디스크가 아니라 S3에 뒀다.</description>
+    </item>
+    <item>
+      <title>ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환</title>
+      <link>http://localhost:1313/posts/ecs-to-eks-cutover/</link>
+      <pubDate>Mon, 22 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/ecs-to-eks-cutover/</guid>
+      <description>운영 중인 서비스를 서비스 영향 없이 EKS로 전환한 과정. 병행 구축·Dark verify·토글 컷오버로 전환을 검증 가능한 절차로 만들고, 롤백과 종료까지 운영 절차로 남긴 기록.</description>
+    </item>
+    <item>
+      <title>ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드</title>
+      <link>http://localhost:1313/posts/arm64-ci-build-strategy/</link>
+      <pubDate>Sat, 20 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/arm64-ci-build-strategy/</guid>
+      <description>Graviton(arm64) 위에서 Spring과 Python 서비스를 빌드하는 방식을 왜 다르게 가져갔나. JVM 바이트코드의 아키텍처 중립성으로 QEMU 비용을 0으로 만들고, 네이티브 의존성은 buildcache로 감당한 이야기.</description>
+    </item>
+    <item>
+      <title>GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나</title>
+      <link>http://localhost:1313/posts/gitops-argocd-drift/</link>
+      <pubDate>Sat, 20 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/gitops-argocd-drift/</guid>
+      <description>ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 &amp;#39;머지 결과&amp;#39;를 검사하게 한 설계.</description>
     </item>
     <item>
       <title>AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정</title>

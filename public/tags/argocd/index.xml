@@ -16,18 +16,18 @@
       <description>서버 운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만든 개인 프로젝트. 목적은 앱이 아니라 운영 패턴의 검증이었습니다.</description>
     </item>
     <item>
-      <title>GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나</title>
-      <link>http://localhost:1313/posts/gitops-argocd-drift/</link>
-      <pubDate>Sat, 20 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/gitops-argocd-drift/</guid>
-      <description>ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 &amp;#39;머지 결과&amp;#39;를 검사하게 한 설계.</description>
-    </item>
-    <item>
       <title>GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기</title>
       <link>http://localhost:1313/posts/gitops-overlay-bump-race/</link>
       <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/gitops-overlay-bump-race/</guid>
       <description>여러 서비스의 CD가 같은 브랜치에 동시에 push하다 실패했다. 그리고 환경을 브랜치로 나눈 구조에선 승격이 운영 이미지를 과거로 되돌릴 수 있었다. 복구 자동화와 사전 차단, 두 층으로 막은 기록.</description>
+    </item>
+    <item>
+      <title>GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나</title>
+      <link>http://localhost:1313/posts/gitops-argocd-drift/</link>
+      <pubDate>Sat, 20 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/gitops-argocd-drift/</guid>
+      <description>ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 &amp;#39;머지 결과&amp;#39;를 검사하게 한 설계.</description>
     </item>
   </channel>
 </rss>

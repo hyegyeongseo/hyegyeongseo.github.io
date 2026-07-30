@@ -3,7 +3,6 @@ title: "AI 드로잉 코치를 설계한 이유 — '못 그렸다'가 아니라
 description: "그림 피드백 서비스를 '판정 도구'가 아니라 '다음 한 걸음을 주는 코치'로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조."
 date: 2026-06-15
 lastmod: 2026-07-27
-weight: 10
 tags: ["ai-engineering", "product-design", "drawe", "pipeline"]
 categories: ["Software Engineering"]
 ---

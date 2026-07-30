@@ -10,7 +10,7 @@
 <meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/aws/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -144,6 +144,21 @@
     Aws
   </h1>
 </header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>원칙 — 키를 어디에도 저장하지 않는다 인프라를 짜면서 자격증명이 필요한 곳이 셋이었습니다.
+CI가 AWS에 이미지를 올리고 배포해야 합니다 파드가 S3·Bedrock·Cost Explorer에 접근해야 합니다 시크릿 18종(DB·JWT·외부 API 키 등)이 여러 서비스에 주입돼야 합니다 가장 쉬운 방법은 IAM User를 만들어 Access Key를 발급하고, CI는 그걸 GitHub Secrets에, 파드는 환경변수에 넣는 것입니다. 동작은 합니다. 대신 유출되면 되돌릴 방법이 로테이션밖에 없고, 유출됐는지 알기도 어렵습니다.
+그래서 원칙을 하나 세웠습니다. 키를 어디에도 저장하지 않는다. 저장된 키가 없으면 유출될 키도 없습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-29 00:00:00 +0000 UTC'>July 29, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO" href="http://localhost:1313/posts/keyless-auth-oidc-irsa-eso/"></a>
+</article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">

@@ -3,7 +3,6 @@ title: "ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한
 description: "운영 중인 서비스를 서비스 영향 없이 EKS로 전환한 과정. 병행 구축·Dark verify·토글 컷오버로 전환을 검증 가능한 절차로 만들고, 롤백과 종료까지 운영 절차로 남긴 기록."
 date: 2026-06-22
 lastmod: 2026-07-27
-weight: 40
 tags: ["eks", "ecs", "migration", "gitops", "terraform", "drawe"]
 categories: ["Infra Observability"]
 ---

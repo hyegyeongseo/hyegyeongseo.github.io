@@ -10,7 +10,7 @@
 <meta name="description" content="Posts - 기록 블로그">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/posts/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -162,20 +162,6 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
-오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
     <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나
     </h2>
   </header>
@@ -191,47 +177,31 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
     </h2>
   </header>
   <div class="entry-content">
-    <p>문제 — 전부 Healthy인데, HPA는 죽어 있었다 prod EKS에 관측 스택(로그·메트릭·트레이스)이 전부 떠 있고 ArgoCD도 모두 Healthy였습니다. 그런데 정기 점검 중 이런 걸 봤습니다.
-$ kubectl get hpa -A NAME TARGETS AGE backend cpu:&lt;unknown&gt;/70% 12d fastapi-embed cpu:&lt;unknown&gt;/70% 12d fastapi-guide cpu:&lt;unknown&gt;/70% 12d HPA 3개가 전부 &lt;unknown&gt;, 그것도 12일째. 어떤 대시보드에도, ArgoCD에도 경보는 없었습니다.
-이건 “장애가 났다&#34;가 아니라 “정상처럼 보이는 상태에서 숨어 있던 리스크” 였습니다. 저에게는 이 유형이 더 무섭습니다 — 아무도 모르니까요.
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
+오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/"></a>
+  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가
     </h2>
   </header>
   <div class="entry-content">
-    <p>문제 — k8s는 60초를 주는데, 앱이 안 쓰고 있었다 파드를 롤링 재시작하다가, 종료되는 파드가 Completed가 아니라 Error 로 끝나는 걸 봤습니다.
-backend-...-9lqc2 1/1 Terminating 0 3d14h backend-...-9lqc2 0/1 Error 0 3d14h 확인해 보니 같은 클러스터인데 서비스마다 종료 정책이 달랐습니다.
-서비스 설정 SIGTERM 수신 시 fastapi-guide graceful timeout 설정됨 진행 중 요청 마무리 후 종료 backend server.shutdown 미설정 → Spring 기본 immediate 기다리지 않고 커넥터 종료 Kubernetes는 terminationGracePeriodSeconds: 60으로 종료 유예를 주고 있었지만, backend는 Spring Boot 기본 종료 모드(immediate)를 쓰고 있어 그 시간을 활용하지 못하는 구조였습니다.
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 이 글 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 배경 — 계측 규격부터 정했다 관측성을 구축하면서 가장 먼저 결정한 건 저장소가 아니라 계측 규격(OpenTelemetry) 이었습니다. 저장소는 나중에 교체할 수 있지만, 애플리케이션 곳곳에 들어가는 계측 코드는 한 번 적용하면 바꾸기 어렵기 때문입니다.
+왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게 OpenTelemetry를 고른 이유는 특정 벤더에 묶이지 않기 위해서입니다.
+애플리케이션은 OTLP로 내보내는 것까지만 알면 됩니다. 그 신호를 어디에 담을지는 수집기(Alloy)가 정하죠. 그래서 저장소가 바뀌어도 앱 코드는 그대로 두고 수집기 설정만 바꾸면 됩니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-07-24 00:00:00 +0000 UTC'>July 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to 60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기" href="http://localhost:1313/posts/graceful-shutdown-drain/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>문제 — 관측을 켰더니 비용이 컨트롤 플레인을 넘었다 prod 비용을 실측했더니 관리형 Prometheus(AMP)가 EKS 컨트롤 플레인보다 컸습니다. AMP는 수집 샘플 수로 과금되는데, 수집 설정(config.alloy)에는 메트릭 필터가 하나도 없었습니다. 수집되는 모든 시계열이 그대로 AMP로 remote_write되고 있었던 거죠.
-관측성을 늘리는 건 좋은데, “무엇을 얼마나 보내는지&#34;를 안 보고 늘리면 비용이 조용히 새 나갑니다.
-가설 — “node-exporter가 주범이겠지” 처음 심증은 node-exporter였습니다. node-exporter는 노드당 1,000개가 넘는 시계열을 기본으로 내보내는데, 대시보드·알림이 쓰는 건 일부뿐이니 그걸 자르면 될 것 같았습니다. 그럴듯한 가설이었습니다.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-07-25 00:00:00 +0000 UTC'>July 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to 관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기" href="http://localhost:1313/posts/amp-spanmetrics-cost/"></a>
+  <footer class="entry-footer"><span title='2026-06-23 00:00:00 +0000 UTC'>June 23, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가" href="http://localhost:1313/posts/opentelemetry-observability-stack/"></a>
 </article>
 
 <article class="post-entry"> 
@@ -252,62 +222,88 @@ RDS는 available DB 쪽 보안그룹 인바운드도 새 보안그룹 ID를 허�
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기
+    <h2 class="entry-hint-parent">ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환
     </h2>
   </header>
   <div class="entry-content">
-    <p>배경 — CI가 클러스터 대신 git을 만진다 GitOps로 옮기면서 CI의 역할이 바뀌었습니다. 예전엔 CI가 클러스터를 직접 갱신했지만, 이제는 이미지를 만들고 오버레이의 이미지 태그를 git에 커밋하는 것까지만 합니다. 클러스터 반영은 ArgoCD가 git을 보고 알아서 하고요.
-그런데 이 구조는 git을 배포 상태의 데이터베이스로 쓴다는 뜻이기도 합니다. 그러면 데이터베이스에서 겪는 문제가 그대로 따라옵니다 — 동시성과 복제 일관성.
-문제 ① 동시 배포가 서로를 밀어낸다 모노레포라 여러 서비스가 한 커밋으로 함께 배포되는 일이 잦았습니다. 그러면 각 서비스의 CD가 동시에 실행되어 같은 브랜치에 push를 시도합니다.
+    <p>문제 — 이사가 아니라 ‘연속성’이었다 운영 중인 서비스(ECS on EC2)를 EKS로 옮겨야 했습니다. 단순 재배포가 아니라 조건이 있었습니다 — 사용자 영향과 관측 공백을 최소화하면서 옮겨야 했습니다. 시크릿(SSM)·관측(로그·메트릭·트레이스)·트래픽(DNS)의 연속성이 유지돼야 했습니다.
+그래서 이 작업의 핵심은 리소스를 만드는 일이 아니라, 변경 과정에서 어떤 상태를 보존해야 하는지 정의하는 일이었습니다. AI 코치 설계에서 불확실성을 어디서 통제할지를 결정했다면, 인프라 전환에서는 변경 위험을 어디서 통제할지가 핵심이었습니다.
+왜 ECS에서 시작했고, 왜 EKS로 갔나 처음엔 ECS(EC2)로 운영했습니다. 컨테이너를 빠르게 띄우고 운영을 시작하기엔 충분했으니까요. 옮기기로 한 이유는 얻고 싶은 운영 방식이 분명했기 때문입니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기" href="http://localhost:1313/posts/gitops-overlay-bump-race/"></a>
+  <footer class="entry-footer"><span title='2026-06-22 00:00:00 +0000 UTC'>June 22, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환" href="http://localhost:1313/posts/ecs-to-eks-cutover/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정
+    <h2 class="entry-hint-parent">ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드
     </h2>
   </header>
   <div class="entry-content">
-    <p>시작 — VPC 카테고리에 $23.74 AWS 청구서 화면에서 한 줄이 눈에 띄었습니다.
-Amazon Virtual Private Cloud: $23.74
-VPC 리소스 자체(subnet, route table, IGW)는 무료라고 알고 있어서 의문이 생겼습니다. “VPC 자체로 돈이 나가나?”
-답은 VPC 카테고리 아래 묶이는 유료 컴포넌트들 — Interface VPC Endpoint, Public IPv4 였습니다.
-비용 분해 — Bills 화면 그대로 펼치기 Billing → Bills → 해당 월을 선택하면 서비스 단위로 수량과 단가까지 다 나옵니다. VPC 카테고리만 펼쳐 보니 다음과 같았습니다.
+    <p>배경 — Graviton으로 갔더니 빌드가 갈렸다 노드를 Graviton(arm64)으로 쓰면서 이미지도 arm64로 빌드해야 했습니다. 그런데 backend(Spring)와 fastapi(Python)는 빌드 방식이 자연히 갈렸습니다. 공통점은 셋 다 네이티브 arm64 러너(ubuntu-24.04-arm)에서 platforms: linux/arm64로 빌드하고 buildx 레지스트리 캐시를 쓴다는 것. 차이는 하나였습니다 — “무엇을 Docker 안에서 빌드하느냐.”
+backend — JAR을 Docker 밖에서 빌드해 COPY CI 단계(Docker 밖): ./gradlew bootJar → app.jar Dockerfile: COPY app.jar (base = JRE 런타임, gradle 없음) 핵심은 JAR이 아키텍처 중립(JVM 바이트코드) 이라는 점입니다. 어디서 빌드하든 결과가 같으니, Gradle 컴파일을 Docker 밖 CI 단계에서 끝내고 Dockerfile은 완성된 JAR만 COPY합니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0000 UTC'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정" href="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/"></a>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드" href="http://localhost:1313/posts/arm64-ci-build-strategy/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)
+    <h2 class="entry-hint-parent">GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
     </h2>
   </header>
   <div class="entry-content">
-    <p>진행 사항 dev 환경의 VPC Interface Endpoint 3개를 제거하고 기존 NAT Instance로 outbound를 우회시키는 작업이 별도 글에서 마무리됐습니다. 변경은 정지 윈도우에서 깔끔하게 4개 destroy만 일어났고, 다음 단계는 단순히 dev를 다시 켜는 것이었습니다.
-NAT, Valkey, RDS 차례로 start. NAT을 거친 outbound가 정상인지를 SSH 대신 SSM Session Manager로 검증해 보기로 했습니다 — SSM Agent의 등록 자체가 NAT 경로를 통한 공개 SSM endpoint 도달에 성공해야만 일어나는 일이라, 간접 검증이 되거든요. 콘솔에서 EC2 → Valkey → SSM Session Manager 탭을 열어봤습니다.
+    <p>배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.
+부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0000 UTC'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)" href="http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/"></a>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나" href="http://localhost:1313/posts/gitops-argocd-drift/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Git 동작 원리 정리 — commit graph, merge-base, cherry-pick
+    <h2 class="entry-hint-parent">믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다
     </h2>
   </header>
   <div class="entry-content">
-    <p>이 글을 쓰게 된 계기 팀 레포의 backend 코드를 GitHub의 Download ZIP으로 받아서 본인 개인 레포에서 한참 변경 작업을 했습니다. 이후 팀 레포의 develop에 변경사항을 합류시키려고 팀 레포를 두 번째 remote(team)로 추가하고 push를 시도했는데, *“git push 한 줄이면 끝”*일 거라 생각한 것과 달리 ! [rejected] non-fast-forward로 거부됐습니다. rebase로 풀어보려다 formatter 적용까지 겹치며 대량 modified 상태가 됐고, git reset --hard origin/develop으로 원래 상태에 복귀한 뒤 graph 관계부터 다시 진단했습니다.
-결정적인 한 줄은 다음이었습니다.
+    <p>시작 — “AI가 진짜 내 그림을 본 게 맞나?” AI 피드백이 그럴듯한데, 믿어도 되나 싶을 때가 있습니다. 같은 그림에 매번 다른 말을 하고, 없는 문제를 지적하기도 하고(환각), 어떤 도구는 점수까지 매겨 위축시킵니다. 결국 “AI가 진짜 내 그림을 본 게 맞나?” 라는 의심이 남죠.
+코치 제품에서 이 의심은 치명적입니다. “왜 지금 이걸 연습하라는지&#34;를 못 믿으면 처방을 따를 이유가 없으니까요. 그래서 저는 문제를 이렇게 바꿔 잡았습니다 — AI 시스템에서 불확실성을 어디에 허용하고, 어디서부터 통제할 것인가.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-05-10 00:00:00 +0000 UTC'>May 10, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Git 동작 원리 정리 — commit graph, merge-base, cherry-pick" href="http://localhost:1313/posts/git-commit-graph-principles/"></a>
+  <footer class="entry-footer"><span title='2026-06-19 00:00:00 +0000 UTC'>June 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다" href="http://localhost:1313/posts/llm-role-constraint/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>시작 — “명암이 부족하다&#34;는데 추천은 분위기만 비슷한 그림? 그림을 올렸더니 “명암이 부족하다&#34;는 진단을 받았습니다. 그런데 추천된 레퍼런스는 분위기만 비슷한 그림뿐이라면? 사용자는 지금 무엇을 연습해야 할지 알 수 없습니다. 진단과 추천이 겉도는 거죠 — “왜 이게 내 문제랑 상관있지?”
+그래서 원칙을 세웠습니다. 추천은 취향이 아니라 ‘연습 목표’를 따라가야 한다. 진단이 “명암&#34;이라고 했으면, 추천은 반드시 그 연습에 맞는 참고여야 하고, 진단→추천의 인과가 끊기면 안 된다.
+결정 — 진단과 검색 사이에 LLM을 넣지 않았다 흔한 RAG형 추천은 보통 이렇게 짭니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-19 00:00:00 +0000 UTC'>June 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게" href="http://localhost:1313/posts/diagnosis-recommend-separation/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>시작 — 사용자는 “못 그린다&#34;가 아니라 “다음을 모른다” 취미로 그림을 그리는 사람은 대개 세 곳에서 멈춥니다.
+“포즈·인체가 안 잡혀서 한참 헤맸어요.” — 원하는 자세는 머릿속에 있는데 뭘 참고해 어떻게 그릴지 모른다. “원하는 분위기의 레퍼런스를 못 찾겠어요.” — 수십 장을 검색해도 그리고 싶은 느낌이 안 나온다. “막혔을 때 누구에게 물어볼지 모르겠어요.” — 혼자 그리면 어디가 문제인지조차 모른다. 세 문제의 공통점은 “그림을 못 그린다&#34;가 아니라 “다음에 뭘 해야 할지 모른다” 는 것이었습니다. 그래서 저는 이 서비스를 잘 그렸다/못 그렸다를 판정하는 도구가 아니라 다음 한 걸음을 주는 코치로 목표를 잡았습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-15 00:00:00 +0000 UTC'>June 15, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;" href="http://localhost:1313/posts/ai-drawing-coach-design/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

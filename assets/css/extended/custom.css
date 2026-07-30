@@ -39,6 +39,16 @@
   --fn-s9-bg: #F0FDFA;
   --fn-s10: #475569;
   --fn-s10-bg: #F1F5F9;
+  --fn-s11: #4F46E5;
+  --fn-s11-bg: #EEF2FF;
+  --fn-s12: #059669;
+  --fn-s12-bg: #ECFDF5;
+  --fn-s13: #B45309;
+  --fn-s13-bg: #FFFBEB;
+  --fn-s14: #BE185D;
+  --fn-s14-bg: #FDF2F8;
+  --fn-s15: #6D28D9;
+  --fn-s15-bg: #FAF5FF;
 }
 
 .dark {
@@ -80,6 +90,16 @@
   --fn-s9-bg: #042F2E;
   --fn-s10: #CBD5E1;
   --fn-s10-bg: #1E293B;
+  --fn-s11: #818CF8;
+  --fn-s11-bg: #1E1B4B;
+  --fn-s12: #6EE7B7;
+  --fn-s12-bg: #022C22;
+  --fn-s13: #FCD34D;
+  --fn-s13-bg: #451A03;
+  --fn-s14: #F472B6;
+  --fn-s14-bg: #500724;
+  --fn-s15: #A78BFA;
+  --fn-s15-bg: #2E1065;
 }
 
 /* ===================================
@@ -636,6 +656,92 @@ body {
 .fn-toc .inner > ul > li:nth-child(10) > a::before {
   background: var(--fn-s10-bg) !important;
   color: var(--fn-s10) !important;
+}
+
+/* 11~15: 각기 다른 색 (신규 팔레트) */
+.fn-toc .inner > ul > li:nth-child(11) > a::before {
+  background: var(--fn-s11-bg) !important;
+  color: var(--fn-s11) !important;
+}
+.fn-toc .inner > ul > li:nth-child(12) > a::before {
+  background: var(--fn-s12-bg) !important;
+  color: var(--fn-s12) !important;
+}
+.fn-toc .inner > ul > li:nth-child(13) > a::before {
+  background: var(--fn-s13-bg) !important;
+  color: var(--fn-s13) !important;
+}
+.fn-toc .inner > ul > li:nth-child(14) > a::before {
+  background: var(--fn-s14-bg) !important;
+  color: var(--fn-s14) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15) > a::before {
+  background: var(--fn-s15-bg) !important;
+  color: var(--fn-s15) !important;
+}
+
+/* 16번 이상: 15개 색을 순환 (nth-child(15n+X))
+ * nth-child(11)~(15) 개별 규칙과 15n+11~15n+15 순환 규칙이
+ * 실제로는 11~15번 요소에서 겹치지만 동일 색상 변수를 참조하므로 결과 동일. */
+.fn-toc .inner > ul > li:nth-child(15n+1) > a::before {
+  background: var(--fn-s1-bg) !important;
+  color: var(--fn-s1) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+2) > a::before {
+  background: var(--fn-s2-bg) !important;
+  color: var(--fn-s2) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+3) > a::before {
+  background: var(--fn-s3-bg) !important;
+  color: var(--fn-s3) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+4) > a::before {
+  background: var(--fn-s4-bg) !important;
+  color: var(--fn-s4) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+5) > a::before {
+  background: var(--fn-s5-bg) !important;
+  color: var(--fn-s5) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+6) > a::before {
+  background: var(--fn-s6-bg) !important;
+  color: var(--fn-s6) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+7) > a::before {
+  background: var(--fn-s7-bg) !important;
+  color: var(--fn-s7) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+8) > a::before {
+  background: var(--fn-s8-bg) !important;
+  color: var(--fn-s8) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+9) > a::before {
+  background: var(--fn-s9-bg) !important;
+  color: var(--fn-s9) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+10) > a::before {
+  background: var(--fn-s10-bg) !important;
+  color: var(--fn-s10) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+11) > a::before {
+  background: var(--fn-s11-bg) !important;
+  color: var(--fn-s11) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+12) > a::before {
+  background: var(--fn-s12-bg) !important;
+  color: var(--fn-s12) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+13) > a::before {
+  background: var(--fn-s13-bg) !important;
+  color: var(--fn-s13) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n+14) > a::before {
+  background: var(--fn-s14-bg) !important;
+  color: var(--fn-s14) !important;
+}
+.fn-toc .inner > ul > li:nth-child(15n) > a::before {
+  background: var(--fn-s15-bg) !important;
+  color: var(--fn-s15) !important;
 }
 
 .fn-toc .inner ul ul a {

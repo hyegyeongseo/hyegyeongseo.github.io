@@ -6,11 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
 <title>GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기 | 기록 블로그</title>
-<meta name="keywords" content="gitops, argocd, cicd, github-actions, sre">
+<meta name="keywords" content="gitops, argocd, cicd, github-actions">
 <meta name="description" content="여러 서비스의 CD가 같은 브랜치에 동시에 push하다 실패했다. 그리고 환경을 브랜치로 나눈 구조에선 승격이 운영 이미지를 과거로 되돌릴 수 있었다. 복구 자동화와 사전 차단, 두 층으로 막은 기록.">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/posts/gitops-overlay-bump-race/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -81,7 +81,6 @@
     <meta property="article:tag" content="Argocd">
     <meta property="article:tag" content="Cicd">
     <meta property="article:tag" content="Github Actions">
-    <meta property="article:tag" content="Sre">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기">
@@ -116,7 +115,7 @@
   "name": "GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기",
   "description": "여러 서비스의 CD가 같은 브랜치에 동시에 push하다 실패했다. 그리고 환경을 브랜치로 나눈 구조에선 승격이 운영 이미지를 과거로 되돌릴 수 있었다. 복구 자동화와 사전 차단, 두 층으로 막은 기록.",
   "keywords": [
-    "gitops", "argocd", "cicd", "github-actions", "sre"
+    "gitops", "argocd", "cicd", "github-actions"
   ],
   "articleBody": "배경 — CI가 클러스터 대신 git을 만진다 GitOps로 옮기면서 CI의 역할이 바뀌었습니다. 예전엔 CI가 클러스터를 직접 갱신했지만, 이제는 이미지를 만들고 오버레이의 이미지 태그를 git에 커밋하는 것까지만 합니다. 클러스터 반영은 ArgoCD가 git을 보고 알아서 하고요.\n",
   "wordCount" : "456",
@@ -292,19 +291,18 @@
       <a href="http://localhost:1313/tags/argocd/">argocd</a>
       <a href="http://localhost:1313/tags/cicd/">cicd</a>
       <a href="http://localhost:1313/tags/github-actions/">github-actions</a>
-      <a href="http://localhost:1313/tags/sre/">sre</a>
     </div>
 
     <footer class="post-footer">
     </footer>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/posts/sgp-branch-eni-timing/">
+  <a class="prev" href="http://localhost:1313/posts/observability-log-trace-correlation/">
     <span class="title">« 이전 페이지</span>
-    <span>설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다</span>
+    <span>trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약</span>
   </a>
-  <a class="next" href="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/">
+  <a class="next" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/">
     <span class="title">다음 페이지 »</span>
-    <span>AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정</span>
+    <span>OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나</span>
   </a>
 </nav>
 

@@ -2,12 +2,11 @@
 title: "OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가"
 date: 2026-06-24
 lastmod: 2026-07-27
-weight: 45
 series: "관측성 설계"
 series_order: 2
 series_title: "무엇을 알리고, 어떻게 말할 것인가"
 description: "알림은 많을수록 좋은 게 아니다. 무엇을 알릴 가치가 있는지 고르고, 받은 사람이 바로 판단하고 행동할 수 있게 메시지를 구성한 기록. 그리고 일부러 끈 알림들."
-tags: ["observability", "alerting", "prometheus", "amp", "sre", "oncall"]
+tags: ["observability", "alerting", "prometheus", "amp"]
 categories: ["Infra Observability"]
 ---
 

@@ -2,7 +2,6 @@
 title: "ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드"
 date: 2026-06-20
 lastmod: 2026-07-27
-weight: 43
 description: "Graviton(arm64) 위에서 Spring과 Python 서비스를 빌드하는 방식을 왜 다르게 가져갔나. JVM 바이트코드의 아키텍처 중립성으로 QEMU 비용을 0으로 만들고, 네이티브 의존성은 buildcache로 감당한 이야기."
 tags: ["arm64", "graviton", "docker", "cicd", "ecr", "buildx", "drawe"]
 categories: ["Infra Observability"]

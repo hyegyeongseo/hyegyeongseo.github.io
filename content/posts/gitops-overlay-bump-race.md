@@ -2,9 +2,8 @@
 title: "GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기"
 date: 2026-06-25
 lastmod: 2026-07-27
-weight: 70
 description: "여러 서비스의 CD가 같은 브랜치에 동시에 push하다 실패했다. 그리고 환경을 브랜치로 나눈 구조에선 승격이 운영 이미지를 과거로 되돌릴 수 있었다. 복구 자동화와 사전 차단, 두 층으로 막은 기록."
-tags: ["gitops", "argocd", "cicd", "github-actions", "sre"]
+tags: ["gitops", "argocd", "cicd", "github-actions"]
 categories: ["Troubleshooting"]
 ---
 

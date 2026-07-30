@@ -2,9 +2,8 @@
 title: "GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나"
 date: 2026-06-20
 lastmod: 2026-07-27
-weight: 42
 description: "ECS 시절 CI가 배포 상태를 직접 갱신하던 구조를 ArgoCD GitOps로 옮긴 이유. git을 단일 출처로 삼고, branch-per-env 드리프트를 2층으로 막고, drift-gate가 diff가 아니라 '머지 결과'를 검사하게 한 설계."
-tags: ["gitops", "argocd", "cicd", "eks", "kubernetes", "sre", "drawe"]
+tags: ["gitops", "argocd", "cicd", "eks", "kubernetes", "drawe"]
 categories: ["Infra Observability"]
 ---
 

@@ -9,18 +9,18 @@
     <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/categories/projects/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>DraWe — 그림에서 막히는 지점을 짚고 다음 연습까지 잇는 AI 드로잉 코치 (팀 프로젝트)</title>
-      <link>http://localhost:1313/posts/project-drawe/</link>
-      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/project-drawe/</guid>
-      <description>창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가이드 기능을 개발하고, 서비스를 운영하기 위한 AWS 클라우드 인프라와 GitOps·Observability 기반 운영 체계를 구축했습니다.</description>
-    </item>
-    <item>
       <title>artcoach — 검색만 있던 제품에 에이전트를 만들어 넣기까지 (개인 프로젝트)</title>
       <link>http://localhost:1313/posts/project-artcoach/</link>
       <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/project-artcoach/</guid>
       <description>&amp;#39;창작 지원 AI 에이전트&amp;#39;를 표방했지만 실제로 동작하는 건 레퍼런스 검색뿐이었습니다. 관찰→진단→행동 제시를 하는 에이전트를 개인 프로젝트로 만들어 검증하고, 팀 프로젝트 DraWe에 도입해 한 끗 가이드와 완성작 갤러리가 됐습니다.</description>
+    </item>
+    <item>
+      <title>DraWe — 그림에서 막히는 지점을 짚고 다음 연습까지 잇는 AI 드로잉 코치 (팀 프로젝트)</title>
+      <link>http://localhost:1313/posts/project-drawe/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/project-drawe/</guid>
+      <description>창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가이드 기능을 개발하고, 서비스를 운영하기 위한 AWS 클라우드 인프라와 GitOps·Observability 기반 운영 체계를 구축했습니다.</description>
     </item>
     <item>
       <title>server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)</title>

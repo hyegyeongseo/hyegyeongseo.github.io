@@ -10,7 +10,7 @@
 <meta name="description" content="만든 서비스를 안정적으로 운영하는 과정">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/categories/infra-observability/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -150,45 +150,46 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환
+    <h2 class="entry-hint-parent">AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO
     </h2>
   </header>
   <div class="entry-content">
-    <p>문제 — 이사가 아니라 ‘연속성’이었다 운영 중인 서비스(ECS on EC2)를 EKS로 옮겨야 했습니다. 단순 재배포가 아니라 조건이 있었습니다 — 사용자 영향과 관측 공백을 최소화하면서 옮겨야 했습니다. 시크릿(SSM)·관측(로그·메트릭·트레이스)·트래픽(DNS)의 연속성이 유지돼야 했습니다.
-그래서 이 작업의 핵심은 리소스를 만드는 일이 아니라, 변경 과정에서 어떤 상태를 보존해야 하는지 정의하는 일이었습니다. AI 코치 설계에서 불확실성을 어디서 통제할지를 결정했다면, 인프라 전환에서는 변경 위험을 어디서 통제할지가 핵심이었습니다.
-왜 ECS에서 시작했고, 왜 EKS로 갔나 처음엔 ECS(EC2)로 운영했습니다. 컨테이너를 빠르게 띄우고 운영을 시작하기엔 충분했으니까요. 옮기기로 한 이유는 얻고 싶은 운영 방식이 분명했기 때문입니다.
+    <p>원칙 — 키를 어디에도 저장하지 않는다 인프라를 짜면서 자격증명이 필요한 곳이 셋이었습니다.
+CI가 AWS에 이미지를 올리고 배포해야 합니다 파드가 S3·Bedrock·Cost Explorer에 접근해야 합니다 시크릿 18종(DB·JWT·외부 API 키 등)이 여러 서비스에 주입돼야 합니다 가장 쉬운 방법은 IAM User를 만들어 Access Key를 발급하고, CI는 그걸 GitHub Secrets에, 파드는 환경변수에 넣는 것입니다. 동작은 합니다. 대신 유출되면 되돌릴 방법이 로테이션밖에 없고, 유출됐는지 알기도 어렵습니다.
+그래서 원칙을 하나 세웠습니다. 키를 어디에도 저장하지 않는다. 저장된 키가 없으면 유출될 키도 없습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-22 00:00:00 +0000 UTC'>June 22, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환" href="http://localhost:1313/posts/ecs-to-eks-cutover/"></a>
+  <footer class="entry-footer"><span title='2026-07-29 00:00:00 +0000 UTC'>July 29, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO" href="http://localhost:1313/posts/keyless-auth-oidc-irsa-eso/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나
     </h2>
   </header>
   <div class="entry-content">
-    <p>배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.
-부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 이 글 문제 — 보는 것과 알리는 것이 한 곳에 묶이면 ②편에서 무엇을 알릴지 고르고 문구까지 정했다면, 남는 문제는 알림 룰을 어디에서 평가하고, 어떤 경로로 운영자에게 전달할 것인가였습니다.
+대시보드 도구(Grafana)는 알림 기능도 제공합니다. 거기서 다 하면 편해 보이죠. 그런데 그러면 “보는 것&#34;과 “알리는 것&#34;이 한 컴포넌트에 묶입니다.
+대시보드를 손보다 알림 룰이 흔들릴 수 있고 알림 때문에 대시보드 구성을 못 바꾸게 되고 UI로 만든 룰은 누가 왜 바꿨는지 6개월 뒤에 알 수 없습니다 결정 — 룰은 메트릭 저장소 쪽에 알림 룰을 대시보드가 아니라 메트릭 저장소(AMP) 에 뒀습니다. Grafana 데이터소스에는 알림 관리를 끄는 설정을 명시했고요.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나" href="http://localhost:1313/posts/gitops-argocd-drift/"></a>
+  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
     </h2>
   </header>
   <div class="entry-content">
-    <p>배경 — Graviton으로 갔더니 빌드가 갈렸다 노드를 Graviton(arm64)으로 쓰면서 이미지도 arm64로 빌드해야 했습니다. 그런데 backend(Spring)와 fastapi(Python)는 빌드 방식이 자연히 갈렸습니다. 공통점은 셋 다 네이티브 arm64 러너(ubuntu-24.04-arm)에서 platforms: linux/arm64로 빌드하고 buildx 레지스트리 캐시를 쓴다는 것. 차이는 하나였습니다 — “무엇을 Docker 안에서 빌드하느냐.”
-backend — JAR을 Docker 밖에서 빌드해 COPY CI 단계(Docker 밖): ./gradlew bootJar → app.jar Dockerfile: COPY app.jar (base = JRE 런타임, gradle 없음) 핵심은 JAR이 아키텍처 중립(JVM 바이트코드) 이라는 점입니다. 어디서 빌드하든 결과가 같으니, Gradle 컴파일을 Docker 밖 CI 단계에서 끝내고 Dockerfile은 완성된 JAR만 COPY합니다.
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
+오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드" href="http://localhost:1313/posts/arm64-ci-build-strategy/"></a>
+  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
@@ -208,31 +209,45 @@ backend — JAR을 Docker 밖에서 빌드해 COPY CI 단계(Docker 밖): ./grad
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
+    <h2 class="entry-hint-parent">ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환
     </h2>
   </header>
   <div class="entry-content">
-    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
-오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
+    <p>문제 — 이사가 아니라 ‘연속성’이었다 운영 중인 서비스(ECS on EC2)를 EKS로 옮겨야 했습니다. 단순 재배포가 아니라 조건이 있었습니다 — 사용자 영향과 관측 공백을 최소화하면서 옮겨야 했습니다. 시크릿(SSM)·관측(로그·메트릭·트레이스)·트래픽(DNS)의 연속성이 유지돼야 했습니다.
+그래서 이 작업의 핵심은 리소스를 만드는 일이 아니라, 변경 과정에서 어떤 상태를 보존해야 하는지 정의하는 일이었습니다. AI 코치 설계에서 불확실성을 어디서 통제할지를 결정했다면, 인프라 전환에서는 변경 위험을 어디서 통제할지가 핵심이었습니다.
+왜 ECS에서 시작했고, 왜 EKS로 갔나 처음엔 ECS(EC2)로 운영했습니다. 컨테이너를 빠르게 띄우고 운영을 시작하기엔 충분했으니까요. 옮기기로 한 이유는 얻고 싶은 운영 방식이 분명했기 때문입니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
+  <footer class="entry-footer"><span title='2026-06-22 00:00:00 +0000 UTC'>June 22, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환" href="http://localhost:1313/posts/ecs-to-eks-cutover/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나
+    <h2 class="entry-hint-parent">ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드
     </h2>
   </header>
   <div class="entry-content">
-    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 이 글 문제 — 보는 것과 알리는 것이 한 곳에 묶이면 ②편에서 무엇을 알릴지 고르고 문구까지 정했다면, 남는 문제는 알림 룰을 어디에서 평가하고, 어떤 경로로 운영자에게 전달할 것인가였습니다.
-대시보드 도구(Grafana)는 알림 기능도 제공합니다. 거기서 다 하면 편해 보이죠. 그런데 그러면 “보는 것&#34;과 “알리는 것&#34;이 한 컴포넌트에 묶입니다.
-대시보드를 손보다 알림 룰이 흔들릴 수 있고 알림 때문에 대시보드 구성을 못 바꾸게 되고 UI로 만든 룰은 누가 왜 바꿨는지 6개월 뒤에 알 수 없습니다 결정 — 룰은 메트릭 저장소 쪽에 알림 룰을 대시보드가 아니라 메트릭 저장소(AMP) 에 뒀습니다. Grafana 데이터소스에는 알림 관리를 끄는 설정을 명시했고요.
+    <p>배경 — Graviton으로 갔더니 빌드가 갈렸다 노드를 Graviton(arm64)으로 쓰면서 이미지도 arm64로 빌드해야 했습니다. 그런데 backend(Spring)와 fastapi(Python)는 빌드 방식이 자연히 갈렸습니다. 공통점은 셋 다 네이티브 arm64 러너(ubuntu-24.04-arm)에서 platforms: linux/arm64로 빌드하고 buildx 레지스트리 캐시를 쓴다는 것. 차이는 하나였습니다 — “무엇을 Docker 안에서 빌드하느냐.”
+backend — JAR을 Docker 밖에서 빌드해 COPY CI 단계(Docker 밖): ./gradlew bootJar → app.jar Dockerfile: COPY app.jar (base = JRE 런타임, gradle 없음) 핵심은 JAR이 아키텍처 중립(JVM 바이트코드) 이라는 점입니다. 어디서 빌드하든 결과가 같으니, Gradle 컴파일을 Docker 밖 CI 단계에서 끝내고 Dockerfile은 완성된 JAR만 COPY합니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/"></a>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to ARM64 CI 빌드 전략 — 같은 클러스터, 두 개의 다른 Docker 빌드" href="http://localhost:1313/posts/arm64-ci-build-strategy/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.
+부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나" href="http://localhost:1313/posts/gitops-argocd-drift/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 

@@ -147,30 +147,17 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
+    <h2 class="entry-hint-parent">관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기
     </h2>
   </header>
   <div class="entry-content">
-    <p>배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.
-부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.
+    <p>문제 — 관측을 켰더니 비용이 컨트롤 플레인을 넘었다 prod 비용을 실측했더니 관리형 Prometheus(AMP)가 EKS 컨트롤 플레인보다 컸습니다. AMP는 수집 샘플 수로 과금되는데, 수집 설정(config.alloy)에는 메트릭 필터가 하나도 없었습니다. 수집되는 모든 시계열이 그대로 AMP로 remote_write되고 있었던 거죠.
+관측성을 늘리는 건 좋은데, “무엇을 얼마나 보내는지&#34;를 안 보고 늘리면 비용이 조용히 새 나갑니다.
+가설 — “node-exporter가 주범이겠지” 처음 심증은 node-exporter였습니다. node-exporter는 노드당 1,000개가 넘는 시계열을 기본으로 내보내는데, 대시보드·알림이 쓰는 건 일부뿐이니 그걸 자르면 될 것 같았습니다. 그럴듯한 가설이었습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나" href="http://localhost:1313/posts/gitops-argocd-drift/"></a>
-</article>
-
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
-오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
+  <footer class="entry-footer"><span title='2026-07-25 00:00:00 +0000 UTC'>July 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기" href="http://localhost:1313/posts/amp-spanmetrics-cost/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
@@ -190,17 +177,31 @@ $ kubectl get hpa -A NAME TARGETS AGE backend cpu:&lt;unknown&gt;/70% 12d fastap
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기
+    <h2 class="entry-hint-parent">GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기
     </h2>
   </header>
   <div class="entry-content">
-    <p>문제 — 관측을 켰더니 비용이 컨트롤 플레인을 넘었다 prod 비용을 실측했더니 관리형 Prometheus(AMP)가 EKS 컨트롤 플레인보다 컸습니다. AMP는 수집 샘플 수로 과금되는데, 수집 설정(config.alloy)에는 메트릭 필터가 하나도 없었습니다. 수집되는 모든 시계열이 그대로 AMP로 remote_write되고 있었던 거죠.
-관측성을 늘리는 건 좋은데, “무엇을 얼마나 보내는지&#34;를 안 보고 늘리면 비용이 조용히 새 나갑니다.
-가설 — “node-exporter가 주범이겠지” 처음 심증은 node-exporter였습니다. node-exporter는 노드당 1,000개가 넘는 시계열을 기본으로 내보내는데, 대시보드·알림이 쓰는 건 일부뿐이니 그걸 자르면 될 것 같았습니다. 그럴듯한 가설이었습니다.
+    <p>배경 — CI가 클러스터 대신 git을 만진다 GitOps로 옮기면서 CI의 역할이 바뀌었습니다. 예전엔 CI가 클러스터를 직접 갱신했지만, 이제는 이미지를 만들고 오버레이의 이미지 태그를 git에 커밋하는 것까지만 합니다. 클러스터 반영은 ArgoCD가 git을 보고 알아서 하고요.
+그런데 이 구조는 git을 배포 상태의 데이터베이스로 쓴다는 뜻이기도 합니다. 그러면 데이터베이스에서 겪는 문제가 그대로 따라옵니다 — 동시성과 복제 일관성.
+문제 ① 동시 배포가 서로를 밀어낸다 모노레포라 여러 서비스가 한 커밋으로 함께 배포되는 일이 잦았습니다. 그러면 각 서비스의 CD가 동시에 실행되어 같은 브랜치에 push를 시도합니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-07-25 00:00:00 +0000 UTC'>July 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to 관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기" href="http://localhost:1313/posts/amp-spanmetrics-cost/"></a>
+  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기" href="http://localhost:1313/posts/gitops-overlay-bump-race/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
+오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
@@ -221,17 +222,16 @@ RDS는 available DB 쪽 보안그룹 인바운드도 새 보안그룹 ID를 허�
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기
+    <h2 class="entry-hint-parent">GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
     </h2>
   </header>
   <div class="entry-content">
-    <p>배경 — CI가 클러스터 대신 git을 만진다 GitOps로 옮기면서 CI의 역할이 바뀌었습니다. 예전엔 CI가 클러스터를 직접 갱신했지만, 이제는 이미지를 만들고 오버레이의 이미지 태그를 git에 커밋하는 것까지만 합니다. 클러스터 반영은 ArgoCD가 git을 보고 알아서 하고요.
-그런데 이 구조는 git을 배포 상태의 데이터베이스로 쓴다는 뜻이기도 합니다. 그러면 데이터베이스에서 겪는 문제가 그대로 따라옵니다 — 동시성과 복제 일관성.
-문제 ① 동시 배포가 서로를 밀어낸다 모노레포라 여러 서비스가 한 커밋으로 함께 배포되는 일이 잦았습니다. 그러면 각 서비스의 CD가 동시에 실행되어 같은 브랜치에 push를 시도합니다.
+    <p>배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.
+부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기" href="http://localhost:1313/posts/gitops-overlay-bump-race/"></a>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나" href="http://localhost:1313/posts/gitops-argocd-drift/"></a>
 </article>
     </main>
     

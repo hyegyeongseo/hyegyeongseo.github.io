@@ -2,9 +2,8 @@
 title: "설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다"
 date: 2026-06-23
 lastmod: 2026-07-27
-weight: 65
 description: "EKS 재기동 후 DB 타임아웃. RDS도 정상이고 보안그룹 인바운드도 새 ID를 허용하는데 연결이 안 됐다. '설정 값'과 '데이터플레인 반영'을 구분하게 된 사례."
-tags: ["kubernetes", "eks", "security-group", "networking", "sre"]
+tags: ["kubernetes", "eks", "security-group", "networking"]
 categories: ["Troubleshooting"]
 ---
 

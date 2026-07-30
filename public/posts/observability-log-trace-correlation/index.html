@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약 | 기록 블로그</title>
+<meta name="keywords" content="observability, opentelemetry, loki, tempo, trace-id, logging, drawe">
+<meta name="description" content="Loki도 Tempo도 정상인데 trace ID로 로그를 못 찾았다. 가설을 세 번 벗겨 로그 패턴에 도달하고, 그다음 print() 157개 앞에서 설정이 무력했던 이야기.">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/observability-log-trace-correlation/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/observability-log-trace-correlation/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/observability-log-trace-correlation/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약">
+  <meta property="og:description" content="Loki도 Tempo도 정상인데 trace ID로 로그를 못 찾았다. 가설을 세 번 벗겨 로그 패턴에 도달하고, 그다음 print() 157개 앞에서 설정이 무력했던 이야기.">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-07-19T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-07-19T00:00:00+00:00">
+    <meta property="article:tag" content="Observability">
+    <meta property="article:tag" content="Opentelemetry">
+    <meta property="article:tag" content="Loki">
+    <meta property="article:tag" content="Tempo">
+    <meta property="article:tag" content="Trace-Id">
+    <meta property="article:tag" content="Logging">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약">
+  <meta name="twitter:description" content="Loki도 Tempo도 정상인데 trace ID로 로그를 못 찾았다. 가설을 세 번 벗겨 로그 패턴에 도달하고, 그다음 print() 157개 앞에서 설정이 무력했던 이야기.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약",
+      "item": "http://localhost:1313/posts/observability-log-trace-correlation/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약",
+  "name": "trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약",
+  "description": "Loki도 Tempo도 정상인데 trace ID로 로그를 못 찾았다. 가설을 세 번 벗겨 로그 패턴에 도달하고, 그다음 print() 157개 앞에서 설정이 무력했던 이야기.",
+  "keywords": [
+    "observability", "opentelemetry", "loki", "tempo", "trace-id", "logging", "drawe"
+  ],
+  "articleBody": "문제 — 수집은 다 되는데 서로를 못 찾는다 3-pillar(메트릭·로그·트레이스)가 전부 떠 있었고 대시보드도 정상이었습니다. 그런데 장애 조사 시 “이 트레이스의 로그” 로 점프가 안 됐습니다.\n[Tempo에서 trace ID 복사] → [Loki에서 검색] → 0건 backend도, fastapi도 마찬가지였습니다. 같은 요청을 가리키면서 두 신호가 서로를 찾지 못하는 상태였습니다.\n왜 이게 중요한가 — 개별 신호의 가치는 상관에서 나온다 관측을 세 신호로 나눠 수집하는 이유는 각각의 강점이 다르기 때문입니다. 메트릭은 추세를, 로그는 이유를, 트레이스는 경로를 보여줍니다.\n문제가 나면 세 신호를 오갑니다. 알림(메트릭) → 트레이스로 병목 지점 확인 → 그 순간의 로그로 원인 확인. 이 흐름이 끊기면 신호를 각각 아무리 잘 모아도, 원인 분석은 여전히 눈대중이 됩니다.\n그래서 이 문제의 목표는 로그와 트레이스를 하나의 요청 컨텍스트 안에서 연결하는 것 이었습니다.\n상관의 계약 — 로그 라인 안에 trace_id를 넣는다 Loki와 Tempo를 잇는 표준 방법은 로그 라인 안에 trace_id를 심고, Loki의 derivedFields가 그 값을 추출해 Tempo 링크로 변환하는 것입니다.\n[로그] 2026-07-23 14:22:11 INFO trace_id:21d9800f...bda9e GET /guide 200 └────────────┬───────────┘ Loki derivedFields regex 가 추출 → Tempo 링크 즉 이 상관에는 세 주체가 관여합니다.\n애플리케이션 — 로그 라인에 trace_id를 실제로 찍어야 합니다 Loki — 로그에서 그 값을 추출하는 regex(derivedFields)를 정확히 알아야 합니다 Tempo — 추출된 값을 받아 해당 trace를 조회할 수 있어야 합니다 셋 중 하나라도 계약이 어긋나면 상관이 조용히 깨집니다. 그리고 깨졌다는 신호가 UI에 뜨지 않습니다 — 그저 검색 결과가 0건일 뿐입니다.\n가설을 세 번 벗겨냈다 수집은 정상이고 대시보드도 뜨는데 상관만 안 된다면, 어디가 끊긴 걸까요. 원인의 후보가 여러 곳이라 가설을 순서대로 벗겨봤습니다.\n① 경로 — Alloy 배선이 잘못됐나 첫 의심은 수집기 배선이었습니다. Alloy가 로그를 Loki로 보낼 때 필드를 잘 넘기고 있는지 확인했습니다. 완비돼 있었습니다. 로그도 정상 도착 중이고, derivedFields 설정도 Grafana에 등록돼 있었습니다.\n경로는 문제가 아니었습니다.\n② 필드 — env로 MDC 캡처를 지시하면 되지 않나 두 번째로 의심한 건 필드 캡처였습니다. OpenTelemetry Java Agent는 MDC(Mapped Diagnostic Context)에 trace_id를 자동으로 넣어줍니다. 그러니 로거가 MDC를 찍도록 설정하면 되지 않을까 — env 변수로 시도했습니다.\n무효했습니다. 그리고 이 지점에서 중요한 것 하나를 알게 됐습니다.\nappender 부재는 env 튜닝으로 못 채운다. 속성을 붙일 주체(로그 appender)가 없는데 “캡처하라” 는 지시는 무의미합니다.\n이 교훈은 나중에 FastAPI 쪽에서 또 한 번 반복됩니다.\n③ 패턴 — 그럼 어디에서 끊긴 걸까 세 번째로, %X{trace_id}를 로그 패턴에 임시로 주입해봤습니다. stdout에 32-hex 문자열이 그대로 찍혔습니다.\n즉 MDC엔 이미 trace_id가 있었고, 로그 패턴이 안 찍고 있었을 뿐이었습니다. OTel Agent는 정상 동작 중이었고, Spring 콘솔 로그 패턴에서 %X 지시자가 빠져 있었던 게 원인이었습니다.\n한 발 더 있었습니다. Loki derivedFields의 regex는 trace_id[\":\\s]+로 되어 있어서 trace_id: 값 은 매치되지만 trace_id= 값 은 매치되지 않습니다. 로그 패턴을 고칠 때 구분자를 :로 정확히 맞춰야 계약이 성립했습니다.\n로그 포맷과 파서 regex는 별개 설정이 아니라 하나의 계약입니다. 한쪽만 고치면 조용히 깨집니다.\nFastAPI에서 마주친 다른 층 — 설정이 prod에서 무효 같은 계약을 FastAPI에도 적용하려 했는데, 여기서는 env 기반 로그 포맷 지정 자체가 prod에서 no-op 이었습니다.\n원인은 uvicorn이었습니다. uvicorn이 애플리케이션보다 먼저 로거를 잡아서, 앱에서 지정하는 로그 포맷이 uvicorn의 기본 포맷에 덮이는 구조였습니다. env로 준 설정은 이미 잡혀 있는 로거 앞에서 무력했습니다.\n커밋 직전 로컬 검증에서 이걸 잡았습니다. env가 아니라 코드에서 logging.basicConfig(force=True)로 root logger를 명시적으로 재설정하는 방식으로 전환했습니다. prod 조건 차이를 커밋 전에 잡을 수 있었다는 게 검증 순서의 값어치였습니다.\n실측으로 확정 — 40요청 → 100% 도달 → 교집합 3 계약을 다 맞춘 뒤 실제로 동작하는지 재봤습니다.\n40요청 발생 → stdout에서 고유 trace_id 48개 확인 (여러 로그 라인에서 반복) → Loki 도달률 100% (로그는 무샘플링) → Tempo 교집합 3 교집합 3은 결함이 아니라 정합의 증거입니다.\n트레이스는 성능 이유로 샘플링을 겁니다. 이 프로젝트는 트레이스 샘플러가 대략 10%로 잡혀 있었고, 40요청이면 확률상 3~4개가 남습니다. 3이 나온 게 오히려 “샘플러가 정직하게 동작 중\"이라는 뜻입니다.\n만약 여기서 40에 가까운 값이 나왔다면 그게 오히려 문제였을 겁니다 — 샘플링이 안 걸린다는 뜻이거나, 검증 방법이 잘못됐다는 뜻이거든요.\n검증할 때 놓치기 쉬운 것 — 배치가 대칭이어야 한다 이런 검증에서 제일 조용히 망가지는 것이 로그만 내는 요청과 트레이스만 내는 요청을 섞는 경우입니다.\n예를 들어 헬스체크는 로그는 남기지만 스팬을 안 만들 수 있고, 반대로 어떤 내부 호출은 스팬만 만들고 로그가 없을 수 있습니다. 이런 요청을 섞어서 재면 교집합이 인위적으로 낮아져 “상관이 안 된다\"고 오판합니다.\n동일한 요청 하나로 로그와 트레이스가 함께 생성되는 시나리오만 골라서 검증해야 합니다.\n후일담 — 계약은 맞췄는데 앱이 그 통로를 안 쓴다 며칠 뒤 FastAPI 쪽 점프 캡처를 뜨려고 Loki를 뒤졌더니 이상한 게 있었습니다.\n$ kubectl logs -n drawe-prod -l app=fastapi-guide --since=1h | grep -c \"trace_id:\" 0 0건. 계약은 맞췄는데 왜 안 나올까 하고 실제 로그 본문을 봤더니 답이 있었습니다.\n{\"body\":\"[llm] grok finish=stop clen=520 reasoning=1506\"} ← 형식이 없음 {\"body\":\"INFO: 10.10.x.x - \\\"GET /health HTTP/1.1\\\" 200 OK\"} ← uvicorn 자체 형식 지정한 trace_id:%(otelTraceID)s 형식을 따르는 로그가 하나도 없었습니다.\n코드를 세어보고서야 원인이 명확해졌습니다.\n서비스 print() logger.* fastapi-guide 157 0 fastapi-embed 256 2 app.py에 log = logging.getLogger(...)로 로거를 만들어 뒀지만, 파이프라인 코드는 그 로거를 쓰지 않았습니다.\nprint()는 파이썬 표준 logging을 거치지 않고 stdout으로 직행합니다. root logger 포맷을 아무리 정확히 고쳐도 print()가 뿌리는 로그에는 아무 영향을 못 줍니다. 계약은 정확했는데 적용 대상이 되는 로그가 사실상 warmup 한 줄뿐 이었던 겁니다.\n끊긴 지점이 한 칸 앞으로 옮겨졌다 원래 정리한 파이프라인은 이랬습니다.\n① trace context 생성 (OTel) ✓ ② 포맷이 trace_id 출력 ✗ ← 원래 여기가 끊긴다고 봤다 ③ regex 가 추출 ... 그런데 실제로는 한 칸이 더 있었습니다.\n① trace context 생성 (OTel) ✓ ② logging 모듈 경유 ✗ ← print() 라 여기서 끊긴다 ③ 포맷이 trace_id 출력 (도달 못 함) ④ regex 가 추출 (도달 못 함) backend(Java)는 프레임워크가 로깅을 강제하니 ②가 자연히 성립합니다. Python은 print()로도 로그가 “보이기” 때문에 ②를 건너뛰고도 개발이 굴러갑니다. 그래서 계약을 맞춰도 절반만 이어졌던 겁니다.\n다만 트레이스 자체는 온전했습니다. print()는 stdout에만 쓰는 것이라 스팬 생성과 무관하거든요. guide.coach가 60초 걸린 병목은 Tempo에서 그대로 보였습니다. 잃은 것은 “그 요청의 로그를 찾아가는 길” 이었고, 그 순간 LLM이 무엇을 반환했는지([llm] grok finish=stop clen=520)를 찾으려면 타임스탬프로 눈대중을 해야 했습니다.\n조치 — 헤드라인 숫자부터 검증했다 print()를 logger 호출로 옮기기로 했는데, 착수 전에 범위 조사부터 했습니다. 157개, 256개라는 헤드라인 숫자가 실제 전환 대상 수와 다를 수 있어서요.\n전체 print() 제외(도구·평가·스크립트·CLI) 실제 전환 대상 fastapi-guide 157 97 60 fastapi-embed 256 253 3 합계 413 63 embed의 256곳 중 253곳은 scripts/ (일회성 인덱싱·재구성 도구)였습니다. 요청 컨텍스트 밖에서 도는 배치라 로거로 옮겨도 trace_id: 0만 찍힙니다.\n“157곳을 고쳐야 한다\"는 전제부터 검증해야 했습니다. 조사만으로도 작업 범위가 60개로 줄었습니다.\n전환 자체는 기계적이었지만, 두 가지가 함께 붙어 있었습니다. 로거 이름을 drawe-fastapi.guide. 로 붙였는데, app.py가 setLevel(INFO)하는 네임스페이스 하위여야 실제로 출력됩니다 — 한 글자만 틀리면 조용히 안 찍힙니다. 그리고 로컬 관측 스택을 열어보니 docker-compose.observability.yml에 OTEL_PYTHON_LOG_FORMAT이 없었고 guide 서비스 블록 자체가 빠져 있었습니다. 로컬에서 재현할 수 없는 상태였다는 뜻이라, 같은 PR에서 ConfigMap과 byte-identical하게 정합을 맞췄습니다.\n배포하고 확인 — 대조 실측으로 증명 동일한 /guide 요청(Grok 실호출 포함, 둘 다 200)으로 코드 변수만 격리해 비교했습니다.\ntrace_id: 문자열 32hex(요청 컨텍스트) BEFORE (print) 2 0 AFTER (logger) 8 5 BEFORE에서 trace_id:가 2건 잡힌 건 이미 logger를 쓰던 warmup 로그였습니다. 판정 기준인 32hex는 정확히 0 → 5 로 갈렸습니다. prod 배포 후에도 같은 수치가 재현됐고, Grafana에서 FastAPI 로그의 trace_id를 눌러 Tempo로 점프하는 것도 확인했습니다.\n점프한 트레이스에서는 backend 자동 계측과 guide 수동 계측이 한 계층으로 이어져 보였고, guide.coach가 전체 1분 18초 중 50.3초(64%) 를 쓰는 병목도 그대로 읽혔습니다. 이제 그 순간의 로그도 함께 볼 수 있게 됐습니다.\n배운 점 관측의 가치는 개별 신호가 아니라 신호 사이의 연결에서 나온다. 잘 모으는 것과 잘 잇는 것은 다른 문제다. 로그 포맷과 파서 regex는 하나의 계약이다. 구분자 하나만 어긋나도 상관이 조용히 깨진다. appender 부재는 env 튜닝으로 못 채운다. 속성을 붙일 주체가 없는데 캡처하라는 지시는 무의미하다. 설정을 고치기 전에 그 통로를 앱이 실제로 쓰는지 세어봐야 한다. print() 157개 앞에서 로거 설정은 무력하다. 헤드라인 숫자부터 검증한다. “157곳\"이 실제로는 60곳이고 “256곳\"이 3곳이었다. 범위 조사 자체가 작업의 절반이다. 검증 배치는 대칭이어야 한다. 로그만 내는 요청과 트레이스만 내는 요청을 섞으면 교집합이 인위적으로 낮아져 오판이 난다. ",
+  "wordCount" : "1225",
+  "inLanguage": "en",
+  "datePublished": "2026-07-19T00:00:00Z",
+  "dateModified": "2026-07-19T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/observability-log-trace-correlation/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약
+      </h1>
+      <p class="post-description">Loki도 Tempo도 정상인데 trace ID로 로그를 못 찾았다. 가설을 세 번 벗겨 로그 패턴에 도달하고, 그다음 print() 157개 앞에서 설정이 무력했던 이야기.</p>
+      <div class="post-meta"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%eb%ac%b8%ec%a0%9c--%ec%88%98%ec%a7%91%ec%9d%80-%eb%8b%a4-%eb%90%98%eb%8a%94%eb%8d%b0-%ec%84%9c%eb%a1%9c%eb%a5%bc-%eb%aa%bb-%ec%b0%be%eb%8a%94%eb%8b%a4" aria-label="문제 — 수집은 다 되는데 서로를 못 찾는다">문제 — 수집은 다 되는데 서로를 못 찾는다</a></li>
+            <li>
+                <a href="#%ec%99%9c-%ec%9d%b4%ea%b2%8c-%ec%a4%91%ec%9a%94%ed%95%9c%ea%b0%80--%ea%b0%9c%eb%b3%84-%ec%8b%a0%ed%98%b8%ec%9d%98-%ea%b0%80%ec%b9%98%eb%8a%94-%ec%83%81%ea%b4%80%ec%97%90%ec%84%9c-%eb%82%98%ec%98%a8%eb%8b%a4" aria-label="왜 이게 중요한가 — 개별 신호의 가치는 상관에서 나온다">왜 이게 중요한가 — 개별 신호의 가치는 상관에서 나온다</a></li>
+            <li>
+                <a href="#%ec%83%81%ea%b4%80%ec%9d%98-%ea%b3%84%ec%95%bd--%eb%a1%9c%ea%b7%b8-%eb%9d%bc%ec%9d%b8-%ec%95%88%ec%97%90-trace_id%eb%a5%bc-%eb%84%a3%eb%8a%94%eb%8b%a4" aria-label="상관의 계약 — 로그 라인 안에 trace_id를 넣는다">상관의 계약 — 로그 라인 안에 trace_id를 넣는다</a></li>
+            <li>
+                <a href="#%ea%b0%80%ec%84%a4%ec%9d%84-%ec%84%b8-%eb%b2%88-%eb%b2%97%ea%b2%a8%eb%83%88%eb%8b%a4" aria-label="가설을 세 번 벗겨냈다">가설을 세 번 벗겨냈다</a><ul>
+            <li>
+                <a href="#-%ea%b2%bd%eb%a1%9c--alloy-%eb%b0%b0%ec%84%a0%ec%9d%b4-%ec%9e%98%eb%aa%bb%eb%90%90%eb%82%98" aria-label="① 경로 — Alloy 배선이 잘못됐나">① 경로 — Alloy 배선이 잘못됐나</a></li>
+            <li>
+                <a href="#-%ed%95%84%eb%93%9c--env%eb%a1%9c-mdc-%ec%ba%a1%ec%b2%98%eb%a5%bc-%ec%a7%80%ec%8b%9c%ed%95%98%eb%a9%b4-%eb%90%98%ec%a7%80-%ec%95%8a%eb%82%98" aria-label="② 필드 — env로 MDC 캡처를 지시하면 되지 않나">② 필드 — env로 MDC 캡처를 지시하면 되지 않나</a></li>
+            <li>
+                <a href="#-%ed%8c%a8%ed%84%b4--%ea%b7%b8%eb%9f%bc-%ec%96%b4%eb%94%94%ec%97%90%ec%84%9c-%eb%81%8a%ea%b8%b4-%ea%b1%b8%ea%b9%8c" aria-label="③ 패턴 — 그럼 어디에서 끊긴 걸까">③ 패턴 — 그럼 어디에서 끊긴 걸까</a></li></ul>
+            </li>
+            <li>
+                <a href="#fastapi%ec%97%90%ec%84%9c-%eb%a7%88%ec%a3%bc%ec%b9%9c-%eb%8b%a4%eb%a5%b8-%ec%b8%b5--%ec%84%a4%ec%a0%95%ec%9d%b4-prod%ec%97%90%ec%84%9c-%eb%ac%b4%ed%9a%a8" aria-label="FastAPI에서 마주친 다른 층 — 설정이 prod에서 무효">FastAPI에서 마주친 다른 층 — 설정이 prod에서 무효</a></li>
+            <li>
+                <a href="#%ec%8b%a4%ec%b8%a1%ec%9c%bc%eb%a1%9c-%ed%99%95%ec%a0%95--40%ec%9a%94%ec%b2%ad--100-%eb%8f%84%eb%8b%ac--%ea%b5%90%ec%a7%91%ed%95%a9-3" aria-label="실측으로 확정 — 40요청 → 100% 도달 → 교집합 3">실측으로 확정 — 40요청 → 100% 도달 → 교집합 3</a><ul>
+            <li>
+                <a href="#%ea%b2%80%ec%a6%9d%ed%95%a0-%eb%95%8c-%eb%86%93%ec%b9%98%ea%b8%b0-%ec%89%ac%ec%9a%b4-%ea%b2%83--%eb%b0%b0%ec%b9%98%ea%b0%80-%eb%8c%80%ec%b9%ad%ec%9d%b4%ec%96%b4%ec%95%bc-%ed%95%9c%eb%8b%a4" aria-label="검증할 때 놓치기 쉬운 것 — 배치가 대칭이어야 한다">검증할 때 놓치기 쉬운 것 — 배치가 대칭이어야 한다</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ed%9b%84%ec%9d%bc%eb%8b%b4--%ea%b3%84%ec%95%bd%ec%9d%80-%eb%a7%9e%ec%b7%84%eb%8a%94%eb%8d%b0-%ec%95%b1%ec%9d%b4-%ea%b7%b8-%ed%86%b5%eb%a1%9c%eb%a5%bc-%ec%95%88-%ec%93%b4%eb%8b%a4" aria-label="후일담 — 계약은 맞췄는데 앱이 그 통로를 안 쓴다">후일담 — 계약은 맞췄는데 앱이 그 통로를 안 쓴다</a><ul>
+            <li>
+                <a href="#%eb%81%8a%ea%b8%b4-%ec%a7%80%ec%a0%90%ec%9d%b4-%ed%95%9c-%ec%b9%b8-%ec%95%9e%ec%9c%bc%eb%a1%9c-%ec%98%ae%ea%b2%a8%ec%a1%8c%eb%8b%a4" aria-label="끊긴 지점이 한 칸 앞으로 옮겨졌다">끊긴 지점이 한 칸 앞으로 옮겨졌다</a></li></ul>
+            </li>
+            <li>
+                <a href="#%ec%a1%b0%ec%b9%98--%ed%97%a4%eb%93%9c%eb%9d%bc%ec%9d%b8-%ec%88%ab%ec%9e%90%eb%b6%80%ed%84%b0-%ea%b2%80%ec%a6%9d%ed%96%88%eb%8b%a4" aria-label="조치 — 헤드라인 숫자부터 검증했다">조치 — 헤드라인 숫자부터 검증했다</a></li>
+            <li>
+                <a href="#%eb%b0%b0%ed%8f%ac%ed%95%98%ea%b3%a0-%ed%99%95%ec%9d%b8--%eb%8c%80%ec%a1%b0-%ec%8b%a4%ec%b8%a1%ec%9c%bc%eb%a1%9c-%ec%a6%9d%eb%aa%85" aria-label="배포하고 확인 — 대조 실측으로 증명">배포하고 확인 — 대조 실측으로 증명</a></li>
+            <li>
+                <a href="#%eb%b0%b0%ec%9a%b4-%ec%a0%90" aria-label="배운 점">배운 점</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <h2 id="문제--수집은-다-되는데-서로를-못-찾는다">문제 — 수집은 다 되는데 서로를 못 찾는다</h2>
+<p>3-pillar(메트릭·로그·트레이스)가 전부 떠 있었고 대시보드도 정상이었습니다. 그런데 장애 조사 시 <strong>&ldquo;이 트레이스의 로그&rdquo;</strong> 로 점프가 안 됐습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">[Tempo에서 trace ID 복사] → [Loki에서 검색] → 0건
+</span></span></code></pre></div><p>backend도, fastapi도 마찬가지였습니다. 같은 요청을 가리키면서 두 신호가 서로를 찾지 못하는 상태였습니다.</p>
+<h2 id="왜-이게-중요한가--개별-신호의-가치는-상관에서-나온다">왜 이게 중요한가 — 개별 신호의 가치는 상관에서 나온다</h2>
+<p>관측을 세 신호로 나눠 수집하는 이유는 각각의 강점이 다르기 때문입니다. 메트릭은 추세를, 로그는 이유를, 트레이스는 경로를 보여줍니다.</p>
+<p>문제가 나면 세 신호를 오갑니다. <strong>알림(메트릭) → 트레이스로 병목 지점 확인 → 그 순간의 로그로 원인 확인.</strong> 이 흐름이 끊기면 신호를 각각 아무리 잘 모아도, 원인 분석은 여전히 눈대중이 됩니다.</p>
+<p>그래서 이 문제의 목표는 <strong>로그와 트레이스를 하나의 요청 컨텍스트 안에서 연결하는 것</strong> 이었습니다.</p>
+<h2 id="상관의-계약--로그-라인-안에-trace_id를-넣는다">상관의 계약 — 로그 라인 안에 trace_id를 넣는다</h2>
+<p>Loki와 Tempo를 잇는 표준 방법은 <strong>로그 라인 안에 trace_id를 심고, Loki의 <code>derivedFields</code>가 그 값을 추출해 Tempo 링크로 변환</strong>하는 것입니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">[로그]  2026-07-23 14:22:11 INFO  trace_id:21d9800f...bda9e  GET /guide 200
+</span></span><span class="line"><span class="cl">                                  └────────────┬───────────┘
+</span></span><span class="line"><span class="cl">                                  Loki derivedFields regex 가 추출 → Tempo 링크
+</span></span></code></pre></div><p>즉 이 상관에는 <strong>세 주체가 관여</strong>합니다.</p>
+<ol>
+<li><strong>애플리케이션</strong> — 로그 라인에 trace_id를 실제로 찍어야 합니다</li>
+<li><strong>Loki</strong> — 로그에서 그 값을 추출하는 regex(<code>derivedFields</code>)를 정확히 알아야 합니다</li>
+<li><strong>Tempo</strong> — 추출된 값을 받아 해당 trace를 조회할 수 있어야 합니다</li>
+</ol>
+<p>셋 중 하나라도 계약이 어긋나면 상관이 조용히 깨집니다. 그리고 <strong>깨졌다는 신호가 UI에 뜨지 않습니다</strong> — 그저 검색 결과가 0건일 뿐입니다.</p>
+<h2 id="가설을-세-번-벗겨냈다">가설을 세 번 벗겨냈다</h2>
+<p>수집은 정상이고 대시보드도 뜨는데 상관만 안 된다면, 어디가 끊긴 걸까요. 원인의 후보가 여러 곳이라 가설을 순서대로 벗겨봤습니다.</p>
+<h3 id="-경로--alloy-배선이-잘못됐나">① 경로 — Alloy 배선이 잘못됐나</h3>
+<p>첫 의심은 수집기 배선이었습니다. Alloy가 로그를 Loki로 보낼 때 필드를 잘 넘기고 있는지 확인했습니다. <strong>완비돼 있었습니다.</strong> 로그도 정상 도착 중이고, <code>derivedFields</code> 설정도 Grafana에 등록돼 있었습니다.</p>
+<p>경로는 문제가 아니었습니다.</p>
+<h3 id="-필드--env로-mdc-캡처를-지시하면-되지-않나">② 필드 — env로 MDC 캡처를 지시하면 되지 않나</h3>
+<p>두 번째로 의심한 건 필드 캡처였습니다. OpenTelemetry Java Agent는 MDC(Mapped Diagnostic Context)에 <code>trace_id</code>를 자동으로 넣어줍니다. 그러니 로거가 MDC를 찍도록 설정하면 되지 않을까 — env 변수로 시도했습니다.</p>
+<p><strong>무효했습니다.</strong> 그리고 이 지점에서 중요한 것 하나를 알게 됐습니다.</p>
+<blockquote>
+<p><strong>appender 부재는 env 튜닝으로 못 채운다.</strong>
+속성을 붙일 주체(로그 appender)가 없는데 <em>&ldquo;캡처하라&rdquo;</em> 는 지시는 무의미합니다.</p>
+</blockquote>
+<p>이 교훈은 나중에 FastAPI 쪽에서 또 한 번 반복됩니다.</p>
+<h3 id="-패턴--그럼-어디에서-끊긴-걸까">③ 패턴 — 그럼 어디에서 끊긴 걸까</h3>
+<p>세 번째로, <code>%X{trace_id}</code>를 로그 패턴에 임시로 주입해봤습니다. stdout에 <strong>32-hex</strong> 문자열이 그대로 찍혔습니다.</p>
+<p>즉 <strong>MDC엔 이미 trace_id가 있었고, 로그 패턴이 안 찍고 있었을 뿐</strong>이었습니다. OTel Agent는 정상 동작 중이었고, Spring 콘솔 로그 패턴에서 <code>%X</code> 지시자가 빠져 있었던 게 원인이었습니다.</p>
+<p>한 발 더 있었습니다. Loki <code>derivedFields</code>의 regex는 <code>trace_id[&quot;:\s]+</code>로 되어 있어서 <strong><code>trace_id: 값</code> 은 매치되지만 <code>trace_id= 값</code> 은 매치되지 않습니다.</strong> 로그 패턴을 고칠 때 구분자를 <code>:</code>로 정확히 맞춰야 계약이 성립했습니다.</p>
+<blockquote>
+<p><strong>로그 포맷과 파서 regex는 별개 설정이 아니라 하나의 계약입니다.</strong> 한쪽만 고치면 조용히 깨집니다.</p>
+</blockquote>
+<h2 id="fastapi에서-마주친-다른-층--설정이-prod에서-무효">FastAPI에서 마주친 다른 층 — 설정이 prod에서 무효</h2>
+<p>같은 계약을 FastAPI에도 적용하려 했는데, 여기서는 <strong>env 기반 로그 포맷 지정 자체가 prod에서 no-op</strong> 이었습니다.</p>
+<p>원인은 uvicorn이었습니다. uvicorn이 애플리케이션보다 먼저 로거를 잡아서, 앱에서 지정하는 로그 포맷이 uvicorn의 기본 포맷에 <strong>덮이는 구조</strong>였습니다. env로 준 설정은 이미 잡혀 있는 로거 앞에서 무력했습니다.</p>
+<p>커밋 직전 로컬 검증에서 이걸 잡았습니다. env가 아니라 코드에서 <code>logging.basicConfig(force=True)</code>로 root logger를 명시적으로 재설정하는 방식으로 전환했습니다. <strong>prod 조건 차이를 커밋 전에 잡을 수 있었다</strong>는 게 검증 순서의 값어치였습니다.</p>
+<h2 id="실측으로-확정--40요청--100-도달--교집합-3">실측으로 확정 — 40요청 → 100% 도달 → 교집합 3</h2>
+<p>계약을 다 맞춘 뒤 실제로 동작하는지 재봤습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">40요청 발생
+</span></span><span class="line"><span class="cl">  → stdout에서 고유 trace_id 48개 확인 (여러 로그 라인에서 반복)
+</span></span><span class="line"><span class="cl">  → Loki 도달률 100% (로그는 무샘플링)
+</span></span><span class="line"><span class="cl">  → Tempo 교집합 3
+</span></span></code></pre></div><p><strong>교집합 3은 결함이 아니라 정합의 증거입니다.</strong></p>
+<p>트레이스는 성능 이유로 샘플링을 겁니다. 이 프로젝트는 트레이스 샘플러가 대략 10%로 잡혀 있었고, 40요청이면 확률상 <strong>3~4개</strong>가 남습니다. 3이 나온 게 오히려 &ldquo;샘플러가 정직하게 동작 중&quot;이라는 뜻입니다.</p>
+<p>만약 여기서 40에 가까운 값이 나왔다면 그게 오히려 문제였을 겁니다 — 샘플링이 안 걸린다는 뜻이거나, 검증 방법이 잘못됐다는 뜻이거든요.</p>
+<h3 id="검증할-때-놓치기-쉬운-것--배치가-대칭이어야-한다">검증할 때 놓치기 쉬운 것 — 배치가 대칭이어야 한다</h3>
+<p>이런 검증에서 제일 조용히 망가지는 것이 <strong>로그만 내는 요청과 트레이스만 내는 요청을 섞는 경우</strong>입니다.</p>
+<p>예를 들어 헬스체크는 로그는 남기지만 스팬을 안 만들 수 있고, 반대로 어떤 내부 호출은 스팬만 만들고 로그가 없을 수 있습니다. 이런 요청을 섞어서 재면 교집합이 인위적으로 낮아져 <strong>&ldquo;상관이 안 된다&quot;고 오판</strong>합니다.</p>
+<p>동일한 요청 하나로 로그와 트레이스가 함께 생성되는 시나리오만 골라서 검증해야 합니다.</p>
+<h2 id="후일담--계약은-맞췄는데-앱이-그-통로를-안-쓴다">후일담 — 계약은 맞췄는데 앱이 그 통로를 안 쓴다</h2>
+<p>며칠 뒤 FastAPI 쪽 점프 캡처를 뜨려고 Loki를 뒤졌더니 이상한 게 있었습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">$ kubectl logs -n drawe-prod -l app=fastapi-guide --since=1h | grep -c &#34;trace_id:&#34;
+</span></span><span class="line"><span class="cl">0
+</span></span></code></pre></div><p><strong>0건.</strong> 계약은 맞췄는데 왜 안 나올까 하고 실제 로그 본문을 봤더니 답이 있었습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">{&#34;body&#34;:&#34;[llm] grok finish=stop clen=520 reasoning=1506&#34;}          ← 형식이 없음
+</span></span><span class="line"><span class="cl">{&#34;body&#34;:&#34;INFO:     10.10.x.x - \&#34;GET /health HTTP/1.1\&#34; 200 OK&#34;} ← uvicorn 자체 형식
+</span></span></code></pre></div><p>지정한 <code>trace_id:%(otelTraceID)s</code> 형식을 따르는 로그가 하나도 없었습니다.</p>
+<p>코드를 세어보고서야 원인이 명확해졌습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>서비스</th>
+          <th style="text-align: right"><code>print()</code></th>
+          <th style="text-align: right"><code>logger.*</code></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>fastapi-guide</td>
+          <td style="text-align: right"><strong>157</strong></td>
+          <td style="text-align: right"><strong>0</strong></td>
+      </tr>
+      <tr>
+          <td>fastapi-embed</td>
+          <td style="text-align: right"><strong>256</strong></td>
+          <td style="text-align: right">2</td>
+      </tr>
+  </tbody>
+</table>
+<p><code>app.py</code>에 <code>log = logging.getLogger(...)</code>로 로거를 만들어 뒀지만, <strong>파이프라인 코드는 그 로거를 쓰지 않았습니다.</strong></p>
+<p><code>print()</code>는 파이썬 표준 logging을 거치지 않고 stdout으로 직행합니다. root logger 포맷을 아무리 정확히 고쳐도 <code>print()</code>가 뿌리는 로그에는 아무 영향을 못 줍니다. 계약은 정확했는데 <strong>적용 대상이 되는 로그가 사실상 warmup 한 줄뿐</strong> 이었던 겁니다.</p>
+<h3 id="끊긴-지점이-한-칸-앞으로-옮겨졌다">끊긴 지점이 한 칸 앞으로 옮겨졌다</h3>
+<p>원래 정리한 파이프라인은 이랬습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">① trace context 생성 (OTel)        ✓
+</span></span><span class="line"><span class="cl">② 포맷이 trace_id 출력              ✗ ← 원래 여기가 끊긴다고 봤다
+</span></span><span class="line"><span class="cl">③ regex 가 추출                     ...
+</span></span></code></pre></div><p>그런데 실제로는 한 칸이 더 있었습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">① trace context 생성 (OTel)        ✓
+</span></span><span class="line"><span class="cl">② logging 모듈 경유                 ✗ ← print() 라 여기서 끊긴다
+</span></span><span class="line"><span class="cl">③ 포맷이 trace_id 출력              (도달 못 함)
+</span></span><span class="line"><span class="cl">④ regex 가 추출                     (도달 못 함)
+</span></span></code></pre></div><p>backend(Java)는 프레임워크가 로깅을 강제하니 ②가 자연히 성립합니다. Python은 <code>print()</code>로도 로그가 &ldquo;보이기&rdquo; 때문에 ②를 건너뛰고도 개발이 굴러갑니다. 그래서 <strong>계약을 맞춰도 절반만 이어졌던</strong> 겁니다.</p>
+<p>다만 트레이스 자체는 온전했습니다. <code>print()</code>는 stdout에만 쓰는 것이라 스팬 생성과 무관하거든요. <code>guide.coach</code>가 60초 걸린 병목은 Tempo에서 그대로 보였습니다. <strong>잃은 것은 &ldquo;그 요청의 로그를 찾아가는 길&rdquo;</strong> 이었고, 그 순간 LLM이 무엇을 반환했는지(<code>[llm] grok finish=stop clen=520</code>)를 찾으려면 타임스탬프로 눈대중을 해야 했습니다.</p>
+<h2 id="조치--헤드라인-숫자부터-검증했다">조치 — 헤드라인 숫자부터 검증했다</h2>
+<p><code>print()</code>를 <code>logger</code> 호출로 옮기기로 했는데, 착수 전에 <strong>범위 조사부터</strong> 했습니다. 157개, 256개라는 헤드라인 숫자가 실제 전환 대상 수와 다를 수 있어서요.</p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th style="text-align: right">전체 <code>print()</code></th>
+          <th style="text-align: right">제외(도구·평가·스크립트·CLI)</th>
+          <th style="text-align: right"><strong>실제 전환 대상</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>fastapi-guide</td>
+          <td style="text-align: right">157</td>
+          <td style="text-align: right">97</td>
+          <td style="text-align: right"><strong>60</strong></td>
+      </tr>
+      <tr>
+          <td>fastapi-embed</td>
+          <td style="text-align: right">256</td>
+          <td style="text-align: right">253</td>
+          <td style="text-align: right"><strong>3</strong></td>
+      </tr>
+      <tr>
+          <td><strong>합계</strong></td>
+          <td style="text-align: right">413</td>
+          <td style="text-align: right"></td>
+          <td style="text-align: right"><strong>63</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p>embed의 256곳 중 253곳은 <code>scripts/</code> (일회성 인덱싱·재구성 도구)였습니다. 요청 컨텍스트 밖에서 도는 배치라 로거로 옮겨도 <code>trace_id: 0</code>만 찍힙니다.</p>
+<blockquote>
+<p><strong>&ldquo;157곳을 고쳐야 한다&quot;는 전제부터 검증해야 했습니다.</strong> 조사만으로도 작업 범위가 60개로 줄었습니다.</p>
+</blockquote>
+<p>전환 자체는 기계적이었지만, 두 가지가 함께 붙어 있었습니다. <strong>로거 이름</strong>을 <code>drawe-fastapi.guide.&lt;module.path&gt;</code> 로 붙였는데, <code>app.py</code>가 <code>setLevel(INFO)</code>하는 네임스페이스 하위여야 실제로 출력됩니다 — 한 글자만 틀리면 조용히 안 찍힙니다. 그리고 <strong>로컬 관측 스택</strong>을 열어보니 <code>docker-compose.observability.yml</code>에 <code>OTEL_PYTHON_LOG_FORMAT</code>이 없었고 <code>guide</code> 서비스 블록 자체가 빠져 있었습니다. 로컬에서 재현할 수 없는 상태였다는 뜻이라, 같은 PR에서 ConfigMap과 byte-identical하게 정합을 맞췄습니다.</p>
+<h2 id="배포하고-확인--대조-실측으로-증명">배포하고 확인 — 대조 실측으로 증명</h2>
+<p>동일한 <code>/guide</code> 요청(Grok 실호출 포함, 둘 다 200)으로 코드 변수만 격리해 비교했습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th style="text-align: right"><code>trace_id:</code> 문자열</th>
+          <th style="text-align: right"><strong>32hex(요청 컨텍스트)</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>BEFORE (<code>print</code>)</td>
+          <td style="text-align: right">2</td>
+          <td style="text-align: right"><strong>0</strong></td>
+      </tr>
+      <tr>
+          <td>AFTER (<code>logger</code>)</td>
+          <td style="text-align: right">8</td>
+          <td style="text-align: right"><strong>5</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p>BEFORE에서 <code>trace_id:</code>가 2건 잡힌 건 이미 logger를 쓰던 warmup 로그였습니다. 판정 기준인 32hex는 정확히 0 → 5 로 갈렸습니다. prod 배포 후에도 같은 수치가 재현됐고, Grafana에서 FastAPI 로그의 <code>trace_id</code>를 눌러 Tempo로 점프하는 것도 확인했습니다.</p>
+<p><img alt="로그의 trace_id 링크를 누르면 Tempo 로 이동한다" loading="lazy" src="/images/posts/observability-loki-trace-jump.png"></p>
+<p>점프한 트레이스에서는 backend 자동 계측과 guide 수동 계측이 한 계층으로 이어져 보였고, <code>guide.coach</code>가 전체 1분 18초 중 <strong>50.3초(64%)</strong> 를 쓰는 병목도 그대로 읽혔습니다. 이제 그 순간의 로그도 함께 볼 수 있게 됐습니다.</p>
+<h2 id="배운-점">배운 점</h2>
+<ol>
+<li><strong>관측의 가치는 개별 신호가 아니라 신호 사이의 연결에서 나온다.</strong> 잘 모으는 것과 잘 잇는 것은 다른 문제다.</li>
+<li><strong>로그 포맷과 파서 regex는 하나의 계약이다.</strong> 구분자 하나만 어긋나도 상관이 조용히 깨진다.</li>
+<li><strong>appender 부재는 env 튜닝으로 못 채운다.</strong> 속성을 붙일 주체가 없는데 캡처하라는 지시는 무의미하다.</li>
+<li><strong>설정을 고치기 전에 그 통로를 앱이 실제로 쓰는지 세어봐야 한다.</strong> <code>print()</code> 157개 앞에서 로거 설정은 무력하다.</li>
+<li><strong>헤드라인 숫자부터 검증한다.</strong> &ldquo;157곳&quot;이 실제로는 60곳이고 &ldquo;256곳&quot;이 3곳이었다. 범위 조사 자체가 작업의 절반이다.</li>
+<li><strong>검증 배치는 대칭이어야 한다.</strong> 로그만 내는 요청과 트레이스만 내는 요청을 섞으면 교집합이 인위적으로 낮아져 오판이 난다.</li>
+</ol>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/observability/">observability</a>
+      <a href="http://localhost:1313/tags/opentelemetry/">opentelemetry</a>
+      <a href="http://localhost:1313/tags/loki/">loki</a>
+      <a href="http://localhost:1313/tags/tempo/">tempo</a>
+      <a href="http://localhost:1313/tags/trace-id/">trace-id</a>
+      <a href="http://localhost:1313/tags/logging/">logging</a>
+      <a href="http://localhost:1313/tags/drawe/">drawe</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/">
+    <span class="title">« 이전 페이지</span>
+    <span>Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/gitops-overlay-bump-race/">
+    <span class="title">다음 페이지 »</span>
+    <span>GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

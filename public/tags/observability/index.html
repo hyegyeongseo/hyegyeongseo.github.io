@@ -10,7 +10,7 @@
 <meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/observability/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -171,31 +171,32 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가
+    <h2 class="entry-hint-parent">관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기
     </h2>
   </header>
   <div class="entry-content">
-    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 이 글 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 배경 — 계측 규격부터 정했다 관측성을 구축하면서 가장 먼저 결정한 건 저장소가 아니라 계측 규격(OpenTelemetry) 이었습니다. 저장소는 나중에 교체할 수 있지만, 애플리케이션 곳곳에 들어가는 계측 코드는 한 번 적용하면 바꾸기 어렵기 때문입니다.
-왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게 OpenTelemetry를 고른 이유는 특정 벤더에 묶이지 않기 위해서입니다.
-애플리케이션은 OTLP로 내보내는 것까지만 알면 됩니다. 그 신호를 어디에 담을지는 수집기(Alloy)가 정하죠. 그래서 저장소가 바뀌어도 앱 코드는 그대로 두고 수집기 설정만 바꾸면 됩니다.
+    <p>문제 — 관측을 켰더니 비용이 컨트롤 플레인을 넘었다 prod 비용을 실측했더니 관리형 Prometheus(AMP)가 EKS 컨트롤 플레인보다 컸습니다. AMP는 수집 샘플 수로 과금되는데, 수집 설정(config.alloy)에는 메트릭 필터가 하나도 없었습니다. 수집되는 모든 시계열이 그대로 AMP로 remote_write되고 있었던 거죠.
+관측성을 늘리는 건 좋은데, “무엇을 얼마나 보내는지&#34;를 안 보고 늘리면 비용이 조용히 새 나갑니다.
+가설 — “node-exporter가 주범이겠지” 처음 심증은 node-exporter였습니다. node-exporter는 노드당 1,000개가 넘는 시계열을 기본으로 내보내는데, 대시보드·알림이 쓰는 건 일부뿐이니 그걸 자르면 될 것 같았습니다. 그럴듯한 가설이었습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-23 00:00:00 +0000 UTC'>June 23, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가" href="http://localhost:1313/posts/opentelemetry-observability-stack/"></a>
+  <footer class="entry-footer"><span title='2026-07-25 00:00:00 +0000 UTC'>July 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기" href="http://localhost:1313/posts/amp-spanmetrics-cost/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
+    <h2 class="entry-hint-parent">trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약
     </h2>
   </header>
   <div class="entry-content">
-    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
-오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
+    <p>문제 — 수집은 다 되는데 서로를 못 찾는다 3-pillar(메트릭·로그·트레이스)가 전부 떠 있었고 대시보드도 정상이었습니다. 그런데 장애 조사 시 “이 트레이스의 로그” 로 점프가 안 됐습니다.
+[Tempo에서 trace ID 복사] → [Loki에서 검색] → 0건 backend도, fastapi도 마찬가지였습니다. 같은 요청을 가리키면서 두 신호가 서로를 찾지 못하는 상태였습니다.
+왜 이게 중요한가 — 개별 신호의 가치는 상관에서 나온다 관측을 세 신호로 나눠 수집하는 이유는 각각의 강점이 다르기 때문입니다. 메트릭은 추세를, 로그는 이유를, 트레이스는 경로를 보여줍니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
+  <footer class="entry-footer"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약" href="http://localhost:1313/posts/observability-log-trace-correlation/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
@@ -215,17 +216,31 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가
     </h2>
   </header>
   <div class="entry-content">
-    <p>문제 — 관측을 켰더니 비용이 컨트롤 플레인을 넘었다 prod 비용을 실측했더니 관리형 Prometheus(AMP)가 EKS 컨트롤 플레인보다 컸습니다. AMP는 수집 샘플 수로 과금되는데, 수집 설정(config.alloy)에는 메트릭 필터가 하나도 없었습니다. 수집되는 모든 시계열이 그대로 AMP로 remote_write되고 있었던 거죠.
-관측성을 늘리는 건 좋은데, “무엇을 얼마나 보내는지&#34;를 안 보고 늘리면 비용이 조용히 새 나갑니다.
-가설 — “node-exporter가 주범이겠지” 처음 심증은 node-exporter였습니다. node-exporter는 노드당 1,000개가 넘는 시계열을 기본으로 내보내는데, 대시보드·알림이 쓰는 건 일부뿐이니 그걸 자르면 될 것 같았습니다. 그럴듯한 가설이었습니다.
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 이 글 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 문제 — 알림은 많을수록 좋은 게 아니다 관측 데이터가 쌓이면 알림은 얼마든지 만들 수 있습니다. CPU가 높으면, 메모리가 차면, 요청이 느리면… 그런데 그렇게 늘리다 보면 두 가지 문제가 생깁니다.
+오탐이 섞이면 사람들이 안 본다. 한 번 “또 그거네&#34;가 되면 진짜 장애도 같이 묻힙니다. 알림을 받아도 뭘 해야 할지 모르면 소용없다. “CPU 85%“만 오면, 그래서 지금 사용자가 불편한 건지, 내가 지금 뭘 봐야 하는지 알 수 없습니다. 그래서 기준을 두 개로 잡았습니다 — 무엇을 알릴 것인가(선택), 그리고 어떻게 말할 것인가(구성).
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-07-25 00:00:00 +0000 UTC'>July 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to 관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기" href="http://localhost:1313/posts/amp-spanmetrics-cost/"></a>
+  <footer class="entry-footer"><span title='2026-06-24 00:00:00 +0000 UTC'>June 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ② — 무엇을 알리고, 어떻게 말할 것인가" href="http://localhost:1313/posts/alert-design-what-and-how/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 이 글 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 배경 — 계측 규격부터 정했다 관측성을 구축하면서 가장 먼저 결정한 건 저장소가 아니라 계측 규격(OpenTelemetry) 이었습니다. 저장소는 나중에 교체할 수 있지만, 애플리케이션 곳곳에 들어가는 계측 코드는 한 번 적용하면 바꾸기 어렵기 때문입니다.
+왜 OpenTelemetry인가 — 저장소를 갈아끼울 수 있게 OpenTelemetry를 고른 이유는 특정 벤더에 묶이지 않기 위해서입니다.
+애플리케이션은 OTLP로 내보내는 것까지만 알면 됩니다. 그 신호를 어디에 담을지는 수집기(Alloy)가 정하죠. 그래서 저장소가 바뀌어도 앱 코드는 그대로 두고 수집기 설정만 바꾸면 됩니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-23 00:00:00 +0000 UTC'>June 23, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가" href="http://localhost:1313/posts/opentelemetry-observability-stack/"></a>
 </article>
     </main>
     

@@ -10,7 +10,7 @@
 <meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/tempo/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -144,6 +144,21 @@
     Tempo
   </h1>
 </header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 수집은 다 되는데 서로를 못 찾는다 3-pillar(메트릭·로그·트레이스)가 전부 떠 있었고 대시보드도 정상이었습니다. 그런데 장애 조사 시 “이 트레이스의 로그” 로 점프가 안 됐습니다.
+[Tempo에서 trace ID 복사] → [Loki에서 검색] → 0건 backend도, fastapi도 마찬가지였습니다. 같은 요청을 가리키면서 두 신호가 서로를 찾지 못하는 상태였습니다.
+왜 이게 중요한가 — 개별 신호의 가치는 상관에서 나온다 관측을 세 신호로 나눠 수집하는 이유는 각각의 강점이 다르기 때문입니다. 메트릭은 추세를, 로그는 이유를, 트레이스는 경로를 보여줍니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약" href="http://localhost:1313/posts/observability-log-trace-correlation/"></a>
+</article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">

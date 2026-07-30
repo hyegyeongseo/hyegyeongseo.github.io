@@ -9,11 +9,11 @@
     <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/categories/troubleshooting/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유</title>
-      <link>http://localhost:1313/posts/hpa-metrics-server-blind-spot/</link>
-      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/hpa-metrics-server-blind-spot/</guid>
-      <description>모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. &amp;#39;고장인가 부재인가&amp;#39;를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지.</description>
+      <title>관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기</title>
+      <link>http://localhost:1313/posts/amp-spanmetrics-cost/</link>
+      <pubDate>Sat, 25 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/amp-spanmetrics-cost/</guid>
+      <description>관리형 Prometheus(AMP) 비용이 EKS 컨트롤 플레인보다 커졌다. &amp;#39;node-exporter겠지&amp;#39;라는 가설을 실측이 뒤집고 spanmetrics(43%)를 범인으로 지목하기까지 — 그리고 검증 도구가 나를 속인 3시간.</description>
     </item>
     <item>
       <title>60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기</title>
@@ -23,18 +23,25 @@
       <description>Kubernetes가 60초 유예를 줬는데 앱은 그 유예를 안 쓰고 있었다. 오진을 두 번 걷어내고, &amp;#39;로그가 찍힌다&amp;#39;가 아니라 &amp;#39;실제로 드레인한다&amp;#39;를 대조 실험으로 증명한 기록.</description>
     </item>
     <item>
-      <title>관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기</title>
-      <link>http://localhost:1313/posts/amp-spanmetrics-cost/</link>
-      <pubDate>Sat, 25 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/amp-spanmetrics-cost/</guid>
-      <description>관리형 Prometheus(AMP) 비용이 EKS 컨트롤 플레인보다 커졌다. &amp;#39;node-exporter겠지&amp;#39;라는 가설을 실측이 뒤집고 spanmetrics(43%)를 범인으로 지목하기까지 — 그리고 검증 도구가 나를 속인 3시간.</description>
+      <title>exit 137인데 OOMKill이 아니었다 — JVM은 limit을 보고, 쿠버네티스는 request를 본다</title>
+      <link>http://localhost:1313/posts/jvm-request-eviction/</link>
+      <pubDate>Wed, 22 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/jvm-request-eviction/</guid>
+      <description>무부하 상태에서도 request를 넘고 있던 파드가 노드 압박이 오자 가장 먼저 축출됐다. exit 137을 OOMKill로 오진했다가 판정 주체를 가르고, MaxRAMPercentage와 request가 구조적으로 어긋나 있던 것을 찾기까지.</description>
     </item>
     <item>
-      <title>설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다</title>
-      <link>http://localhost:1313/posts/sgp-branch-eni-timing/</link>
-      <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/sgp-branch-eni-timing/</guid>
-      <description>EKS 재기동 후 DB 타임아웃. RDS도 정상이고 보안그룹 인바운드도 새 ID를 허용하는데 연결이 안 됐다. &amp;#39;설정 값&amp;#39;과 &amp;#39;데이터플레인 반영&amp;#39;을 구분하게 된 사례.</description>
+      <title>Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유</title>
+      <link>http://localhost:1313/posts/hpa-metrics-server-blind-spot/</link>
+      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/hpa-metrics-server-blind-spot/</guid>
+      <description>모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. &amp;#39;고장인가 부재인가&amp;#39;를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지.</description>
+    </item>
+    <item>
+      <title>trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약</title>
+      <link>http://localhost:1313/posts/observability-log-trace-correlation/</link>
+      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/observability-log-trace-correlation/</guid>
+      <description>Loki도 Tempo도 정상인데 trace ID로 로그를 못 찾았다. 가설을 세 번 벗겨 로그 패턴에 도달하고, 그다음 print() 157개 앞에서 설정이 무력했던 이야기.</description>
     </item>
     <item>
       <title>GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기</title>
@@ -42,6 +49,13 @@
       <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/gitops-overlay-bump-race/</guid>
       <description>여러 서비스의 CD가 같은 브랜치에 동시에 push하다 실패했다. 그리고 환경을 브랜치로 나눈 구조에선 승격이 운영 이미지를 과거로 되돌릴 수 있었다. 복구 자동화와 사전 차단, 두 층으로 막은 기록.</description>
+    </item>
+    <item>
+      <title>설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다</title>
+      <link>http://localhost:1313/posts/sgp-branch-eni-timing/</link>
+      <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/sgp-branch-eni-timing/</guid>
+      <description>EKS 재기동 후 DB 타임아웃. RDS도 정상이고 보안그룹 인바운드도 새 ID를 허용하는데 연결이 안 됐다. &amp;#39;설정 값&amp;#39;과 &amp;#39;데이터플레인 반영&amp;#39;을 구분하게 된 사례.</description>
     </item>
     <item>
       <title>NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)</title>

@@ -2,7 +2,6 @@
 title: "OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가"
 date: 2026-06-23
 lastmod: 2026-07-27
-weight: 44
 series: "관측성 설계"
 series_order: 1
 series_title: "데이터를 어떻게 모으고 저장했는가"

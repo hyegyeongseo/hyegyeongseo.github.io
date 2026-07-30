@@ -3,8 +3,7 @@ title: "Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 �
 description: "모니터링이 전부 정상인데 HPA 3개가 12일간 죽어 있었다. '고장인가 부재인가'를 먼저 가르는 진단과, metrics-server가 IaC에서 누락된 사각지대를 알림으로 봉인하기까지."
 date: 2026-07-19
 lastmod: 2026-07-27
-weight: 50
-tags: ["kubernetes", "hpa", "metrics-server", "eks", "iac", "sre", "drawe"]
+tags: ["kubernetes", "hpa", "metrics-server", "eks", "iac", "drawe"]
 categories: ["Troubleshooting"]
 ---
 

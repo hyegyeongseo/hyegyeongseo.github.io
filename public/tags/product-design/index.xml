@@ -9,18 +9,18 @@
     <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/product-design/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;</title>
-      <link>http://localhost:1313/posts/ai-drawing-coach-design/</link>
-      <pubDate>Mon, 15 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/ai-drawing-coach-design/</guid>
-      <description>그림 피드백 서비스를 &amp;#39;판정 도구&amp;#39;가 아니라 &amp;#39;다음 한 걸음을 주는 코치&amp;#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.</description>
-    </item>
-    <item>
       <title>진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게</title>
       <link>http://localhost:1313/posts/diagnosis-recommend-separation/</link>
       <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/diagnosis-recommend-separation/</guid>
       <description>진단 결과를 LLM으로 재해석하지 않고 그대로 검색 조건으로 쓴 이유. hard(협상 불가)와 soft(순위만)를 가른 추천 설계.</description>
+    </item>
+    <item>
+      <title>AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;</title>
+      <link>http://localhost:1313/posts/ai-drawing-coach-design/</link>
+      <pubDate>Mon, 15 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/ai-drawing-coach-design/</guid>
+      <description>그림 피드백 서비스를 &amp;#39;판정 도구&amp;#39;가 아니라 &amp;#39;다음 한 걸음을 주는 코치&amp;#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.</description>
     </item>
   </channel>
 </rss>

@@ -4,7 +4,6 @@ description: "서버 운영 작업의 이력·권한·감사를 다루는 REST A
 summary: "운영 작업의 이력·권한·감사를 다루는 REST API를, 그 앱 자체를 kubeadm 클러스터 위에 GitOps로 배포하고 3신호로 관측하며 만들었습니다. 목적은 앱이 아니라 운영 패턴의 검증이었습니다."
 date: 2026-07-28
 lastmod: 2026-07-28
-weight: 3
 tags: ["server-job-history", "project", "personal", "kubernetes", "kubeadm", "gitops", "argocd", "observability", "slo", "django"]
 categories: ["Projects"]
 ---

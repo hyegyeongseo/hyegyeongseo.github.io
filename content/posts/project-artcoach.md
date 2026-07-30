@@ -4,7 +4,6 @@ description: "'창작 지원 AI 에이전트'를 표방했지만 실제로 동�
 summary: "'AI 에이전트'를 표방했지만 실제로 동작하는 건 레퍼런스 검색뿐이었습니다. 관찰 → 진단 → 행동 제시를 하는 에이전트를 개인 프로젝트로 먼저 만들어 검증하고, 팀 프로젝트 DraWe에 도입했습니다."
 date: 2026-07-28
 lastmod: 2026-07-28
-weight: 2
 tags: ["artcoach", "project", "personal", "ai-engineering", "llm", "vlm", "fastapi", "qdrant"]
 categories: ["Projects"]
 ---

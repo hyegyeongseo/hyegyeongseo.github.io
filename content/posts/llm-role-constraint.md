@@ -3,7 +3,6 @@ title: "믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한�
 description: "AI 시스템에서 불확실성을 어디에 허용하고 어디서 통제할 것인가. VLM 관찰·코드 결정·LLM 설명의 경계를 나눈 설계."
 date: 2026-06-19
 lastmod: 2026-07-27
-weight: 30
 tags: ["ai-engineering", "llm", "vlm", "reliability", "drawe"]
 categories: ["Software Engineering"]
 ---

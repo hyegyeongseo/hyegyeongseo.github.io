@@ -3,8 +3,7 @@ title: "관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만�
 description: "관리형 Prometheus(AMP) 비용이 EKS 컨트롤 플레인보다 커졌다. 'node-exporter겠지'라는 가설을 실측이 뒤집고 spanmetrics(43%)를 범인으로 지목하기까지 — 그리고 검증 도구가 나를 속인 3시간."
 date: 2026-07-25
 lastmod: 2026-07-27
-weight: 60
-tags: ["observability", "amp", "prometheus", "opentelemetry", "cost", "sre", "drawe"]
+tags: ["observability", "amp", "prometheus", "opentelemetry", "cost", "drawe"]
 categories: ["Troubleshooting"]
 ---
 

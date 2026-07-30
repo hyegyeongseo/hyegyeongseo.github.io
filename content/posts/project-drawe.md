@@ -4,7 +4,6 @@ description: "창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가�
 summary: "창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가이드 기능을 개발하고, 서비스를 운영하기 위한 AWS 클라우드 인프라와 GitOps·Observability 기반 운영 체계를 구축했습니다."
 date: 2026-07-28
 lastmod: 2026-07-28
-weight: 1
 tags: ["drawe", "project", "team", "eks", "gitops", "observability", "ai-engineering"]
 categories: ["Projects"]
 ---

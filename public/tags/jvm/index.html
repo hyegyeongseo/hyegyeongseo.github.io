@@ -10,7 +10,7 @@
 <meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/jvm/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -144,6 +144,19 @@
     Jvm
   </h1>
 </header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">exit 137인데 OOMKill이 아니었다 — JVM은 limit을 보고, 쿠버네티스는 request를 본다
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 파드 하나가 Evicted 되어 있었다 ArgoCD를 열었더니 Degraded 1이 떠 있었습니다. 파드 하나가 Evicted 상태였습니다.
+STATE ContainerStatusUnknown CONTAINER exited with exit code 137 HEALTH The node was low on resource: memory. Threshold quantity: 100Mi, available: 97296Ki. Container backend was using 1227368Ki, request is 1Gi, has larger consumption of memory. ...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-22 00:00:00 +0000 UTC'>July 22, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to exit 137인데 OOMKill이 아니었다 — JVM은 limit을 보고, 쿠버네티스는 request를 본다" href="http://localhost:1313/posts/jvm-request-eviction/"></a>
+</article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">

@@ -3,7 +3,6 @@ title: "진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌�
 description: "진단 결과를 LLM으로 재해석하지 않고 그대로 검색 조건으로 쓴 이유. hard(협상 불가)와 soft(순위만)를 가른 추천 설계."
 date: 2026-06-19
 lastmod: 2026-07-27
-weight: 20
 tags: ["ai-engineering", "search", "rag", "drawe", "product-design"]
 categories: ["Software Engineering"]
 ---

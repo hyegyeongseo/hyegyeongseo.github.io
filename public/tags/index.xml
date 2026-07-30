@@ -6,8 +6,64 @@
     <description>Recent content in Tags on 기록 블로그</description>
     <generator>Hugo</generator>
     <language>ko</language>
-    <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 29 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Aws</title>
+      <link>http://localhost:1313/tags/aws/</link>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/aws/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Drawe</title>
+      <link>http://localhost:1313/tags/drawe/</link>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/drawe/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Eks</title>
+      <link>http://localhost:1313/tags/eks/</link>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/eks/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>External-Secrets</title>
+      <link>http://localhost:1313/tags/external-secrets/</link>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/external-secrets/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Iam</title>
+      <link>http://localhost:1313/tags/iam/</link>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/iam/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Irsa</title>
+      <link>http://localhost:1313/tags/irsa/</link>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/irsa/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Oidc</title>
+      <link>http://localhost:1313/tags/oidc/</link>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/oidc/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Terraform</title>
+      <link>http://localhost:1313/tags/terraform/</link>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/terraform/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Ai-Engineering</title>
       <link>http://localhost:1313/tags/ai-engineering/</link>
@@ -34,20 +90,6 @@
       <link>http://localhost:1313/tags/django/</link>
       <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/django/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Drawe</title>
-      <link>http://localhost:1313/tags/drawe/</link>
-      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/drawe/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Eks</title>
-      <link>http://localhost:1313/tags/eks/</link>
-      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/eks/</guid>
       <description></description>
     </item>
     <item>
@@ -170,13 +212,6 @@
       <description></description>
     </item>
     <item>
-      <title>Sre</title>
-      <link>http://localhost:1313/tags/sre/</link>
-      <pubDate>Sat, 25 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/sre/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Graceful-Shutdown</title>
       <link>http://localhost:1313/tags/graceful-shutdown/</link>
       <pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
@@ -184,10 +219,38 @@
       <description></description>
     </item>
     <item>
-      <title>Spring Boot</title>
+      <title>Spring-Boot</title>
       <link>http://localhost:1313/tags/spring-boot/</link>
       <pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/spring-boot/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Eviction</title>
+      <link>http://localhost:1313/tags/eviction/</link>
+      <pubDate>Wed, 22 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/eviction/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Jvm</title>
+      <link>http://localhost:1313/tags/jvm/</link>
+      <pubDate>Wed, 22 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/jvm/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Qos</title>
+      <link>http://localhost:1313/tags/qos/</link>
+      <pubDate>Wed, 22 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/qos/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Resource-Limits</title>
+      <link>http://localhost:1313/tags/resource-limits/</link>
+      <pubDate>Wed, 22 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/resource-limits/</guid>
       <description></description>
     </item>
     <item>
@@ -205,10 +268,38 @@
       <description></description>
     </item>
     <item>
+      <title>Logging</title>
+      <link>http://localhost:1313/tags/logging/</link>
+      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/logging/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Loki</title>
+      <link>http://localhost:1313/tags/loki/</link>
+      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/loki/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Metrics-Server</title>
       <link>http://localhost:1313/tags/metrics-server/</link>
       <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/metrics-server/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Tempo</title>
+      <link>http://localhost:1313/tags/tempo/</link>
+      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/tempo/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Trace-Id</title>
+      <link>http://localhost:1313/tags/trace-id/</link>
+      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/trace-id/</guid>
       <description></description>
     </item>
     <item>
@@ -240,24 +331,10 @@
       <description></description>
     </item>
     <item>
-      <title>Oncall</title>
-      <link>http://localhost:1313/tags/oncall/</link>
-      <pubDate>Wed, 24 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/oncall/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Alloy</title>
       <link>http://localhost:1313/tags/alloy/</link>
       <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/alloy/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Loki</title>
-      <link>http://localhost:1313/tags/loki/</link>
-      <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/loki/</guid>
       <description></description>
     </item>
     <item>
@@ -282,13 +359,6 @@
       <description></description>
     </item>
     <item>
-      <title>Tempo</title>
-      <link>http://localhost:1313/tags/tempo/</link>
-      <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/tempo/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Ecs</title>
       <link>http://localhost:1313/tags/ecs/</link>
       <pubDate>Mon, 22 Jun 2026 00:00:00 +0000</pubDate>
@@ -300,13 +370,6 @@
       <link>http://localhost:1313/tags/migration/</link>
       <pubDate>Mon, 22 Jun 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/migration/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Terraform</title>
-      <link>http://localhost:1313/tags/terraform/</link>
-      <pubDate>Mon, 22 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/terraform/</guid>
       <description></description>
     </item>
     <item>
@@ -394,13 +457,6 @@
       <description></description>
     </item>
     <item>
-      <title>Aws</title>
-      <link>http://localhost:1313/tags/aws/</link>
-      <pubDate>Sun, 17 May 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/aws/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Cost-Optimization</title>
       <link>http://localhost:1313/tags/cost-optimization/</link>
       <pubDate>Sun, 17 May 2026 00:00:00 +0000</pubDate>
@@ -482,13 +538,6 @@
       <link>http://localhost:1313/tags/hikaricp/</link>
       <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/tags/hikaricp/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Jvm</title>
-      <link>http://localhost:1313/tags/jvm/</link>
-      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/jvm/</guid>
       <description></description>
     </item>
     <item>

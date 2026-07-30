@@ -10,7 +10,7 @@
 <meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/iac/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -147,21 +147,6 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 이 글 문제 — 보는 것과 알리는 것이 한 곳에 묶이면 ②편에서 무엇을 알릴지 고르고 문구까지 정했다면, 남는 문제는 알림 룰을 어디에서 평가하고, 어떤 경로로 운영자에게 전달할 것인가였습니다.
-대시보드 도구(Grafana)는 알림 기능도 제공합니다. 거기서 다 하면 편해 보이죠. 그런데 그러면 “보는 것&#34;과 “알리는 것&#34;이 한 컴포넌트에 묶입니다.
-대시보드를 손보다 알림 룰이 흔들릴 수 있고 알림 때문에 대시보드 구성을 못 바꾸게 되고 UI로 만든 룰은 누가 왜 바꿨는지 6개월 뒤에 알 수 없습니다 결정 — 룰은 메트릭 저장소 쪽에 알림 룰을 대시보드가 아니라 메트릭 저장소(AMP) 에 뒀습니다. Grafana 데이터소스에는 알림 관리를 끄는 설정을 명시했고요.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/"></a>
-</article>
-
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
     <h2 class="entry-hint-parent">Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유
     </h2>
   </header>
@@ -173,6 +158,21 @@ $ kubectl get hpa -A NAME TARGETS AGE backend cpu:&lt;unknown&gt;/70% 12d fastap
   </div>
   <footer class="entry-footer"><span title='2026-07-19 00:00:00 +0000 UTC'>July 19, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p> Series 관측성 설계 3부작 1 데이터를 어떻게 모으고 저장했는가 2 무엇을 알리고, 어떻게 말할 것인가 3 왜 Grafana가 아니라 AMP가 알림을 책임졌나 이 글 문제 — 보는 것과 알리는 것이 한 곳에 묶이면 ②편에서 무엇을 알릴지 고르고 문구까지 정했다면, 남는 문제는 알림 룰을 어디에서 평가하고, 어떤 경로로 운영자에게 전달할 것인가였습니다.
+대시보드 도구(Grafana)는 알림 기능도 제공합니다. 거기서 다 하면 편해 보이죠. 그런데 그러면 “보는 것&#34;과 “알리는 것&#34;이 한 컴포넌트에 묶입니다.
+대시보드를 손보다 알림 룰이 흔들릴 수 있고 알림 때문에 대시보드 구성을 못 바꾸게 되고 UI로 만든 룰은 누가 왜 바꿨는지 6개월 뒤에 알 수 없습니다 결정 — 룰은 메트릭 저장소 쪽에 알림 룰을 대시보드가 아니라 메트릭 저장소(AMP) 에 뒀습니다. Grafana 데이터소스에는 알림 관리를 끄는 설정을 명시했고요.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-25 00:00:00 +0000 UTC'>June 25, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나" href="http://localhost:1313/posts/alerting-with-amp-not-grafana/"></a>
 </article>
     </main>
     

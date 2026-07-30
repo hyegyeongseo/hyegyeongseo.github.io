@@ -9,13 +9,6 @@
     <lastBuildDate>Tue, 28 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/ai-engineering/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>DraWe — 그림에서 막히는 지점을 짚고 다음 연습까지 잇는 AI 드로잉 코치 (팀 프로젝트)</title>
-      <link>http://localhost:1313/posts/project-drawe/</link>
-      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/project-drawe/</guid>
-      <description>창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가이드 기능을 개발하고, 서비스를 운영하기 위한 AWS 클라우드 인프라와 GitOps·Observability 기반 운영 체계를 구축했습니다.</description>
-    </item>
-    <item>
       <title>artcoach — 검색만 있던 제품에 에이전트를 만들어 넣기까지 (개인 프로젝트)</title>
       <link>http://localhost:1313/posts/project-artcoach/</link>
       <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
@@ -23,11 +16,18 @@
       <description>&amp;#39;창작 지원 AI 에이전트&amp;#39;를 표방했지만 실제로 동작하는 건 레퍼런스 검색뿐이었습니다. 관찰→진단→행동 제시를 하는 에이전트를 개인 프로젝트로 만들어 검증하고, 팀 프로젝트 DraWe에 도입해 한 끗 가이드와 완성작 갤러리가 됐습니다.</description>
     </item>
     <item>
-      <title>AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;</title>
-      <link>http://localhost:1313/posts/ai-drawing-coach-design/</link>
-      <pubDate>Mon, 15 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/ai-drawing-coach-design/</guid>
-      <description>그림 피드백 서비스를 &amp;#39;판정 도구&amp;#39;가 아니라 &amp;#39;다음 한 걸음을 주는 코치&amp;#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.</description>
+      <title>DraWe — 그림에서 막히는 지점을 짚고 다음 연습까지 잇는 AI 드로잉 코치 (팀 프로젝트)</title>
+      <link>http://localhost:1313/posts/project-drawe/</link>
+      <pubDate>Tue, 28 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/project-drawe/</guid>
+      <description>창작 지원 AI 에이전트 개발 프로젝트. AI 한 끗 가이드 기능을 개발하고, 서비스를 운영하기 위한 AWS 클라우드 인프라와 GitOps·Observability 기반 운영 체계를 구축했습니다.</description>
+    </item>
+    <item>
+      <title>믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다</title>
+      <link>http://localhost:1313/posts/llm-role-constraint/</link>
+      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/llm-role-constraint/</guid>
+      <description>AI 시스템에서 불확실성을 어디에 허용하고 어디서 통제할 것인가. VLM 관찰·코드 결정·LLM 설명의 경계를 나눈 설계.</description>
     </item>
     <item>
       <title>진단과 추천을 분리한 이유 — 추천이 내 문제와 겉돌지 않게</title>
@@ -37,11 +37,11 @@
       <description>진단 결과를 LLM으로 재해석하지 않고 그대로 검색 조건으로 쓴 이유. hard(협상 불가)와 soft(순위만)를 가른 추천 설계.</description>
     </item>
     <item>
-      <title>믿을 수 있는 AI 코치를 만들기 위해 LLM의 역할을 제한했다</title>
-      <link>http://localhost:1313/posts/llm-role-constraint/</link>
-      <pubDate>Fri, 19 Jun 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/llm-role-constraint/</guid>
-      <description>AI 시스템에서 불확실성을 어디에 허용하고 어디서 통제할 것인가. VLM 관찰·코드 결정·LLM 설명의 경계를 나눈 설계.</description>
+      <title>AI 드로잉 코치를 설계한 이유 — &#39;못 그렸다&#39;가 아니라 &#39;다음에 뭘 해야 할지&#39;</title>
+      <link>http://localhost:1313/posts/ai-drawing-coach-design/</link>
+      <pubDate>Mon, 15 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/ai-drawing-coach-design/</guid>
+      <description>그림 피드백 서비스를 &amp;#39;판정 도구&amp;#39;가 아니라 &amp;#39;다음 한 걸음을 주는 코치&amp;#39;로 설계한 이유와, 한 장의 업로드가 네 가지 산출로 이어지는 파이프라인 구조.</description>
     </item>
   </channel>
 </rss>

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO | 기록 블로그</title>
+<meta name="keywords" content="aws, iam, oidc, irsa, external-secrets, eks, terraform, drawe">
+<meta name="description" content="CI도 파드도 Access Key 없이 인증하게 만든 과정. 시크릿은 레포가 아니라 SSM에 두고, IaC가 그 값을 덮어쓰지 않도록 무장해제하기까지.">
+<meta name="author" content="hyegyeongseo">
+<link rel="canonical" href="http://localhost:1313/posts/keyless-auth-oidc-irsa-eso/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/keyless-auth-oidc-irsa-eso/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<meta property="og:url" content="http://localhost:1313/posts/keyless-auth-oidc-irsa-eso/">
+  <meta property="og:site_name" content="기록 블로그">
+  <meta property="og:title" content="AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO">
+  <meta property="og:description" content="CI도 파드도 Access Key 없이 인증하게 만든 과정. 시크릿은 레포가 아니라 SSM에 두고, IaC가 그 값을 덮어쓰지 않도록 무장해제하기까지.">
+  <meta property="og:locale" content="ko">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-07-29T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-07-29T00:00:00+00:00">
+    <meta property="article:tag" content="Aws">
+    <meta property="article:tag" content="Iam">
+    <meta property="article:tag" content="Oidc">
+    <meta property="article:tag" content="Irsa">
+    <meta property="article:tag" content="External-Secrets">
+    <meta property="article:tag" content="Eks">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO">
+  <meta name="twitter:description" content="CI도 파드도 Access Key 없이 인증하게 만든 과정. 시크릿은 레포가 아니라 SSM에 두고, IaC가 그 값을 덮어쓰지 않도록 무장해제하기까지.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO",
+      "item": "http://localhost:1313/posts/keyless-auth-oidc-irsa-eso/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO",
+  "name": "AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO",
+  "description": "CI도 파드도 Access Key 없이 인증하게 만든 과정. 시크릿은 레포가 아니라 SSM에 두고, IaC가 그 값을 덮어쓰지 않도록 무장해제하기까지.",
+  "keywords": [
+    "aws", "iam", "oidc", "irsa", "external-secrets", "eks", "terraform", "drawe"
+  ],
+  "articleBody": "원칙 — 키를 어디에도 저장하지 않는다 인프라를 짜면서 자격증명이 필요한 곳이 셋이었습니다.\nCI가 AWS에 이미지를 올리고 배포해야 합니다 파드가 S3·Bedrock·Cost Explorer에 접근해야 합니다 시크릿 18종(DB·JWT·외부 API 키 등)이 여러 서비스에 주입돼야 합니다 가장 쉬운 방법은 IAM User를 만들어 Access Key를 발급하고, CI는 그걸 GitHub Secrets에, 파드는 환경변수에 넣는 것입니다. 동작은 합니다. 대신 유출되면 되돌릴 방법이 로테이션밖에 없고, 유출됐는지 알기도 어렵습니다.\n그래서 원칙을 하나 세웠습니다. 키를 어디에도 저장하지 않는다. 저장된 키가 없으면 유출될 키도 없습니다.\n이 글은 그 원칙을 세 축으로 구현한 기록입니다 — CI는 OIDC, 파드는 IRSA, 시크릿은 ESO.\nCI — Access Key 대신 OIDC GitHub Actions는 워크플로 실행마다 자기 자신을 증명하는 짧은 수명의 토큰을 발급할 수 있습니다. AWS가 그 토큰을 신뢰하도록 등록해두면, CI는 키 없이 역할을 assume할 수 있습니다.\nresource \"aws_iam_openid_connect_provider\" \"github\" { url = \"https://token.actions.githubusercontent.com\" client_id_list = [\"sts.amazonaws.com\"] } 중요한 건 provider 등록이 아니라 신뢰 조건을 얼마나 좁히느냐입니다. repo:* 같은 느슨한 조건이면 그 조직의 아무 레포나 prod 배포 역할을 가져갈 수 있습니다.\ndata \"aws_iam_policy_document\" \"github_assume\" { statement { effect = \"Allow\" actions = [\"sts:AssumeRoleWithWebIdentity\"] principals { type = \"Federated\" identifiers = [aws_iam_openid_connect_provider.github[0].arn] } condition { test = \"StringEquals\" variable = \"token.actions.githubusercontent.com:aud\" values = [\"sts.amazonaws.com\"] } # prod 는 main branch 또는 prod environment 에서만 deploy condition { test = \"StringLike\" variable = \"token.actions.githubusercontent.com:sub\" values = flatten([ for repo in var.github_repos : [ \"repo:${var.github_owner}/${repo}:ref:refs/heads/main\", \"repo:${var.github_owner}/${repo}:environment:prod\", ] ]) } } } sub 클레임에 레포·브랜치·환경이 함께 들어갑니다. 즉 이 역할을 가져가려면 우리 레포 + main 브랜치 이거나 우리 레포 + prod 환경 이어야 합니다. feature 브랜치나 포크에서는 assume 자체가 실패합니다.\n워크플로 쪽은 이렇게 짧습니다.\npermissions: id-token: write # AWS OIDC contents: write - name: Configure AWS credentials (OIDC) uses: aws-actions/configure-aws-credentials@v4 with: role-to-assume: arn:aws:iam:::role/drawe-prod-github-deploy-role aws-region: ap-northeast-2 id-token: write 권한이 없으면 토큰 자체가 발급되지 않습니다. 비밀은 없고, 권한 선언만 있습니다.\n파드 — 노드 Role 공유 대신 IRSA EKS에서 파드에 AWS 권한을 주는 가장 쉬운 방법은 노드 IAM Role에 정책을 붙이는 것입니다. 그런데 그러면 그 노드 위의 모든 파드가 같은 권한을 갖습니다. backend가 필요한 S3 권한을 fastapi도, 심지어 관측 에이전트도 갖게 됩니다.\nIRSA는 그 단위를 ServiceAccount로 내립니다. 클러스터 자체가 OIDC provider가 되고, 신뢰 조건에 SA 이름을 박습니다.\ncondition { test = \"StringEquals\" variable = \"${local.backend_oidc_url}:sub\" values = [\"system:serviceaccount:${var.project}-${var.env}:backend\"] } system:serviceaccount:\u003c네임스페이스\u003e: — 이 SA를 쓰는 파드만 이 역할을 가져갑니다. 다른 SA를 쓰는 파드는 같은 노드에 있어도 못 씁니다.\n권한도 필요한 것만 붙였습니다. 예를 들어 어드민 화면의 비용 탭이 Cost Explorer를 호출해야 했는데, 이렇게 좁혔습니다.\nstatement { sid = \"CostExplorerReadOnly\" effect = \"Allow\" actions = [\"ce:GetCostAndUsage\"] # GetCostForecast 는 미사용 → 부여 안 함 resources = [\"*\"] # CE 는 리소스 레벨 권한을 지원하지 않는다 } resources = [\"*\"]가 마음에 걸려서 좁혀보려 했는데, Cost Explorer는 리소스 레벨 권한을 지원하지 않습니다. 서비스가 지원하지 않는 건 IAM으로 못 좁힙니다. 대신 액션 쪽을 실제 호출하는 하나로만 제한하고, 그 사실을 코드 주석에 남겼습니다. 좁힐 수 없는 축이 있으면 좁힐 수 있는 다른 축을 최대한 좁히는 것이 차선입니다.\n시크릿 — 레포 대신 SSM, 주입은 ESO 시크릿 18종을 어디에 둘지가 남았습니다. 후보는 셋이었습니다.\n안 문제 매니페스트에 Secret 직접 작성 base64는 암호화가 아니다. 레포에 평문이 남는 것과 같음 Sealed Secrets 암호화는 되지만 복호화 키를 클러스터가 갖는다 — 그 키의 백업·로테이션을 또 관리해야 함 SSM Parameter Store + ESO 원본은 AWS에, 레포엔 경로만. 채택 External Secrets Operator는 SSM을 읽어 K8s Secret으로 동기화합니다. 매니페스트에는 “어디서 가져올지\"만 있고 “값\"은 없습니다.\napiVersion: external-secrets.io/v1beta1 kind: ExternalSecret metadata: name: backend-secrets spec: refreshInterval: 1h secretStoreRef: name: aws-ssm kind: ClusterSecretStore target: name: drawe-backend-secrets creationPolicy: Owner data: - secretKey: DB_PASSWORD remoteRef: { key: /drawe/prod/db-password } - secretKey: JWT_SECRET remoteRef: { key: /drawe/prod/jwt-secret } # ... 총 18종, 전부 SSM 경로만 refreshInterval: 1h이라 SSM 값이 바뀌면 한 시간 안에 K8s Secret이 따라옵니다.\nESO 자신이 SSM을 읽을 권한도 IRSA로 받는데, 여기도 경로를 좁혔습니다.\nstatement { sid = \"ReadSSM\" actions = [\"ssm:GetParameter\", \"ssm:GetParameters\", \"ssm:GetParametersByPath\", \"ssm:DescribeParameters\"] resources = [\"arn:aws:ssm:${region}:${account}:parameter${var.ssm_path_prefix}/*\"] } statement { sid = \"DecryptSecureString\" actions = [\"kms:Decrypt\"] resources = [\"*\"] condition { test = \"StringEquals\" variable = \"kms:ViaService\" values = [\"ssm.${var.aws_region}.amazonaws.com\"] # SSM 경유일 때만 } } kms:Decrypt도 리소스를 좁히기 어려운 축이었습니다(SecureString이 쓰는 KMS 키를 미리 특정하기 번거로움). 대신 kms:ViaService 조건으로 SSM을 경유한 복호화만 허용했습니다. 이 역할로 다른 경로의 KMS 복호화는 못 합니다. 여기서도 좁힐 수 있는 축을 골라 좁힌 셈입니다.\n결과적으로 git에도, 매니페스트에도 시크릿 평문이 한 줄도 없습니다. 실수로 커밋할 경로 자체가 사라집니다.\n이 구조는 ECS 시절에 데인 경험에서 나왔다 처음부터 이렇게 설계한 건 아닙니다. ECS를 쓰던 시절, 시크릿 한 줄을 배선하는 “5분짜리” 작업이 며칠짜리가 된 적이 있습니다.\nbria.api-key=${BRIA_API_KEY} — 이 placeholder를 채우려고 Parameter Store에 값을 넣었는데 컨테이너 env가 안 채워졌습니다. 이유는 진실이 세 곳에 나뉘어 있었기 때문입니다.\nParameter Store — KV 저장소일 뿐, 스스로 주입하지 않습니다 ECS task definition의 secrets 매핑 — SSM ARN ↔ env 이름 매핑을 따로 명시해야 주입됩니다 Terraform — 위 매핑을 콘솔/CLI로 손수 넣었더니, 코드의 진실과 실제가 어긋났습니다 특히 3번이 오래 남았습니다. 기능은 이미 동작하는데 terraform plan에 diff가 남아 있었거든요. “동작하니까 됐지\"로 넘길 수도 있었지만, 그 diff는 다음 apply 때 터질 뇌관입니다. terraform import로 state를 실제와 맞추고 나서야 끝났습니다.\n기능 일치와 state 일치는 다릅니다. 동작한다는 사실이 IaC가 현실을 알고 있다는 뜻은 아닙니다.\nESO를 고른 건 이 경험 때문입니다. 주입 경로에 사람 손이 들어가는 단계를 없애고 싶었습니다. ESO 구조에서는 SSM에 값을 넣는 것 하나로 끝나고, 매핑은 매니페스트에 선언돼 git이 관리합니다.\n지뢰 — TF_VAR 없이 plan하면 암호를 갈아엎는다 구조를 다 짜고 나서 발견한 문제입니다. 비밀번호를 이렇게 만들고 있었습니다.\nresource \"random_password\" \"db\" { count = var.db_password == \"\" ? 1 : 0 length = 32 } locals { db_password = var.db_password != \"\" ? var.db_password : random_password.db[0].result } “변수가 비어 있으면 자동 생성” — 초기 구축엔 편한 패턴입니다. 그런데 운영에 들어간 뒤 TF_VAR_db_password를 export하지 않은 채 terraform plan을 돌리면 조건이 참이 되어 random_password가 새로 생성되고, “SSM 파라미터를 새 암호로 덮겠다\"는 diff가 뜹니다.\n그대로 apply하면 두 갈래로 터집니다.\n대상 결과 DB RDS 마스터 암호와 SSM이 함께 로테이션 → 앱이 즉시 접속 불가 Redis ElastiCache는 ignore_changes=[auth_token]이라 그대로인데 SSM만 갱신 → split-brain Redis 쪽이 더 고약합니다. 한쪽만 바뀌니 에러 메시지가 “인증 실패\"로만 나오고, 원인이 IaC라는 걸 알아채기 어렵습니다.\n해소는 실제 암호의 소스를 SSM으로 확정하는 것이었습니다.\nresource \"aws_ssm_parameter\" \"db_password\" { name = \"/${var.project}/${var.env}/db-password\" type = \"SecureString\" value = local.db_password lifecycle { ignore_changes = [value] } } ignore_changes = [value]로 Terraform이 값 변경을 무시하게 했습니다. Terraform은 파라미터가 존재한다는 것까지만 관리하고, 값의 진실은 SSM에 둡니다. 로테이션이 필요하면 별도 절차(새 값 주입 + 앱 재기동)로 명시적으로 합니다.\n같은 패턴을 외부에서 주입되는 파라미터 전체에 적용했습니다. API 키들은 아예 CHANGE_ME를 초기값으로 두고 ignore_changes를 겁니다 — “자리는 코드가 만들고, 값은 사람이 채운다” 는 계약입니다.\nIaC가 관리하는 대상이 “리소스의 존재\"인지 “리소스의 값\"인지 구분해야 합니다. 시크릿은 전자만 맡기는 게 안전합니다.\n사고 대응 절차가 실제로 동작하는지 확인한 일 설계가 끝나고 얼마 뒤, GA4 서비스계정 키가 노출된 사건이 있었습니다. 대응 절차가 이렇게 돌았습니다.\n키 재발급 SSM 값만 교체 — 새 키를 file://로 주입해서 셸 히스토리·터미널에 값이 남지 않게 ESO force-sync → K8s Secret 갱신 kubectl rollout restart → 파드가 새 값을 읽음 레포·매니페스트·CI 어디도 건드리지 않았습니다. 시크릿의 원본이 한 곳이면 사고 대응도 한 곳에서 끝납니다. 만약 매니페스트에 값이 박혀 있었다면 커밋 히스토리 정리까지 따라왔을 겁니다.\n부끄러운 사고지만, 설계해둔 로테이션 경로가 실제 상황에서 동작하는지 확인할 기회이기도 했습니다. 평소에 안 써본 절차는 사고 때 안 돌아갑니다.\n계정과 state를 나눠 폭발 반경을 줄이기 권한을 아무리 좁혀도, 사람이 잘못된 환경에 apply하면 소용없습니다. 그래서 경계를 두 층 더 뒀습니다.\n① dev/prod AWS 계정 분리. IAM 경계와 청구가 계정 수준에서 갈립니다. 실수로 prod를 건드리는 사고를 구조적으로 차단합니다.\n② tfstate 3분할. 같은 버킷 안에서 key만 나눴습니다.\nstate 담당 drawe/prod 앱 인프라 — VPC·RDS·ALB eks/prod/cluster EKS 클러스터 eks/prod/platform ArgoCD·Karpenter·ESO 등 플랫폼 이렇게 나누면 플랫폼을 고치다 클러스터 state를 건드릴 일이 없습니다. 나중에 dev 계정을 정리할 때도 플랫폼 → 클러스터 → 앱 순서로 계층별 destroy가 가능해서, 순서 의존을 안전하게 통제할 수 있었습니다.\n언제 이 구조를 쓰고, 언제는 과한가 정직하게 적어둡니다.\n쓸 만한 조건\nCI가 클라우드에 접근하는 경우 — OIDC는 거의 항상 이득입니다. 설정 비용이 낮고 키 관리 부담이 통째로 사라집니다 파드마다 필요한 AWS 리소스가 다를 때 → IRSA. 전부 같은 권한이면 굳이 나눌 실익이 적습니다 시크릿이 10종을 넘고 환경이 둘 이상일 때 → ESO. 값이 두세 개 고정이면 과합니다 과한 조건\n서비스 하나에 시크릿 두세 개면 ESO 운영 부담이 이득을 넘습니다. ESO는 그 자체가 클러스터에 상주하는 컴포넌트고, 버전 관리와 장애 대응 대상이 하나 더 느는 겁니다 계정 분리도 팀이 한 명이고 환경이 하나면 오히려 계정 전환 비용만 늘어납니다 남은 과제 시크릿 로테이션 주기가 없습니다. 사고가 나면 도는 절차는 검증했지만, 정기 로테이션은 수동이고 주기도 정해두지 않았습니다. refreshInterval이 SSM→K8s 동기화 주기일 뿐 로테이션 주기는 아닙니다 kms:Decrypt의 resources = [\"*\"] 는 ViaService 조건으로 막았지만, SecureString용 CMK를 따로 두면 리소스까지 좁힐 수 있습니다 OIDC 신뢰 정책에 과거 분리 레포 시절 조건이 남아 있습니다. 지금은 모노레포라 실제로는 안 쓰이지만, 안 쓰는 조건도 공격 표면이니 정리 대상입니다 배운 점 저장하지 않은 키는 유출되지 않는다. 로테이션 부담은 키를 잘 관리해서 줄이는 게 아니라, 키를 없애서 없애는 편이 확실하다. 최소권한은 “좁힐 수 있는 축을 찾는 일\"이다. Cost Explorer는 리소스를 못 좁히고 KMS는 키를 특정하기 번거롭다. 한 축이 막히면 다른 축(액션·조건)을 좁힌다 — 못 좁힌다고 포기하는 것과 다르다. 기능 일치와 state 일치는 다르다. 동작한다고 IaC가 현실을 아는 건 아니다. 남겨둔 diff는 다음 apply의 뇌관이다. IaC에 무엇을 맡길지 구분해야 한다. 시크릿은 “존재\"만 코드가 관리하고 “값\"은 저장소에 둔다. 값까지 맡기면 변수 하나 안 넣은 plan이 운영 암호를 갈아엎는다. 평소에 안 써본 절차는 사고 때 안 돌아간다. 로테이션 경로는 설계해두는 것과 실제로 돌려보는 것이 다르다. 인증과 시크릿은 같은 문제가 아니다. 인증은 OIDC·IRSA처럼 필요할 때만 권한을 받아 해결하고, 시크릿은 SSM처럼 원본을 한 곳에 두고 배포 시 주입하는 편이 관리와 사고 대응 모두 단순하다. ",
+  "wordCount" : "1525",
+  "inLanguage": "en",
+  "datePublished": "2026-07-29T00:00:00Z",
+  "dateModified": "2026-07-29T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "hyegyeongseo"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/keyless-auth-oidc-irsa-eso/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "기록 블로그",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="기록 블로그 (Alt + H)">기록 블로그</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/software-engineering/" title="Software Engineering">
+                    <span>Software Engineering</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/infra-observability/" title="Infra &amp; Observability">
+                    <span>Infra &amp; Observability</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/troubleshooting/" title="Troubleshooting">
+                    <span>Troubleshooting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+
+  <div class="fn-post-body">
+
+    <header class="post-header">
+      <h1 class="post-title entry-hint-parent">
+        AWS에 장기 자격증명을 하나도 두지 않기 — OIDC · IRSA · ESO
+      </h1>
+      <p class="post-description">CI도 파드도 Access Key 없이 인증하게 만든 과정. 시크릿은 레포가 아니라 SSM에 두고, IaC가 그 값을 덮어쓰지 않도록 무장해제하기까지.</p>
+      <div class="post-meta"><span title='2026-07-29 00:00:00 +0000 UTC'>July 29, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></div>
+
+      <div class="fn-post-divider"></div>
+    </header><details class="toc fn-toc" open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">CONTENTS</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%ec%9b%90%ec%b9%99--%ed%82%a4%eb%a5%bc-%ec%96%b4%eb%94%94%ec%97%90%eb%8f%84-%ec%a0%80%ec%9e%a5%ed%95%98%ec%a7%80-%ec%95%8a%eb%8a%94%eb%8b%a4" aria-label="원칙 — 키를 어디에도 저장하지 않는다">원칙 — 키를 어디에도 저장하지 않는다</a></li>
+            <li>
+                <a href="#ci--access-key-%eb%8c%80%ec%8b%a0-oidc" aria-label="CI — Access Key 대신 OIDC">CI — Access Key 대신 OIDC</a></li>
+            <li>
+                <a href="#%ed%8c%8c%eb%93%9c--%eb%85%b8%eb%93%9c-role-%ea%b3%b5%ec%9c%a0-%eb%8c%80%ec%8b%a0-irsa" aria-label="파드 — 노드 Role 공유 대신 IRSA">파드 — 노드 Role 공유 대신 IRSA</a></li>
+            <li>
+                <a href="#%ec%8b%9c%ed%81%ac%eb%a6%bf--%eb%a0%88%ed%8f%ac-%eb%8c%80%ec%8b%a0-ssm-%ec%a3%bc%ec%9e%85%ec%9d%80-eso" aria-label="시크릿 — 레포 대신 SSM, 주입은 ESO">시크릿 — 레포 대신 SSM, 주입은 ESO</a></li>
+            <li>
+                <a href="#%ec%9d%b4-%ea%b5%ac%ec%a1%b0%eb%8a%94-ecs-%ec%8b%9c%ec%a0%88%ec%97%90-%eb%8d%b0%ec%9d%b8-%ea%b2%bd%ed%97%98%ec%97%90%ec%84%9c-%eb%82%98%ec%99%94%eb%8b%a4" aria-label="이 구조는 ECS 시절에 데인 경험에서 나왔다">이 구조는 ECS 시절에 데인 경험에서 나왔다</a></li>
+            <li>
+                <a href="#%ec%a7%80%eb%a2%b0--tf_var-%ec%97%86%ec%9d%b4-plan%ed%95%98%eb%a9%b4-%ec%95%94%ed%98%b8%eb%a5%bc-%ea%b0%88%ec%95%84%ec%97%8e%eb%8a%94%eb%8b%a4" aria-label="지뢰 — TF_VAR 없이 plan하면 암호를 갈아엎는다">지뢰 — TF_VAR 없이 plan하면 암호를 갈아엎는다</a></li>
+            <li>
+                <a href="#%ec%82%ac%ea%b3%a0-%eb%8c%80%ec%9d%91-%ec%a0%88%ec%b0%a8%ea%b0%80-%ec%8b%a4%ec%a0%9c%eb%a1%9c-%eb%8f%99%ec%9e%91%ed%95%98%eb%8a%94%ec%a7%80-%ed%99%95%ec%9d%b8%ed%95%9c-%ec%9d%bc" aria-label="사고 대응 절차가 실제로 동작하는지 확인한 일">사고 대응 절차가 실제로 동작하는지 확인한 일</a></li>
+            <li>
+                <a href="#%ea%b3%84%ec%a0%95%ea%b3%bc-state%eb%a5%bc-%eb%82%98%eb%88%a0-%ed%8f%ad%eb%b0%9c-%eb%b0%98%ea%b2%bd%ec%9d%84-%ec%a4%84%ec%9d%b4%ea%b8%b0" aria-label="계정과 state를 나눠 폭발 반경을 줄이기">계정과 state를 나눠 폭발 반경을 줄이기</a></li>
+            <li>
+                <a href="#%ec%96%b8%ec%a0%9c-%ec%9d%b4-%ea%b5%ac%ec%a1%b0%eb%a5%bc-%ec%93%b0%ea%b3%a0-%ec%96%b8%ec%a0%9c%eb%8a%94-%ea%b3%bc%ed%95%9c%ea%b0%80" aria-label="언제 이 구조를 쓰고, 언제는 과한가">언제 이 구조를 쓰고, 언제는 과한가</a></li>
+            <li>
+                <a href="#%eb%82%a8%ec%9d%80-%ea%b3%bc%ec%a0%9c" aria-label="남은 과제">남은 과제</a></li>
+            <li>
+                <a href="#%eb%b0%b0%ec%9a%b4-%ec%a0%90" aria-label="배운 점">배운 점</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+    <div class="post-content">
+      <h2 id="원칙--키를-어디에도-저장하지-않는다">원칙 — 키를 어디에도 저장하지 않는다</h2>
+<p>인프라를 짜면서 자격증명이 필요한 곳이 셋이었습니다.</p>
+<ul>
+<li><strong>CI</strong>가 AWS에 이미지를 올리고 배포해야 합니다</li>
+<li><strong>파드</strong>가 S3·Bedrock·Cost Explorer에 접근해야 합니다</li>
+<li><strong>시크릿 18종</strong>(DB·JWT·외부 API 키 등)이 여러 서비스에 주입돼야 합니다</li>
+</ul>
+<p>가장 쉬운 방법은 IAM User를 만들어 Access Key를 발급하고, CI는 그걸 GitHub Secrets에, 파드는 환경변수에 넣는 것입니다. 동작은 합니다. 대신 <strong>유출되면 되돌릴 방법이 로테이션밖에 없고, 유출됐는지 알기도 어렵습니다.</strong></p>
+<p>그래서 원칙을 하나 세웠습니다. <strong>키를 어디에도 저장하지 않는다.</strong> 저장된 키가 없으면 유출될 키도 없습니다.</p>
+<p>이 글은 그 원칙을 세 축으로 구현한 기록입니다 — CI는 OIDC, 파드는 IRSA, 시크릿은 ESO.</p>
+<h2 id="ci--access-key-대신-oidc">CI — Access Key 대신 OIDC</h2>
+<p>GitHub Actions는 워크플로 실행마다 <strong>자기 자신을 증명하는 짧은 수명의 토큰</strong>을 발급할 수 있습니다. AWS가 그 토큰을 신뢰하도록 등록해두면, CI는 키 없이 역할을 assume할 수 있습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_iam_openid_connect_provider&#34; &#34;github&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  url</span>            <span class="o">=</span> <span class="s2">&#34;https://token.actions.githubusercontent.com&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  client_id_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;sts.amazonaws.com&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p>중요한 건 provider 등록이 아니라 <strong>신뢰 조건을 얼마나 좁히느냐</strong>입니다. <code>repo:*</code> 같은 느슨한 조건이면 그 조직의 아무 레포나 prod 배포 역할을 가져갈 수 있습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="k">data</span> <span class="s2">&#34;aws_iam_policy_document&#34; &#34;github_assume&#34;</span> {
+</span></span><span class="line"><span class="cl">  <span class="k">statement</span> {
+</span></span><span class="line"><span class="cl"><span class="n">    effect</span>  <span class="o">=</span> <span class="s2">&#34;Allow&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">    actions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;sts:AssumeRoleWithWebIdentity&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">principals</span> {
+</span></span><span class="line"><span class="cl"><span class="n">      type</span>        <span class="o">=</span> <span class="s2">&#34;Federated&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">      identifiers</span> <span class="o">=</span> <span class="p">[</span><span class="k">aws_iam_openid_connect_provider</span><span class="p">.</span><span class="k">github</span><span class="p">[</span><span class="m">0</span><span class="p">].</span><span class="k">arn</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">condition</span> {
+</span></span><span class="line"><span class="cl"><span class="n">      test</span>     <span class="o">=</span> <span class="s2">&#34;StringEquals&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">      variable</span> <span class="o">=</span> <span class="s2">&#34;token.actions.githubusercontent.com:aud&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">      values</span>   <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;sts.amazonaws.com&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    }<span class="c1">
+</span></span></span><span class="line"><span class="cl"><span class="c1">
+</span></span></span><span class="line"><span class="cl"><span class="c1">    # prod 는 main branch 또는 prod environment 에서만 deploy
+</span></span></span><span class="line"><span class="cl">    <span class="k">condition</span> {
+</span></span><span class="line"><span class="cl"><span class="n">      test</span>     <span class="o">=</span> <span class="s2">&#34;StringLike&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">      variable</span> <span class="o">=</span> <span class="s2">&#34;token.actions.githubusercontent.com:sub&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">      values</span> <span class="o">=</span> <span class="k">flatten</span><span class="p">([</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="k">repo</span> <span class="k">in</span> <span class="k">var</span><span class="p">.</span><span class="k">github_repos</span> <span class="err">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">          <span class="s2">&#34;repo:${var.github_owner}/${repo}:ref:refs/heads/main&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">          <span class="s2">&#34;repo:${var.github_owner}/${repo}:environment:prod&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="p">]</span>
+</span></span><span class="line"><span class="cl">      <span class="p">])</span>
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">  }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p><code>sub</code> 클레임에 <strong>레포·브랜치·환경</strong>이 함께 들어갑니다. 즉 이 역할을 가져가려면 <em>우리 레포 + main 브랜치</em> 이거나 <em>우리 레포 + prod 환경</em> 이어야 합니다. feature 브랜치나 포크에서는 assume 자체가 실패합니다.</p>
+<p><img alt="신뢰 정책 — sub 조건에 레포·브랜치·환경이 함께 걸려 있다" loading="lazy" src="/images/posts/security-oidc-trust-policy.png"></p>
+<p>워크플로 쪽은 이렇게 짧습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">permissions</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">id-token</span><span class="p">:</span><span class="w"> </span><span class="l">write  </span><span class="w"> </span><span class="c"># AWS OIDC</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">contents</span><span class="p">:</span><span class="w"> </span><span class="l">write</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl">- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Configure AWS credentials (OIDC)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">aws-actions/configure-aws-credentials@v4</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">role-to-assume</span><span class="p">:</span><span class="w"> </span><span class="l">arn:aws:iam::&lt;ACCOUNT_ID&gt;:role/drawe-prod-github-deploy-role</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">aws-region</span><span class="p">:</span><span class="w"> </span><span class="l">ap-northeast-2</span><span class="w">
+</span></span></span></code></pre></div><p><code>id-token: write</code> 권한이 없으면 토큰 자체가 발급되지 않습니다. <strong>비밀은 없고, 권한 선언만 있습니다.</strong></p>
+<h2 id="파드--노드-role-공유-대신-irsa">파드 — 노드 Role 공유 대신 IRSA</h2>
+<p>EKS에서 파드에 AWS 권한을 주는 가장 쉬운 방법은 노드 IAM Role에 정책을 붙이는 것입니다. 그런데 그러면 <strong>그 노드 위의 모든 파드가 같은 권한을 갖습니다.</strong> backend가 필요한 S3 권한을 fastapi도, 심지어 관측 에이전트도 갖게 됩니다.</p>
+<p>IRSA는 그 단위를 <strong>ServiceAccount</strong>로 내립니다. 클러스터 자체가 OIDC provider가 되고, 신뢰 조건에 SA 이름을 박습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="k">condition</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  test</span>     <span class="o">=</span> <span class="s2">&#34;StringEquals&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  variable</span> <span class="o">=</span> <span class="s2">&#34;${local.backend_oidc_url}:sub&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  values</span>   <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;system:serviceaccount:${var.project}-${var.env}:backend&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p><code>system:serviceaccount:&lt;네임스페이스&gt;:&lt;SA 이름&gt;</code> — 이 SA를 쓰는 파드만 이 역할을 가져갑니다. 다른 SA를 쓰는 파드는 같은 노드에 있어도 못 씁니다.</p>
+<p><img alt="ServiceAccount의 role-arn 어노테이션 — 여기가 파드와 IAM 역할을 잇는 지점" loading="lazy" src="/images/posts/security-irsa-sa-annotation.png"></p>
+<p>권한도 필요한 것만 붙였습니다. 예를 들어 어드민 화면의 비용 탭이 Cost Explorer를 호출해야 했는데, 이렇게 좁혔습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="k">statement</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  sid</span>       <span class="o">=</span> <span class="s2">&#34;CostExplorerReadOnly&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  effect</span>    <span class="o">=</span> <span class="s2">&#34;Allow&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  actions</span>   <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;ce:GetCostAndUsage&#34;</span><span class="p">]</span><span class="c1">   # GetCostForecast 는 미사용 → 부여 안 함
+</span></span></span><span class="line"><span class="cl"><span class="n">  resources</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span><span class="c1">                    # CE 는 리소스 레벨 권한을 지원하지 않는다
+</span></span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p><code>resources = [&quot;*&quot;]</code>가 마음에 걸려서 좁혀보려 했는데, <strong>Cost Explorer는 리소스 레벨 권한을 지원하지 않습니다.</strong> 서비스가 지원하지 않는 건 IAM으로 못 좁힙니다. 대신 액션 쪽을 실제 호출하는 하나로만 제한하고, 그 사실을 코드 주석에 남겼습니다. 좁힐 수 없는 축이 있으면 <strong>좁힐 수 있는 다른 축을 최대한 좁히는 것</strong>이 차선입니다.</p>
+<h2 id="시크릿--레포-대신-ssm-주입은-eso">시크릿 — 레포 대신 SSM, 주입은 ESO</h2>
+<p>시크릿 18종을 어디에 둘지가 남았습니다. 후보는 셋이었습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>안</th>
+          <th>문제</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>매니페스트에 Secret 직접 작성</td>
+          <td>base64는 암호화가 아니다. 레포에 평문이 남는 것과 같음</td>
+      </tr>
+      <tr>
+          <td>Sealed Secrets</td>
+          <td>암호화는 되지만 <strong>복호화 키를 클러스터가 갖는다</strong> — 그 키의 백업·로테이션을 또 관리해야 함</td>
+      </tr>
+      <tr>
+          <td><strong>SSM Parameter Store + ESO</strong></td>
+          <td>원본은 AWS에, 레포엔 경로만. 채택</td>
+      </tr>
+  </tbody>
+</table>
+<p>External Secrets Operator는 SSM을 읽어 K8s Secret으로 동기화합니다. 매니페스트에는 <strong>&ldquo;어디서 가져올지&quot;만 있고 &ldquo;값&quot;은 없습니다.</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">external-secrets.io/v1beta1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ExternalSecret</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">backend-secrets</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">refreshInterval</span><span class="p">:</span><span class="w"> </span><span class="l">1h</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">secretStoreRef</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">aws-ssm</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterSecretStore</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">drawe-backend-secrets</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">creationPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Owner</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">secretKey</span><span class="p">:</span><span class="w"> </span><span class="l">DB_PASSWORD</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">remoteRef</span><span class="p">:</span><span class="w"> </span>{<span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">/drawe/prod/db-password }</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">secretKey</span><span class="p">:</span><span class="w"> </span><span class="l">JWT_SECRET</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">remoteRef</span><span class="p">:</span><span class="w"> </span>{<span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">/drawe/prod/jwt-secret }</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># ... 총 18종, 전부 SSM 경로만</span><span class="w">
+</span></span></span></code></pre></div><p><code>refreshInterval: 1h</code>이라 SSM 값이 바뀌면 한 시간 안에 K8s Secret이 따라옵니다.</p>
+<p><img alt="실제 클러스터의 ExternalSecret — 값은 없고 SSM 경로만 있고, status는 SecretSynced=True" loading="lazy" src="/images/posts/security-eso-externalsecret.png"></p>
+<p>ESO 자신이 SSM을 읽을 권한도 IRSA로 받는데, 여기도 경로를 좁혔습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="k">statement</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  sid</span>       <span class="o">=</span> <span class="s2">&#34;ReadSSM&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  actions</span>   <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;ssm:GetParameter&#34;, &#34;ssm:GetParameters&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">               <span class="s2">&#34;ssm:GetParametersByPath&#34;, &#34;ssm:DescribeParameters&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">  resources</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;arn:aws:ssm:${region}:${account}:parameter${var.ssm_path_prefix}/*&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">statement</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  sid</span>       <span class="o">=</span> <span class="s2">&#34;DecryptSecureString&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  actions</span>   <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;kms:Decrypt&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">  resources</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="k">condition</span> {
+</span></span><span class="line"><span class="cl"><span class="n">    test</span>     <span class="o">=</span> <span class="s2">&#34;StringEquals&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">    variable</span> <span class="o">=</span> <span class="s2">&#34;kms:ViaService&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">    values</span>   <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;ssm.${var.aws_region}.amazonaws.com&#34;</span><span class="p">]</span><span class="c1">   # SSM 경유일 때만
+</span></span></span><span class="line"><span class="cl">  }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p><code>kms:Decrypt</code>도 리소스를 좁히기 어려운 축이었습니다(SecureString이 쓰는 KMS 키를 미리 특정하기 번거로움). 대신 <code>kms:ViaService</code> 조건으로 <strong>SSM을 경유한 복호화만</strong> 허용했습니다. 이 역할로 다른 경로의 KMS 복호화는 못 합니다. 여기서도 좁힐 수 있는 축을 골라 좁힌 셈입니다.</p>
+<p>결과적으로 <strong>git에도, 매니페스트에도 시크릿 평문이 한 줄도 없습니다.</strong> 실수로 커밋할 경로 자체가 사라집니다.</p>
+<h2 id="이-구조는-ecs-시절에-데인-경험에서-나왔다">이 구조는 ECS 시절에 데인 경험에서 나왔다</h2>
+<p>처음부터 이렇게 설계한 건 아닙니다. ECS를 쓰던 시절, 시크릿 한 줄을 배선하는 &ldquo;5분짜리&rdquo; 작업이 며칠짜리가 된 적이 있습니다.</p>
+<p><code>bria.api-key=${BRIA_API_KEY}</code> — 이 placeholder를 채우려고 Parameter Store에 값을 넣었는데 컨테이너 env가 안 채워졌습니다. 이유는 <strong>진실이 세 곳에 나뉘어 있었기 때문</strong>입니다.</p>
+<ol>
+<li><strong>Parameter Store</strong> — KV 저장소일 뿐, 스스로 주입하지 않습니다</li>
+<li><strong>ECS task definition의 <code>secrets</code> 매핑</strong> — SSM ARN ↔ env 이름 매핑을 따로 명시해야 주입됩니다</li>
+<li><strong>Terraform</strong> — 위 매핑을 콘솔/CLI로 손수 넣었더니, 코드의 진실과 실제가 어긋났습니다</li>
+</ol>
+<p>특히 3번이 오래 남았습니다. 기능은 이미 동작하는데 <code>terraform plan</code>에 diff가 남아 있었거든요. &ldquo;동작하니까 됐지&quot;로 넘길 수도 있었지만, 그 diff는 <strong>다음 apply 때 터질 뇌관</strong>입니다. <code>terraform import</code>로 state를 실제와 맞추고 나서야 끝났습니다.</p>
+<blockquote>
+<p><strong>기능 일치와 state 일치는 다릅니다.</strong> 동작한다는 사실이 IaC가 현실을 알고 있다는 뜻은 아닙니다.</p>
+</blockquote>
+<p>ESO를 고른 건 이 경험 때문입니다. <strong>주입 경로에 사람 손이 들어가는 단계를 없애고 싶었습니다.</strong> ESO 구조에서는 SSM에 값을 넣는 것 하나로 끝나고, 매핑은 매니페스트에 선언돼 git이 관리합니다.</p>
+<h2 id="지뢰--tf_var-없이-plan하면-암호를-갈아엎는다">지뢰 — TF_VAR 없이 plan하면 암호를 갈아엎는다</h2>
+<p>구조를 다 짜고 나서 발견한 문제입니다. 비밀번호를 이렇게 만들고 있었습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;random_password&#34; &#34;db&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  count</span>  <span class="o">=</span><span class="n"> var.db_password</span> <span class="o">==</span> <span class="s2">&#34;&#34;</span> <span class="err">?</span> <span class="m">1</span> <span class="err">:</span> <span class="m">0</span>
+</span></span><span class="line"><span class="cl"><span class="n">  length</span> <span class="o">=</span> <span class="m">32</span>
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">locals</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  db_password</span> <span class="o">=</span><span class="n"> var.db_password !</span><span class="o">=</span> <span class="s2">&#34;&#34;</span> <span class="err">?</span> <span class="k">var</span><span class="p">.</span><span class="k">db_password</span> <span class="err">:</span> <span class="k">random_password</span><span class="p">.</span><span class="k">db</span><span class="p">[</span><span class="m">0</span><span class="p">].</span><span class="k">result</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p>&ldquo;변수가 비어 있으면 자동 생성&rdquo; — 초기 구축엔 편한 패턴입니다. 그런데 운영에 들어간 뒤 <strong><code>TF_VAR_db_password</code>를 export하지 않은 채 <code>terraform plan</code>을 돌리면</strong> 조건이 참이 되어 <code>random_password</code>가 새로 생성되고, &ldquo;SSM 파라미터를 새 암호로 덮겠다&quot;는 diff가 뜹니다.</p>
+<p>그대로 apply하면 두 갈래로 터집니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>대상</th>
+          <th>결과</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DB</td>
+          <td>RDS 마스터 암호와 SSM이 <strong>함께</strong> 로테이션 → 앱이 즉시 접속 불가</td>
+      </tr>
+      <tr>
+          <td>Redis</td>
+          <td>ElastiCache는 <code>ignore_changes=[auth_token]</code>이라 그대로인데 <strong>SSM만 갱신</strong> → split-brain</td>
+      </tr>
+  </tbody>
+</table>
+<p>Redis 쪽이 더 고약합니다. 한쪽만 바뀌니 에러 메시지가 &ldquo;인증 실패&quot;로만 나오고, 원인이 IaC라는 걸 알아채기 어렵습니다.</p>
+<p>해소는 <strong>실제 암호의 소스를 SSM으로 확정</strong>하는 것이었습니다.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_ssm_parameter&#34; &#34;db_password&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  name</span>  <span class="o">=</span> <span class="s2">&#34;/${var.project}/${var.env}/db-password&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  type</span>  <span class="o">=</span> <span class="s2">&#34;SecureString&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  value</span> <span class="o">=</span> <span class="k">local</span><span class="p">.</span><span class="k">db_password</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">  lifecycle { ignore_changes</span> <span class="o">=</span> <span class="p">[</span><span class="k">value</span><span class="p">]</span> }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p><code>ignore_changes = [value]</code>로 Terraform이 값 변경을 무시하게 했습니다. Terraform은 <strong>파라미터가 존재한다는 것</strong>까지만 관리하고, 값의 진실은 SSM에 둡니다. 로테이션이 필요하면 별도 절차(새 값 주입 + 앱 재기동)로 명시적으로 합니다.</p>
+<p>같은 패턴을 외부에서 주입되는 파라미터 전체에 적용했습니다. API 키들은 아예 <code>CHANGE_ME</code>를 초기값으로 두고 <code>ignore_changes</code>를 겁니다 — <strong>&ldquo;자리는 코드가 만들고, 값은 사람이 채운다&rdquo;</strong> 는 계약입니다.</p>
+<blockquote>
+<p>IaC가 관리하는 대상이 &ldquo;리소스의 존재&quot;인지 &ldquo;리소스의 값&quot;인지 구분해야 합니다. 시크릿은 전자만 맡기는 게 안전합니다.</p>
+</blockquote>
+<h2 id="사고-대응-절차가-실제로-동작하는지-확인한-일">사고 대응 절차가 실제로 동작하는지 확인한 일</h2>
+<p>설계가 끝나고 얼마 뒤, GA4 서비스계정 키가 노출된 사건이 있었습니다. 대응 절차가 이렇게 돌았습니다.</p>
+<ol>
+<li>키 재발급</li>
+<li><strong>SSM 값만 교체</strong> — 새 키를 <code>file://</code>로 주입해서 셸 히스토리·터미널에 값이 남지 않게</li>
+<li>ESO force-sync → K8s Secret 갱신</li>
+<li><code>kubectl rollout restart</code> → 파드가 새 값을 읽음</li>
+</ol>
+<p>레포·매니페스트·CI 어디도 건드리지 않았습니다. <strong>시크릿의 원본이 한 곳이면 사고 대응도 한 곳에서 끝납니다.</strong> 만약 매니페스트에 값이 박혀 있었다면 커밋 히스토리 정리까지 따라왔을 겁니다.</p>
+<p>부끄러운 사고지만, 설계해둔 로테이션 경로가 실제 상황에서 동작하는지 확인할 기회이기도 했습니다. <strong>평소에 안 써본 절차는 사고 때 안 돌아갑니다.</strong></p>
+<h2 id="계정과-state를-나눠-폭발-반경을-줄이기">계정과 state를 나눠 폭발 반경을 줄이기</h2>
+<p>권한을 아무리 좁혀도, 사람이 잘못된 환경에 apply하면 소용없습니다. 그래서 경계를 두 층 더 뒀습니다.</p>
+<p><strong>① dev/prod AWS 계정 분리.</strong> IAM 경계와 청구가 계정 수준에서 갈립니다. 실수로 prod를 건드리는 사고를 구조적으로 차단합니다.</p>
+<p><strong>② tfstate 3분할.</strong> 같은 버킷 안에서 key만 나눴습니다.</p>
+<table>
+  <thead>
+      <tr>
+          <th>state</th>
+          <th>담당</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>drawe/prod</code></td>
+          <td>앱 인프라 — VPC·RDS·ALB</td>
+      </tr>
+      <tr>
+          <td><code>eks/prod/cluster</code></td>
+          <td>EKS 클러스터</td>
+      </tr>
+      <tr>
+          <td><code>eks/prod/platform</code></td>
+          <td>ArgoCD·Karpenter·ESO 등 플랫폼</td>
+      </tr>
+  </tbody>
+</table>
+<p>이렇게 나누면 <strong>플랫폼을 고치다 클러스터 state를 건드릴 일이 없습니다.</strong> 나중에 dev 계정을 정리할 때도 플랫폼 → 클러스터 → 앱 순서로 계층별 destroy가 가능해서, 순서 의존을 안전하게 통제할 수 있었습니다.</p>
+<h2 id="언제-이-구조를-쓰고-언제는-과한가">언제 이 구조를 쓰고, 언제는 과한가</h2>
+<p>정직하게 적어둡니다.</p>
+<p><strong>쓸 만한 조건</strong></p>
+<ul>
+<li>CI가 클라우드에 접근하는 경우 — <strong>OIDC는 거의 항상 이득</strong>입니다. 설정 비용이 낮고 키 관리 부담이 통째로 사라집니다</li>
+<li>파드마다 필요한 AWS 리소스가 다를 때 → IRSA. 전부 같은 권한이면 굳이 나눌 실익이 적습니다</li>
+<li>시크릿이 10종을 넘고 환경이 둘 이상일 때 → ESO. 값이 두세 개 고정이면 과합니다</li>
+</ul>
+<p><strong>과한 조건</strong></p>
+<ul>
+<li>서비스 하나에 시크릿 두세 개면 ESO 운영 부담이 이득을 넘습니다. ESO는 그 자체가 클러스터에 상주하는 컴포넌트고, 버전 관리와 장애 대응 대상이 하나 더 느는 겁니다</li>
+<li>계정 분리도 팀이 한 명이고 환경이 하나면 오히려 계정 전환 비용만 늘어납니다</li>
+</ul>
+<h2 id="남은-과제">남은 과제</h2>
+<ul>
+<li><strong>시크릿 로테이션 주기가 없습니다.</strong> 사고가 나면 도는 절차는 검증했지만, 정기 로테이션은 수동이고 주기도 정해두지 않았습니다. <code>refreshInterval</code>이 SSM→K8s 동기화 주기일 뿐 로테이션 주기는 아닙니다</li>
+<li><strong><code>kms:Decrypt</code>의 <code>resources = [&quot;*&quot;]</code></strong> 는 <code>ViaService</code> 조건으로 막았지만, SecureString용 CMK를 따로 두면 리소스까지 좁힐 수 있습니다</li>
+<li>OIDC 신뢰 정책에 과거 분리 레포 시절 조건이 남아 있습니다. 지금은 모노레포라 실제로는 안 쓰이지만, <strong>안 쓰는 조건도 공격 표면</strong>이니 정리 대상입니다</li>
+</ul>
+<h2 id="배운-점">배운 점</h2>
+<ol>
+<li><strong>저장하지 않은 키는 유출되지 않는다.</strong> 로테이션 부담은 키를 잘 관리해서 줄이는 게 아니라, 키를 없애서 없애는 편이 확실하다.</li>
+<li><strong>최소권한은 &ldquo;좁힐 수 있는 축을 찾는 일&quot;이다.</strong> Cost Explorer는 리소스를 못 좁히고 KMS는 키를 특정하기 번거롭다. 한 축이 막히면 다른 축(액션·조건)을 좁힌다 — 못 좁힌다고 포기하는 것과 다르다.</li>
+<li><strong>기능 일치와 state 일치는 다르다.</strong> 동작한다고 IaC가 현실을 아는 건 아니다. 남겨둔 diff는 다음 apply의 뇌관이다.</li>
+<li><strong>IaC에 무엇을 맡길지 구분해야 한다.</strong> 시크릿은 &ldquo;존재&quot;만 코드가 관리하고 &ldquo;값&quot;은 저장소에 둔다. 값까지 맡기면 변수 하나 안 넣은 plan이 운영 암호를 갈아엎는다.</li>
+<li><strong>평소에 안 써본 절차는 사고 때 안 돌아간다.</strong> 로테이션 경로는 설계해두는 것과 실제로 돌려보는 것이 다르다.</li>
+<li><strong>인증과 시크릿은 같은 문제가 아니다.</strong> 인증은 OIDC·IRSA처럼 필요할 때만 권한을 받아 해결하고, 시크릿은 SSM처럼 원본을 한 곳에 두고 배포 시 주입하는 편이 관리와 사고 대응 모두 단순하다.</li>
+</ol>
+
+    </div>
+    <div class="fn-tags-bottom">
+      <a href="http://localhost:1313/tags/aws/">aws</a>
+      <a href="http://localhost:1313/tags/iam/">iam</a>
+      <a href="http://localhost:1313/tags/oidc/">oidc</a>
+      <a href="http://localhost:1313/tags/irsa/">irsa</a>
+      <a href="http://localhost:1313/tags/external-secrets/">external-secrets</a>
+      <a href="http://localhost:1313/tags/eks/">eks</a>
+      <a href="http://localhost:1313/tags/terraform/">terraform</a>
+      <a href="http://localhost:1313/tags/drawe/">drawe</a>
+    </div>
+
+    <footer class="post-footer">
+    </footer>
+<nav class="paginav">
+  <a class="next" href="http://localhost:1313/posts/project-artcoach/">
+    <span class="title">다음 페이지 »</span>
+    <span>artcoach — 검색만 있던 제품에 에이전트를 만들어 넣기까지 (개인 프로젝트)</span>
+  </a>
+</nav>
+
+
+  </div>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">기록 블로그</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '복사';
+
+        function copyingDone() {
+            copybutton.innerHTML = '복사 완료!';
+            setTimeout(() => {
+                copybutton.innerHTML = '복사';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

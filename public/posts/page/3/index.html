@@ -10,7 +10,7 @@
 <meta name="description" content="Posts - 기록 블로그">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/posts/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -162,6 +162,51 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>시작 — VPC 카테고리에 $23.74 AWS 청구서 화면에서 한 줄이 눈에 띄었습니다.
+Amazon Virtual Private Cloud: $23.74
+VPC 리소스 자체(subnet, route table, IGW)는 무료라고 알고 있어서 의문이 생겼습니다. “VPC 자체로 돈이 나가나?”
+답은 VPC 카테고리 아래 묶이는 유료 컴포넌트들 — Interface VPC Endpoint, Public IPv4 였습니다.
+비용 분해 — Bills 화면 그대로 펼치기 Billing → Bills → 해당 월을 선택하면 서비스 단위로 수량과 단가까지 다 나옵니다. VPC 카테고리만 펼쳐 보니 다음과 같았습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0000 UTC'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to AWS dev 환경 VPC 비용 최적화 — Interface Endpoint를 NAT Instance로 우회한 의사결정" href="http://localhost:1313/posts/aws-vpc-endpoint-nat-cost-optimization/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>진행 사항 dev 환경의 VPC Interface Endpoint 3개를 제거하고 기존 NAT Instance로 outbound를 우회시키는 작업이 별도 글에서 마무리됐습니다. 변경은 정지 윈도우에서 깔끔하게 4개 destroy만 일어났고, 다음 단계는 단순히 dev를 다시 켜는 것이었습니다.
+NAT, Valkey, RDS 차례로 start. NAT을 거친 outbound가 정상인지를 SSH 대신 SSM Session Manager로 검증해 보기로 했습니다 — SSM Agent의 등록 자체가 NAT 경로를 통한 공개 SSM endpoint 도달에 성공해야만 일어나는 일이라, 간접 검증이 되거든요. 콘솔에서 EC2 → Valkey → SSM Session Manager 탭을 열어봤습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-17 00:00:00 +0000 UTC'>May 17, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to NAT은 무죄 — SSM이 연결되지 않던 진짜 이유 (AL2023 minimal AMI 함정)" href="http://localhost:1313/posts/nat-ssm-al2023-minimal-ami/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Git 동작 원리 정리 — commit graph, merge-base, cherry-pick
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>이 글을 쓰게 된 계기 팀 레포의 backend 코드를 GitHub의 Download ZIP으로 받아서 본인 개인 레포에서 한참 변경 작업을 했습니다. 이후 팀 레포의 develop에 변경사항을 합류시키려고 팀 레포를 두 번째 remote(team)로 추가하고 push를 시도했는데, *“git push 한 줄이면 끝”*일 거라 생각한 것과 달리 ! [rejected] non-fast-forward로 거부됐습니다. rebase로 풀어보려다 formatter 적용까지 겹치며 대량 modified 상태가 됐고, git reset --hard origin/develop으로 원래 상태에 복귀한 뒤 graph 관계부터 다시 진단했습니다.
+결정적인 한 줄은 다음이었습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-05-10 00:00:00 +0000 UTC'>May 10, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to Git 동작 원리 정리 — commit graph, merge-base, cherry-pick" href="http://localhost:1313/posts/git-commit-graph-principles/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Flyway Invalid version: 1 디버깅 기록 — 인라인 주석과 보이지 않는 공백 2단 함정
     </h2>
   </header>
@@ -267,44 +312,12 @@ Error: unknown command &#34;sh&#34; for &#34;/bin/alloy&#34; 원인 분석 에�
   <footer class="entry-footer"><span title='2026-05-08 00:00:00 +0000 UTC'>May 8, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to ECS에서 unknown command &#34;sh&#34;가 발생한 이유 — task definition command와 ENTRYPOINT 동작 방식" href="http://localhost:1313/posts/ecs-task-definition-entrypoint-command/"></a>
 </article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">nginx에서 React SPA 라우팅이 깨지는 문제와 해결
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>진행 사항 React SPA를 nginx 기반 Docker 컨테이너로 실행했습니다.
-발생한 문제 Vite dev 서버(npm run dev)로 실행 시에는 로그인 페이지가 정상 렌더링되었으나,
-도커 컨테이너로 띄울 때는 다음과 같은 이상 현상이 발생했습니다.
-로그인하지 않은 상태임에도 보호된 메인 페이지의 일부 UI가 먼저 렌더링되는 현상이 발생했습니다. 문제 재현 및 추가 실험 문제를 더 정확히 이해하기 위해 아래 4가지 케이스로 나누어 테스트했습니다.
-PrivateRoute nginx.conf 결과 ❌ ❌ 흰 화면 ❌ ⭕ 흰 화면 ⭕ ❌ 로그인 페이지는 뜨지만 새로고침 시 404 ⭕ ⭕ 로그인 페이지 로딩 후 새로고침 시에도 정상 → 실험을 통해 nginx 설정과 인증 로직은 서로 다른 문제를 해결하며, 둘 다 필요하다는 것을 확인했습니다.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-04-26 00:00:00 +0000 UTC'>April 26, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to nginx에서 React SPA 라우팅이 깨지는 문제와 해결" href="http://localhost:1313/posts/first-post/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Spring Boot를 도커 컨테이너로 실행 시 민감 정보 외부화
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>진행 사항 Spring Boot를 Docker Compose 환경에서 Docker 컨테이너로 실행했습니다.
-발생한 문제 GitHub에서 프로젝트를 Clone한 뒤 Docker Compose로 실행했을 때 컨테이너가 즉시 종료되는 문제가 발생했습니다.
-application.properties가 포함되지 않은 상태로 컨테이너를 실행하면서 발생한 문제였습니다. application.properties에 민감정보를 다시 하드코딩하면 동작은 하지만, Git에 민감정보가 노출되는 문제가 있었습니다.
-테스트 사항 1. application.properties ❌ → 빌드 성공 / 컨테이너 실행 실패
-2. application.properties ❌ &#43; .env ⭕ → 빌드 성공 / 컨테이너 실행 실패 → .env의 일부 환경변수는 자동 매핑되었지만, 애플리케이션 기동에 필요한 필수 설정값이 모두 제공되지 않아 정상적으로 실행되지 않음
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-04-26 00:00:00 +0000 UTC'>April 26, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to Spring Boot를 도커 컨테이너로 실행 시 민감 정보 외부화" href="http://localhost:1313/posts/spring-boot-docker-env-config/"></a>
-</article>
 <footer class="page-footer">
   <nav class="pagination">
     <a class="prev" href="http://localhost:1313/posts/page/2/">
       «&nbsp;이전 페이지&nbsp;
+    </a>
+    <a class="next" href="http://localhost:1313/posts/page/4/">다음 페이지&nbsp;&nbsp;»
     </a>
   </nav>
 </footer>

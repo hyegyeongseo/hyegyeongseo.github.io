@@ -2,7 +2,6 @@
 title: "60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기"
 date: 2026-07-24
 lastmod: 2026-07-27
-weight: 55
 description: "Kubernetes가 60초 유예를 줬는데 앱은 그 유예를 안 쓰고 있었다. 오진을 두 번 걷어내고, '로그가 찍힌다'가 아니라 '실제로 드레인한다'를 대조 실험으로 증명한 기록."
 tags: ["kubernetes", "graceful-shutdown", "spring-boot", "drawe"]
 categories: ["Troubleshooting"]

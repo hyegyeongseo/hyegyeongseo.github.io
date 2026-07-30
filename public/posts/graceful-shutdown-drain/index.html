@@ -10,7 +10,7 @@
 <meta name="description" content="Kubernetes가 60초 유예를 줬는데 앱은 그 유예를 안 쓰고 있었다. 오진을 두 번 걷어내고, &#39;로그가 찍힌다&#39;가 아니라 &#39;실제로 드레인한다&#39;를 대조 실험으로 증명한 기록.">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/posts/graceful-shutdown-drain/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -79,7 +79,7 @@
     <meta property="article:modified_time" content="2026-07-27T00:00:00+00:00">
     <meta property="article:tag" content="Kubernetes">
     <meta property="article:tag" content="Graceful-Shutdown">
-    <meta property="article:tag" content="Spring Boot">
+    <meta property="article:tag" content="Spring-Boot">
     <meta property="article:tag" content="Drawe">
 
   <meta name="twitter:card" content="summary">
@@ -311,13 +311,13 @@ Dockerfile이 <code>ENTRYPOINT [&quot;java&quot;, &quot;-jar&quot;, ...]</code>(
     <footer class="post-footer">
     </footer>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/posts/hpa-metrics-server-blind-spot/">
+  <a class="prev" href="http://localhost:1313/posts/amp-spanmetrics-cost/">
     <span class="title">« 이전 페이지</span>
-    <span>Healthy인데 왜 죽어 있었을까 — HPA가 12일간 동작하지 않은 이유</span>
-  </a>
-  <a class="next" href="http://localhost:1313/posts/amp-spanmetrics-cost/">
-    <span class="title">다음 페이지 »</span>
     <span>관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/jvm-request-eviction/">
+    <span class="title">다음 페이지 »</span>
+    <span>exit 137인데 OOMKill이 아니었다 — JVM은 limit을 보고, 쿠버네티스는 request를 본다</span>
   </a>
 </nav>
 

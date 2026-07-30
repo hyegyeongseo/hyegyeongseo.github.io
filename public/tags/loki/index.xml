@@ -9,6 +9,13 @@
     <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/loki/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>trace_id는 있었는데 왜 점프가 안 됐을까 — 로그와 트레이스의 상관 계약</title>
+      <link>http://localhost:1313/posts/observability-log-trace-correlation/</link>
+      <pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/observability-log-trace-correlation/</guid>
+      <description>Loki도 Tempo도 정상인데 trace ID로 로그를 못 찾았다. 가설을 세 번 벗겨 로그 패턴에 도달하고, 그다음 print() 157개 앞에서 설정이 무력했던 이야기.</description>
+    </item>
+    <item>
       <title>OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가</title>
       <link>http://localhost:1313/posts/opentelemetry-observability-stack/</link>
       <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>

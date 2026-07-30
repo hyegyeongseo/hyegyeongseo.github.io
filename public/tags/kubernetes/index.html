@@ -10,7 +10,7 @@
 <meta name="description" content="서비스를 만들고(Software Engineering) · 운영 가능하게 만들고(Infra &amp; Observability) · 문제 해결로 증명하는(Troubleshooting) 기록">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/tags/kubernetes/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -159,16 +159,30 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
+    <h2 class="entry-hint-parent">60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기
     </h2>
   </header>
   <div class="entry-content">
-    <p>배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.
-부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.
+    <p>문제 — k8s는 60초를 주는데, 앱이 안 쓰고 있었다 파드를 롤링 재시작하다가, 종료되는 파드가 Completed가 아니라 Error 로 끝나는 걸 봤습니다.
+backend-...-9lqc2 1/1 Terminating 0 3d14h backend-...-9lqc2 0/1 Error 0 3d14h 확인해 보니 같은 클러스터인데 서비스마다 종료 정책이 달랐습니다.
+서비스 설정 SIGTERM 수신 시 fastapi-guide graceful timeout 설정됨 진행 중 요청 마무리 후 종료 backend server.shutdown 미설정 → Spring 기본 immediate 기다리지 않고 커넥터 종료 Kubernetes는 terminationGracePeriodSeconds: 60으로 종료 유예를 주고 있었지만, backend는 Spring Boot 기본 종료 모드(immediate)를 쓰고 있어 그 시간을 활용하지 못하는 구조였습니다.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나" href="http://localhost:1313/posts/gitops-argocd-drift/"></a>
+  <footer class="entry-footer"><span title='2026-07-24 00:00:00 +0000 UTC'>July 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to 60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기" href="http://localhost:1313/posts/graceful-shutdown-drain/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">exit 137인데 OOMKill이 아니었다 — JVM은 limit을 보고, 쿠버네티스는 request를 본다
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>문제 — 파드 하나가 Evicted 되어 있었다 ArgoCD를 열었더니 Degraded 1이 떠 있었습니다. 파드 하나가 Evicted 상태였습니다.
+STATE ContainerStatusUnknown CONTAINER exited with exit code 137 HEALTH The node was low on resource: memory. Threshold quantity: 100Mi, available: 97296Ki. Container backend was using 1227368Ki, request is 1Gi, has larger consumption of memory. ...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-07-22 00:00:00 +0000 UTC'>July 22, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to exit 137인데 OOMKill이 아니었다 — JVM은 limit을 보고, 쿠버네티스는 request를 본다" href="http://localhost:1313/posts/jvm-request-eviction/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
@@ -188,21 +202,6 @@ $ kubectl get hpa -A NAME TARGETS AGE backend cpu:&lt;unknown&gt;/70% 12d fastap
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>문제 — k8s는 60초를 주는데, 앱이 안 쓰고 있었다 파드를 롤링 재시작하다가, 종료되는 파드가 Completed가 아니라 Error 로 끝나는 걸 봤습니다.
-backend-...-9lqc2 1/1 Terminating 0 3d14h backend-...-9lqc2 0/1 Error 0 3d14h 확인해 보니 같은 클러스터인데 서비스마다 종료 정책이 달랐습니다.
-서비스 설정 SIGTERM 수신 시 fastapi-guide graceful timeout 설정됨 진행 중 요청 마무리 후 종료 backend server.shutdown 미설정 → Spring 기본 immediate 기다리지 않고 커넥터 종료 Kubernetes는 terminationGracePeriodSeconds: 60으로 종료 유예를 주고 있었지만, backend는 Spring Boot 기본 종료 모드(immediate)를 쓰고 있어 그 시간을 활용하지 못하는 구조였습니다.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-07-24 00:00:00 +0000 UTC'>July 24, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
-  <a class="entry-link" aria-label="post link to 60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기" href="http://localhost:1313/posts/graceful-shutdown-drain/"></a>
-</article>
-
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
     <h2 class="entry-hint-parent">설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다
     </h2>
   </header>
@@ -215,6 +214,20 @@ RDS는 available DB 쪽 보안그룹 인바운드도 새 보안그룹 ID를 허�
   </div>
   <footer class="entry-footer"><span title='2026-06-23 00:00:00 +0000 UTC'>June 23, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
   <a class="entry-link" aria-label="post link to 설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다" href="http://localhost:1313/posts/sgp-branch-eni-timing/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>배경 — 배포 상태의 단일 출처가 git이 아니라 AWS에 있었다 ECS 시절에도 배포는 버전 관리됐습니다. GitHub Actions가 JAR을 빌드해 ECR에 :커밋SHA 태그로 푸시하고, 현재 task definition을 읽어 이미지만 바꾼 새 리비전을 등록한 뒤(register-task-definition) 서비스를 갱신하고(update-service) 안정화를 기다렸습니다. 이미지가 커밋 SHA로 고정되니 이전 리비전으로 되돌리는 롤백도 가능했습니다.
+부족했던 건 이력이 아니라 운영 상태의 기준점이었습니다. 눈여겨볼 부분은, 새 task definition의 원본을 git이 아니라 AWS의 ‘현재 살아있는 task definition’ 에서 읽어 왔다는 점입니다(describe-task-definition → 이미지만 교체 → 재등록). 즉 배포 명세(desired state)의 출처가 git이 아니라 AWS였습니다. git은 애플리케이션 코드와 Dockerfile은 담았지만, 지금 무엇이 어떻게 떠 있는가를 선언하거나 보장하지는 않았습니다. 콘솔에서 수동 변경이 생겨도 git과 다시 맞춰지지 않았고, 실제 운영 상태를 확인하려면 git보다 AWS를 먼저 봐야 했습니다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-06-20 00:00:00 +0000 UTC'>June 20, 2026</span>&nbsp;·&nbsp;<span>hyegyeongseo</span></footer>
+  <a class="entry-link" aria-label="post link to GitOps로 배포 상태를 코드화하다 — 왜 ArgoCD였고, 드리프트를 어떻게 막았나" href="http://localhost:1313/posts/gitops-argocd-drift/"></a>
 </article>
     </main>
     

@@ -6,11 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
 <title>관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기 | 기록 블로그</title>
-<meta name="keywords" content="observability, amp, prometheus, opentelemetry, cost, sre, drawe">
+<meta name="keywords" content="observability, amp, prometheus, opentelemetry, cost, drawe">
 <meta name="description" content="관리형 Prometheus(AMP) 비용이 EKS 컨트롤 플레인보다 커졌다. &#39;node-exporter겠지&#39;라는 가설을 실측이 뒤집고 spanmetrics(43%)를 범인으로 지목하기까지 — 그리고 검증 도구가 나를 속인 3시간.">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/posts/amp-spanmetrics-cost/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -82,7 +82,7 @@
     <meta property="article:tag" content="Prometheus">
     <meta property="article:tag" content="Opentelemetry">
     <meta property="article:tag" content="Cost">
-    <meta property="article:tag" content="Sre">
+    <meta property="article:tag" content="Drawe">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기">
@@ -117,7 +117,7 @@
   "name": "관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기",
   "description": "관리형 Prometheus(AMP) 비용이 EKS 컨트롤 플레인보다 커졌다. 'node-exporter겠지'라는 가설을 실측이 뒤집고 spanmetrics(43%)를 범인으로 지목하기까지 — 그리고 검증 도구가 나를 속인 3시간.",
   "keywords": [
-    "observability", "amp", "prometheus", "opentelemetry", "cost", "sre", "drawe"
+    "observability", "amp", "prometheus", "opentelemetry", "cost", "drawe"
   ],
   "articleBody": "문제 — 관측을 켰더니 비용이 컨트롤 플레인을 넘었다 prod 비용을 실측했더니 관리형 Prometheus(AMP)가 EKS 컨트롤 플레인보다 컸습니다. AMP는 수집 샘플 수로 과금되는데, 수집 설정(config.alloy)에는 메트릭 필터가 하나도 없었습니다. 수집되는 모든 시계열이 그대로 AMP로 remote_write되고 있었던 거죠.\n관측성을 늘리는 건 좋은데, “무엇을 얼마나 보내는지\"를 안 보고 늘리면 비용이 조용히 새 나갑니다.\n가설 — “node-exporter가 주범이겠지” 처음 심증은 node-exporter였습니다. node-exporter는 노드당 1,000개가 넘는 시계열을 기본으로 내보내는데, 대시보드·알림이 쓰는 건 일부뿐이니 그걸 자르면 될 것 같았습니다. 그럴듯한 가설이었습니다.\n실측이 가설을 뒤집다 Grafana Explore로 AMP를 직접 재봤더니 가설이 깨졌습니다.\n전체 시계열: 20,653 job 별: backend 10,372 (50%) infra-daemon 8,873 (43%) ← node-exporter + kube-state-metrics fastapi-* 1,406 (7%) 지표별 최대: traces_spanmetrics_duration_..._bucket 7,188 ← 단일 최대(35%) (+ calls_total·sum·count 합쳐 spanmetrics 계열 ~8,985 = 43%) 실제 최대는 spanmetrics 계열(43%) 이었습니다. node/kube를 자잘하게 필터해봐야 얻는 게 크지 않다는 뜻이죠. 원인은 명확했습니다 — spanmetrics 커넥터가 모든 스팬에서 오퍼레이션을 만들고 있었습니다. 트레이스 한 건이 100+ 스팬이고 대부분이 DB 쿼리와 내부 함수 스팬인데, 그 전부가 오퍼레이션 카디널리티로 폭증하고 있었습니다.\n측정 없이 필터를 만들면 엉뚱한 걸 자른다. “주범\"은 심증이 아니라 실측으로 정해야 했습니다.\n무엇을 남길지 — “버릴 목록\"이 아니라 “쓰이는 목록” 필터의 핵심은 버릴 목록이 아니라 쓰이는 목록입니다. 빠뜨리고 버리면 대시보드·알림이 조용히 깨지니까요. 그래서 실제로 쓰이는 지표를 세 곳에서 전수 수집했습니다 — 대시보드의 모든 쿼리, 알림 룰의 모든 표현식, 수집 설정의 파생 메트릭.\n대조해 보니 함정이 있었습니다. 대시보드에는 없고 알림 룰에서만 쓰는 지표 3종이 있었는데(node_boot_time_seconds·kube_node_created·kube_node_info), 대시보드만 봤다면 놓쳐서 “노드 재부팅” “kube-state-metrics 다운” 알림이 조용히 깨질 뻔했습니다. 특히 kube_node_info는 absent() 룰이 쓰기 때문에, 필터해 버리면 알림이 상시 오발화합니다.\n검증 도구가 나를 속였다 — 3시간의 함정 prod에 넣기 전 로컬에서 검증하려 했는데, 여기서 세 시간을 헤맸습니다.\n함정 ① 관측 도구가 같은 이름의 메트릭을 만든다. 필터를 켜도 로컬에서 traces_spanmetrics_calls_total에 필터돼야 할 스팬이 그대로 보였습니다. “필터가 안 먹네” 싶었죠. 원인은 로컬 관측 스택의 Tempo가 동일한 이름의 메트릭을 (필터 안 거친) 전체 트레이스에서 자체 생성하고 있었던 것. 내가 그 오염된 메트릭을 측정하고 있었습니다. (prod의 self-host Tempo에는 그 생성기가 없어 충돌이 없습니다 — 로컬 전용 함정.)\n함정 ② error_mode=ignore가 잘못된 표현식을 조용히 삼킨다. 필터 표현식(OTTL)이 문법은 통과하는데 실제로는 아무것도 안 거르거나, 다른 형태로는 전부 드롭하거나 — 측정 오염과 겹쳐 판단이 계속 흔들렸습니다.\n진실은 프로세서 자신의 카운터에 있었다. 관측 대상이 아니라 필터 프로세서 자신의 내부 카운터를 보자 명확해졌습니다.\notelcol_receiver_accepted_spans_total 75 (수신) otelcol_processor_filter_spans_filtered_total 52 ← 필터가 non-SERVER 52개 드롭 otelcol_exporter_sent_spans_total 75 ← 트레이스는 그대로 (손실 없음) 필터가 정상 동작하고 있었고, 나를 속인 건 내가 보던 측정 대상이었습니다.\n해결 네 가지를 함께 적용했습니다.\nspanmetrics 입력에 SERVER-only 필터 — DB(CLIENT)·내부(INTERNAL) 스팬 제거. RED 지표는 SERVER 스팬만으로 성립하고, 오히려 요청 p95 정확도가 올라갑니다. 트레이스 자체는 무영향(Tempo 보존). 히스토그램 버킷 상한 10s → 90s — 이건 절감이 아니라 버그 수정이었습니다. 실측 70초대 요청이 기존 상한을 초과해 +Inf로만 잡혀 p95가 부정확했거든요. node/kube keep 필터 — 위 전수 대조로 확인한 “쓰이는 목록\"만 유지. scrape 간격 30s → 60s — 샘플 절반. 최단 rate 창이 [5m]이라 안전. 리뷰도 한 끗을 잡았습니다. node keep 정규식이 node_load1을 누락하고 있었는데(패밀리 뒤 언더스코어를 요구했지만 load 지표는 숫자가 직결됨), 걸러졌다면 Load 패널이 조용히 깨질 뻔했습니다. 머지 전에 막았죠.\n배포가 ‘적용’이 아니었다 머지 후 ArgoCD가 새 설정을 ConfigMap에 동기화했는데, 수집기 파드는 옛 설정으로 계속 돌고 있었습니다(파드 나이 6시간+). ConfigMap 이름이 고정이라 내용이 바뀌어도 DaemonSet 스펙이 변하지 않아 자동 롤링이 안 걸린 것. 수동으로 롤아웃 재시작해 적용한 뒤, 재발 방지로 해당 ConfigMap만 이름 해시를 켜서 설정이 바뀌면 자동 롤링되게 고쳤습니다.\nGitOps로 동기화됐다 ≠ 파드에 적용됐다. 선언된 상태와 실제 구동 상태 사이의 틈은 플랫폼 전환 이후 반복해서 나타난 단골 함정입니다.\n결과 재시작 후 prod AMP를 직접 조회해 검증했습니다. 전체 시계열이 20,653 → 4,204로 줄었고(구조적 감소 + 당시 저트래픽), spanmetrics는 SERVER-only로 축소, node/kube 사용 지표는 전부 생존(kube_node_info·node_load1 포함), 대시보드 No-data는 0이었습니다.\n배운 점 측정이 가설을 이긴다. “node-exporter가 주범\"은 그럴듯했지만 실측은 spanmetrics(43%)를 가리켰다. 무엇이 큰지 모르면 엉뚱한 걸 자른다. 버릴 것을 고르지 말고 쓰이는 것을 모아라. 대시보드·룰 전수 대조. 룰에서만 쓰는 지표를 놓치면 알림이 조용히 깨진다. 관측 도구가 관측을 오염시킬 수 있다. 신뢰할 진실은 프로세서 자신의 카운터에 있었다. 로컬 ≠ prod. 문법 통과 ≠ 동작. error_mode=ignore는 잘못된 표현식을 조용히 무시한다. 실제로 거르는지 확인해야 한다. 동기화 ≠ 적용. 이름 고정 ConfigMap은 자동 롤링을 막는다. ",
   "wordCount" : "656",
@@ -307,20 +307,19 @@
       <a href="http://localhost:1313/tags/prometheus/">prometheus</a>
       <a href="http://localhost:1313/tags/opentelemetry/">opentelemetry</a>
       <a href="http://localhost:1313/tags/cost/">cost</a>
-      <a href="http://localhost:1313/tags/sre/">sre</a>
       <a href="http://localhost:1313/tags/drawe/">drawe</a>
     </div>
 
     <footer class="post-footer">
     </footer>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/posts/graceful-shutdown-drain/">
+  <a class="prev" href="http://localhost:1313/posts/project-server-job-history/">
     <span class="title">« 이전 페이지</span>
-    <span>60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기</span>
+    <span>server-job-history — 관리형이 가려주던 것을 직접 세워보기 (개인 프로젝트)</span>
   </a>
-  <a class="next" href="http://localhost:1313/posts/sgp-branch-eni-timing/">
+  <a class="next" href="http://localhost:1313/posts/graceful-shutdown-drain/">
     <span class="title">다음 페이지 »</span>
-    <span>설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다</span>
+    <span>60초를 줬는데 왜 5ms 만에 종료됐을까 — Graceful Shutdown의 실제 경계 찾기</span>
   </a>
 </nav>
 

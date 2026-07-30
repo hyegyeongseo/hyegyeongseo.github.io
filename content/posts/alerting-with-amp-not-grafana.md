@@ -2,7 +2,6 @@
 title: "OpenTelemetry 기반 관측성 설계 ③ — 왜 Grafana가 아니라 AMP가 알림을 책임졌나"
 date: 2026-06-25
 lastmod: 2026-07-27
-weight: 46
 series: "관측성 설계"
 series_order: 3
 series_title: "왜 Grafana가 아니라 AMP가 알림을 책임졌나"

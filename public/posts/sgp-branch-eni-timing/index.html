@@ -6,11 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
 <title>설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다 | 기록 블로그</title>
-<meta name="keywords" content="kubernetes, eks, security-group, networking, sre">
+<meta name="keywords" content="kubernetes, eks, security-group, networking">
 <meta name="description" content="EKS 재기동 후 DB 타임아웃. RDS도 정상이고 보안그룹 인바운드도 새 ID를 허용하는데 연결이 안 됐다. &#39;설정 값&#39;과 &#39;데이터플레인 반영&#39;을 구분하게 된 사례.">
 <meta name="author" content="hyegyeongseo">
 <link rel="canonical" href="http://localhost:1313/posts/sgp-branch-eni-timing/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.82d8b58045ff9ba55da07af1fda59c6ff408ccc41d6af46fe1dfada0d94adad0.css" integrity="sha256-gti1gEX/m6VdoHrx/aWcb/QIzMQdavRv4d&#43;toNlK2tA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.0a434dbf8a5a5f5232ab40c3730e2088c6510d23d0575ba63a6351c326d8e8d9.css" integrity="sha256-CkNNv4paX1Iyq0DDcw4giMZRDSPQV1umOmNRwybY6Nk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -81,7 +81,6 @@
     <meta property="article:tag" content="Eks">
     <meta property="article:tag" content="Security-Group">
     <meta property="article:tag" content="Networking">
-    <meta property="article:tag" content="Sre">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다">
@@ -116,7 +115,7 @@
   "name": "설정은 맞는데 왜 안 될까 — SecurityGroupPolicy는 파드 생성 시점에만 적용된다",
   "description": "EKS 재기동 후 DB 타임아웃. RDS도 정상이고 보안그룹 인바운드도 새 ID를 허용하는데 연결이 안 됐다. '설정 값'과 '데이터플레인 반영'을 구분하게 된 사례.",
   "keywords": [
-    "kubernetes", "eks", "security-group", "networking", "sre"
+    "kubernetes", "eks", "security-group", "networking"
   ],
   "articleBody": "문제 — 다 맞는데 DB에 못 붙는다 prod EKS를 재기동한 뒤 backend가 ArgoCD에서 Degraded로 뜨고 CrashLoop에 빠졌습니다. 로그는 DB Connect timed out.\n그런데 확인해 보면 전부 정상이었습니다.\nRDS는 available DB 쪽 보안그룹 인바운드도 새 보안그룹 ID를 허용하도록 갱신 완료 재기동으로 클러스터가 재생성되면서 파드용 SG ID가 바뀐 것도 인지하고, 오버레이를 갱신해 커밋까지 해둔 상태 “설정은 다 맞는데 안 되는” 상황이었습니다.\n조사 — 설정이 아니라 ‘반영’을 봤다 RDS 상태 → 보안그룹 인바운드 규칙 → 파드 쪽 네트워크 순으로 좁혀 갔습니다. 앞의 둘이 멀쩡하니 남는 건 선언한 설정이 실제 네트워크에 반영됐는가였죠.\n그래서 파드의 ENI 부착 상태를 봤더니 — 파드에 branch ENI가 붙어 있지 않았습니다.\nEKS에서 파드에 보안그룹을 부여하는 SecurityGroupPolicy는 파드 전용 ENI(branch ENI)를 붙여 동작하는데, 그게 없다는 건 파드가 새 보안그룹을 달지 못한 채 떠 있다는 뜻입니다. DB의 인바운드 규칙 입장에서 이 파드는 “허용 대상이 아닌 출발지\"였던 거죠.\n원인 — 적용 시점 의미론 핵심은 이것이었습니다.\nSecurityGroupPolicy는 파드 생성 시점에만 적용되고, 이미 떠 있는 파드에 소급되지 않는다.\n재기동 순서상 SGP(새 SG를 가리키는)가 반영되기 전에 파드가 먼저 떠버렸고, 그 파드는 옛 상태로 기동을 마친 겁니다. 그 뒤에 SGP를 아무리 고쳐도 이미 뜬 파드는 바뀌지 않습니다.\n이건 쿠버네티스 리소스가 두 부류로 나뉜다는 걸 보여줍니다.\n유형 예 성격 지속 수렴 Deployment·Service 선언을 바꾸면 컨트롤러가 계속 맞춰 감 생성 시 1회 적용 SecurityGroupPolicy 파드가 뜰 때만 반영, 이후 소급 없음 디버깅 방향이 갈리는 지점이 여기입니다. 앞쪽이면 “왜 수렴을 안 하지?“를 보고, 뒤쪽이면 “언제 만들어졌지?” 를 봐야 합니다.\n해결 파드를 강제로 재생성했습니다(rollout restart). 생성 시점에 SGP가 적용되면서 branch ENI에 새 보안그룹이 붙었고, 그 즉시 DB 연결이 뚫려 Flyway가 Schema is up to date를 찍고 API가 200으로 돌아왔습니다.\n고친 뒤에는 재기동 런북에 “보안그룹 ID 갱신 후 파드 재생성” 단계를 명시했습니다. 같은 함정을 기억이 아니라 절차로 막으려고요.\n곁가지 — SGP를 어디에 붙일지도 설계다 이 일을 계기로 “어떤 파드에 DB 보안그룹을 붙일 것인가\"를 다시 정리했습니다. 기준은 단순합니다 — 실제로 그 데이터스토어를 쓰는 파드에만.\n붙임: DB를 직접 쓰는 서비스들(대시보드 상태를 DB에 저장하는 것까지 포함) 의도적 제외: DB를 안 쓰고 외부 벡터 저장소만 호출하는 서비스 “어떤 파드가 무슨 데이터스토어를 쓰는가\"가 곧 최소권한의 경계였습니다.\n배운 점 리소스의 적용 시점 의미론을 알아야 디버깅 방향이 정해진다. “지속 수렴\"인지 “생성 시 1회\"인지에 따라 봐야 할 곳이 완전히 달라진다. “설정은 맞는데 안 된다\"면 설정 값이 아니라 데이터플레인 반영을 봐라. 선언(YAML)과 실제(ENI·규칙)는 다를 수 있다. 재기동은 배포와 다른 장애 프로파일을 가진다. 배포는 리소스가 그대로인 채 파드만 바뀌지만, 재기동은 식별자 자체가 바뀐다 — 그래서 런북이 필요하다. ",
   "wordCount" : "385",
@@ -302,19 +301,18 @@
       <a href="http://localhost:1313/tags/eks/">eks</a>
       <a href="http://localhost:1313/tags/security-group/">security-group</a>
       <a href="http://localhost:1313/tags/networking/">networking</a>
-      <a href="http://localhost:1313/tags/sre/">sre</a>
     </div>
 
     <footer class="post-footer">
     </footer>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/posts/amp-spanmetrics-cost/">
+  <a class="prev" href="http://localhost:1313/posts/opentelemetry-observability-stack/">
     <span class="title">« 이전 페이지</span>
-    <span>관측성을 늘렸더니 비용이 늘었다 — AMP 비용 43%를 만든 진짜 원인 찾기</span>
+    <span>OpenTelemetry 기반 관측성 설계 ① — 데이터를 어떻게 모으고 저장했는가</span>
   </a>
-  <a class="next" href="http://localhost:1313/posts/gitops-overlay-bump-race/">
+  <a class="next" href="http://localhost:1313/posts/ecs-to-eks-cutover/">
     <span class="title">다음 페이지 »</span>
-    <span>GitOps에서 git은 데이터베이스다 — 동시 배포 경합과 브랜치 드리프트 막기</span>
+    <span>ECS에서 EKS로 — 관측·시크릿·트래픽 연속성을 유지한 전환</span>
   </a>
 </nav>
 
